@@ -1,16 +1,17 @@
-class HttpException extends Error {
+export class HttpException extends Error {
     status: number;
-    name:string = "unknown";
+    type:string = "unknown";
     message: string;
     errors : any = null;
-    constructor(name:string, message:string, errors:any | null) {
+    constructor(status:number, type:string, message:string, errors:any | null) {
       super(message);
-      this.status = 200;
-      this.name = name;         //Name of the Error
+      this.status = status;
+      this.type = type;         //Name of the Error
       this.message = message;   //Default message
       this.errors = errors;     //Errors in case of validation for example
-
+      console.log("We end creating HttpException !");
+      console.log(this);
     }
 }
    
-export default HttpException;
+//export default HttpException;

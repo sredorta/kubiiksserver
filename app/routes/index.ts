@@ -1,20 +1,18 @@
 //Define all API routes here !!!!
-
+import express from 'express';
 import {Request, Response, NextFunction, Router} from "express";
 import {UserController} from '../controllers/user.controller';
 import { messages } from "../middleware/common";
 import {Middleware} from "../middleware/common";
-
+import {GetUserByIdDTO} from "../models/user";
 
 export class Routes {    
     public userController : UserController = new UserController();   
 
     public routes(app:Router): void {          
 
-      //Common middlewares   
-      app.use(Middleware.cors());     //Enable cors
-      app.use(Middleware.language()); //Parses headers and determines language
-
+  
+      app.use(express.json())
       app.route('/')
         .get((req: Request, res: Response, next: NextFunction) => {            
             res.status(200).send({
@@ -22,8 +20,20 @@ export class Routes {
             });
         });
         
-        app.route('/user')
+        //Get all users
+        app.route('/api/users')
+        .get(this.userController.getUsers);
+
+        //Get user by ID
+        
+        app.route('/api/users')
+        .post(Middleware.validation(GetUserByIdDTO),this.userController.getUserById)
+
+
+        //Create new user
+        app.route('/api/usercreate')
         .get(this.userController.addNewUser);
+
 
         
         // Contact 
