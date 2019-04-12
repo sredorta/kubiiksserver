@@ -3,8 +3,6 @@ import express from 'express';
 import {Request, Response, NextFunction, Router} from "express";
 import {UserController} from '../controllers/user.controller';
 import { messages } from "../middleware/common";
-import {Middleware} from "../middleware/common";
-import {GetUserByIdDTO} from "../models/user";
 
 export class Routes {    
     public userController : UserController = new UserController();   
@@ -25,9 +23,8 @@ export class Routes {
         .get(this.userController.getUsers);
 
         //Get user by ID
-        
         app.route('/api/users')
-        .post(Middleware.validation(GetUserByIdDTO),this.userController.getUserById)
+        .post(this.userController.getUserByIdChecks(),this.userController.getUserById);
 
 
         //Create new user

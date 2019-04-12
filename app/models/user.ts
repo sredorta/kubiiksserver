@@ -1,20 +1,6 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelAttributes } from 'sequelize';
 import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
 import {Account} from './account';
-//import errorMiddleware from '../middleware/error.middleware';
-//import {HttpException} from '../classes/HttpException';
-//import {validate, Contains, IsInt, Length, IsEmail, IsFQDN, IsDate, Min, Max} from "class-validator";
-import { IsNumber, IsEmail } from 'class-validator';
-
-export class GetUserByIdDTO {
-   @IsNumber()
-   public id: number= 0;
-   @IsEmail() 
-   public toto: string = "";
-}
-
-
-export default GetUserByIdDTO;
 
 export class User extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.

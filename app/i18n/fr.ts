@@ -1,7 +1,7 @@
 export const messages = {
     description:"Ça c'est une api",
     validation: (name = 'field') => `Le champ '${name}' est incorrect`,
-    sequelize: (name= 'field') => `Le champ '${name}' n'a pas le bon format pour la base de donnees`,
+    validationSequelize: (name= 'field') => `Le champ '${name}' n'a pas le bon format pour la base de donnees`,
 
     title: 'Implementation simple de i18n avec TypeScript',
     greeting: (name = 'John Doe') => `Bonjour, ${name}.`,

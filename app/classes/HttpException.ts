@@ -40,7 +40,9 @@ export class HttpException extends Error {
 
     private transformSequelizeMessage() {
       let myError :ValidationErrorItem =  this.errors[0];
-      this.message = messages.sequelize(myError.path);
+      if (myError.type == "Validation error") {
+        this.message = messages.validationSequelize(myError.path);
+      }
     }
 }
    
