@@ -1,5 +1,15 @@
 {
     "api" : {
-        "version" : "1.0.0"
+        "version" : "1.0.0",
+        "defaultLanguage": "en"
+    },
+    "db" : {
+        "username": "test2",
+        "password": "Secure=;",
+        "database": "express",
+        "options": {
+          "host": "127.0.0.1",
+          "dialect" : "mariadb"
+        }
     }
 }

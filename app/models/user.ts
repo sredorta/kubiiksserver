@@ -14,8 +14,9 @@ export class User extends Model {
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
 
-    public getAccounts: HasManyGetAssociationsMixin<Account>;
-    public createAccount: HasManyCreateAssociationMixin<Account>;
+    public getAccounts!: HasManyGetAssociationsMixin<Account>;
+    public createAccount!: HasManyCreateAssociationMixin<Account>;
+
 
     public readonly accounts?: Account[];
 
@@ -131,3 +132,8 @@ export class User extends Model {
         addUser().then(function(result) {
             res.send(result);
         })*/
+
+
+
+
+        

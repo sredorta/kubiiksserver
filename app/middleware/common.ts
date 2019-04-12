@@ -5,8 +5,10 @@ import { messages as en} from '../i18n/en';
 
 import * as path from 'path';
 import * as glob  from 'glob';
+import { config } from 'bluebird';
+import AppConfig from '../config/config.json';
 
-export var messages = en; //Set default language and export messages
+export let messages = en; //Set default language and export messages
 
 /*
 export const cors = () => {
@@ -56,10 +58,11 @@ export class Middleware {
             const acceptableLanguages = glob.sync(`${__dirname}/../i18n/*.ts`)
                     .map((file:any) => path.basename(file, '.ts'))
                     .filter((language:string) => language !== 'index');
-            var language = (req.acceptsLanguages(acceptableLanguages) || 'en') as string;
+            let language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
+            console.log("Answering with language : " + language);
             req.language = language; //TODO REMOVE AS NOT NEEDED !!!
             //Override messages so that it uses correct language
-            var acc : any = [];
+            let acc : any = [];
             acc[language] = require(`../i18n/${language}`).messages;
             messages = acc[language];
             next();
