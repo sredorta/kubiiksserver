@@ -1,0 +1,29 @@
+{
+    "development": {
+      "username": "test2",
+      "password": "Secure=;",
+      "database": "express",
+      "options" : {
+        "host": "127.0.0.1",
+        "dialect": "mariadb"
+      }
+    },
+    "test": {
+        "username": "test2",
+        "password": "Secure=;",
+        "database": "express",
+        "options" : {
+          "host": "127.0.0.1",
+          "dialect": "mariadb"
+        }
+    },
+    "production": {
+        "username": "test2",
+        "password": "Secure=;",
+        "database": "express",
+        "options" : {
+          "host": "127.0.0.1",
+          "dialect": "mariadb"
+        }
+    }
+  }
