@@ -92,19 +92,13 @@ export class Middleware {
             response.status(status)
               .send({
                 status:status,
-                message: error.type
+                message: error.message
               })
-              /*            
-            response.status(status)
-              .send({
-                status,
-                message,
-              })*/
           }
     }
 
 
-
+    //Middleware that handles parameter input validation
     public static validation<T>(type: any): express.RequestHandler {
         console.log("Validation middleWare enabled !");
         return function validationMiddleware(req:Request, res:Response, next: NextFunction) {
@@ -114,7 +108,7 @@ export class Middleware {
               if (errors.length > 0) {
                 const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
                 console.log("We got here !!!!!");
-                next(new HttpException(400,"validation", message,errors));
+                next(new HttpException(400, "validation", message, errors));
               } else {
                 next();
               }

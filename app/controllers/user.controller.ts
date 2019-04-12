@@ -19,7 +19,7 @@ export class UserController {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");
-            next(new HttpException(400, error.name, error.message, error.errors));
+            next(new HttpException(400, "sequelize", error.message, error.errors));
         });
     }
     //Get all users
@@ -47,18 +47,6 @@ export class UserController {
             console.log(error);
         });
     }   
-    //Handle validations
-    public static validate(method:string) {
-        switch (method) {
-            case 'getUserById': {
-                console.log("Running validation !!!!!!!!!!!!!!");
-                return function (req:Request, res:Response, next:NextFunction) {
-                    body('id', 'Id must be given').exists();
-                    body('id', 'Id must be an integer').isInt();
-                    next();
-                }
-            }
-        }
-    }
+
 
 }
