@@ -7,7 +7,8 @@
     "test": "test.js",
     "tsc": "tsc",
     "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
-    "prod": "tsc && node ./build/app.js"
+    "prod": "tsc && node ./build/app.js",
+    "kk": "test"
   },
   "author": "",
   "license": "ISC",
