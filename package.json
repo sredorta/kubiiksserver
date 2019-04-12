@@ -1,0 +1,27 @@
+{
+  "name": "kiiserver",
+  "version": "1.0.0",
+  "description": "Server for kubiiks",
+  "main": "index.js",
+  "scripts": {
+    "test": "test.js",
+    "tsc": "tsc",
+    "dev": "ts-node-dev --respawn --transpileOnly ./app/app.ts",
+    "prod": "tsc && node ./build/app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/bluebird": "^3.5.26",
+    "@types/express": "^4.16.1",
+    "@types/node": "^11.13.4",
+    "@types/sequelize": "^4.27.46",
+    "@types/validator": "^10.11.0",
+    "express": "^4.16.4",
+    "mariadb": "^2.0.3",
+    "sequelize": "^5.3.1",
+    "sequelize-cli": "^5.4.0",
+    "ts-node-dev": "^1.0.0-pre.32",
+    "typescript": "^3.4.3"
+  }
+}
