@@ -5,6 +5,9 @@ import {UserController} from '../controllers/user.controller';
 import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
 import { messages } from "../middleware/common";
+import {Setting} from "../models/setting";
+import AppConfig from '../config/config.json';
+
 
 export class Routes {    
   //Call all controllers required here  
@@ -34,13 +37,13 @@ export class Routes {
 
     /////////////////////////////////////////////////////////////////
     // SETTINGS CONTROLLER PART
+    //  This table is mapped from the config.json on the server start
+    //  FE can only read this table to has access to the server config
     ////////////////////////////////////////////////////////////////
       app.route('/api/settings/all')
       .get(this.settingController.getAll);
       app.route('/api/settings/get/key')
       .post(this.settingController.getByKeyChecks(),this.settingController.getByKey);
-      app.route('/api/settings/create')
-      .post(this.settingController.addChecks(),this.settingController.add);
     
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
@@ -53,7 +56,7 @@ export class Routes {
 
 
         app.route('/api/auth/signup')
-        .post(this.authController.signup);
+        .post(this.authController.signupChecks(),this.authController.signup);
 
         //Get user by ID
         app.route('/api/users')

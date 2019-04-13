@@ -20,23 +20,8 @@ class DTOHasValue {
 
 
 export class SettingController {
-    //Add a specific setting
-    public add(req: Request, res: Response, next: NextFunction) {
-        Setting.create({
-            key: req.body.key,
-            value: req.body.value
-        }).then((result)=> {
-            res.json(result);
-        }).catch((error)=> {
-            next(new HttpException(500, "sequelize", error.message, error.errors));
-        });
-    }
-    //ADD CHECKS
-    public addChecks() {
-        return Middleware.validation(DTOHasKey);
-    }
 
- 
+    //Get all settings from the table 
     public getAll(req: Request, res: Response, next: NextFunction) {
         Setting.findAll().then((result)=> {
             res.json(result);

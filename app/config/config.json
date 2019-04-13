@@ -11,5 +11,15 @@
           "host": "127.0.0.1",
           "dialect" : "mariadb"
         }
-    }
+    },
+    "user" : {
+        "firstName" : "include",
+        "lastName" : "include",
+        "email"    : "include"
+    },
+    "settings" : [
+        {"key": "firstName", "value":"include"},
+        {"key": "lastName", "value":"include"},
+        {"key": "email", "value":"include"}
+    ]
 }

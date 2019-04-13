@@ -19,7 +19,9 @@ User.hasMany(Account, {foreignKey: 'userId', as: 'accounts'});
 
 async function startServer() {    
     await sequelize.sync({force:true});
-    await Setting.seed(); //Seed settings
+    await Setting.seed(); //Seed settings from the config.json for FE
+    //We should here read the settings and store them globally
+
     //Start server listenning
     app.listen(PORT, () => {
         console.log('Express server listening on port ' + PORT);

@@ -1,4 +1,6 @@
+import app from "../app";
 import { Sequelize, Model, DataTypes } from 'sequelize';
+import AppConfig from '../config/config.json';
 
 export class Setting extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
@@ -11,6 +13,9 @@ export class Setting extends Model {
     public readonly updatedAt!: Date;
 
 
+    public static data : any[] = [];
+
+    //Does the model definition for SQL
     public static definition(sequelize : Sequelize) {
         return { params :{
                id: {
@@ -27,7 +32,7 @@ export class Setting extends Model {
                     type: new DataTypes.STRING(50),
                     allowNull: false,
                     defaultValue: ""
-                },
+                }
             }, table: {
                 tableName: 'settings',
                 modelName: 'setting',
@@ -35,22 +40,20 @@ export class Setting extends Model {
             }};
         }
 
-    //Seeds the table with all the defaults
+    //Seeds the table with all the defaults copies the data from the config.json to the settings table for the front-end
+    //import AppConfig from '../config/config.json';
+
     public static seed() {
         async function _seed() {
-            console.log("SEED START");
-            await Setting.create({
-                key: "test1",
-                value: "value1"
-            });
-            await Setting.create({
-                key:  "test2",
-                value: "value2"
-            })
+            for(let item of AppConfig.settings) {
+                await Setting.create({
+                    key: item.key,
+                    value: item.value
+                });                
+            }
             console.log("SEED END");
         }
         return _seed();
-
     }
 
 }

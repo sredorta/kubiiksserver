@@ -35,17 +35,18 @@ export class User extends Model {
                 },
                 firstName: {
                     type: new DataTypes.STRING(50),
-                    allowNull: false,
+                    allowNull: true,
                 },
                 lastName: {
                     type: new DataTypes.STRING(50),
-                    allowNull: false,
+                    allowNull: true,
                 },                
                 email: {
                     type: new DataTypes.STRING(128),
-                    allowNull: false,
+                    allowNull: true,
+                    unique: true,
                     validate : {isEmail:true}
-                }
+                },
             }, table: {
                 tableName: 'users',
                 modelName: 'user',
