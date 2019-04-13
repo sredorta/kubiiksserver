@@ -39,11 +39,21 @@ export class HttpException extends Error {
 
     private transformSequelizeMessage() {
       let myError :ValidationErrorItem =  this.errors[0];
-      if (myError.type == "Validation error") {
-        this.message = messages.validationParamsSequelize(myError.path);
-      }
-      if (myError.type == "unique violation") {
-        this.message = messages.validationUniqueSequelize;
+      console.log(myError);
+      switch (myError.type) {
+        case "Validation error": {
+          this.message = messages.validationParamsSequelize(myError.path);
+          break;
+        }
+        case "unique violation": {
+          this.message = messages.validationUniqueSequelize;
+          break;
+        }
+        case "notNull Violation": {
+          this.message = messages.validationNotNullSequelize(myError.path);
+          break;
+        }
+        default:
       }
     }
 }

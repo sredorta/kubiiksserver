@@ -3,12 +3,14 @@ import express from 'express';
 import {Request, Response, NextFunction, Router} from "express";
 import {UserController} from '../controllers/user.controller';
 import {SettingController} from '../controllers/setting.controller';
+import {AuthController} from '../controllers/auth.controller';
 import { messages } from "../middleware/common";
 
 export class Routes {    
   //Call all controllers required here  
   public userController : UserController = new UserController();   
   public settingController : SettingController = new SettingController();
+  public authController : AuthController = new AuthController();
 
 
   public routes(app:Router): void {          
@@ -21,22 +23,6 @@ export class Routes {
             });
     });
 
-/*
-    // Create a new Note
-    app.post('/notes', notes.create);
-
-    // Retrieve all Notes
-    app.get('/notes', notes.findAll);
-
-    // Retrieve a single Note with noteId
-    app.get('/notes/:noteId', notes.findOne);
-
-    // Update a Note with noteId
-    app.put('/notes/:noteId', notes.update);
-
-    // Delete a Note with noteId
-    app.delete('/notes/:noteId', notes.delete);
-*/
 
     //NAMING CONVENTIONS ENDPOINTS
     //  /api/<plural>/all        GET     : getAll (returns all records)
@@ -64,6 +50,10 @@ export class Routes {
         //Get all users
         app.route('/api/users')
         .get(this.userController.getUsers);
+
+
+        app.route('/api/auth/signup')
+        .post(this.authController.signup);
 
         //Get user by ID
         app.route('/api/users')

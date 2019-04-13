@@ -1,10 +1,6 @@
-import {Request, Response, NextFunction, RequestHandler} from 'express'; 
+import {Request, Response, NextFunction} from 'express'; 
 import {Setting} from '../models/setting';
-import check from 'express-validator';
 import {HttpException} from '../classes/HttpException';
-import bodyParser = require('body-parser');
-import { checkServerIdentity } from 'tls';
-import { body } from 'express-validator/check';
 import { Middleware } from '../middleware/common';
 
 

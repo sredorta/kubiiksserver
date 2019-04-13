@@ -29,22 +29,22 @@ export class User extends Model {
     public static definition(sequelize : Sequelize) {
         return { params :{
                id: {
-                type: new DataTypes.INTEGER().UNSIGNED,
-                autoIncrement: true,
-                primaryKey: true,
+                    type: new DataTypes.INTEGER().UNSIGNED,
+                    autoIncrement: true,
+                    primaryKey: true,
                 },
                 firstName: {
-                type: new DataTypes.STRING(128),
-                allowNull: false,
+                    type: new DataTypes.STRING(50),
+                    allowNull: false,
                 },
+                lastName: {
+                    type: new DataTypes.STRING(50),
+                    allowNull: false,
+                },                
                 email: {
                     type: new DataTypes.STRING(128),
                     allowNull: false,
                     validate : {isEmail:true}
-                },
-                preferredName: {
-                type: new DataTypes.STRING(128),
-                allowNull: true
                 }
             }, table: {
                 tableName: 'users',
