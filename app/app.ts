@@ -1,4 +1,5 @@
 import express from 'express';
+import * as bodyParser from 'body-parser';
 import {Router} from 'express';
 import { Routes } from "./routes/index";
 import {Middleware} from "./middleware/common";
@@ -20,6 +21,12 @@ class App {
 
     //Call herea all common to all routes middlewares
     private initializeMiddlewares() {
+        // support application/json type post data
+        this.app.use(bodyParser.json());
+        // support application/x-www-form-urlencoded post data
+        //this.app.use(bodyParser.urlencoded({extended: false}));
+
+      //this.app.use(express.json());        //Use JSON post parameters format 
       this.app.use(Middleware.cors());     //Enable cors
       this.app.use(Middleware.language()); //Parses headers and determines language
     }

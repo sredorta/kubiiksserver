@@ -13,7 +13,6 @@ export class HttpException extends Error {
       this.type = type;
       this.message = message;   //Default message
       this.errors = errors;     //Errors in case of validation for example
-      console.log(this.errors);
       this.patchMessage();
     }
 
@@ -41,7 +40,10 @@ export class HttpException extends Error {
     private transformSequelizeMessage() {
       let myError :ValidationErrorItem =  this.errors[0];
       if (myError.type == "Validation error") {
-        this.message = messages.validationSequelize(myError.path);
+        this.message = messages.validationParamsSequelize(myError.path);
+      }
+      if (myError.type == "unique violation") {
+        this.message = messages.validationUniqueSequelize;
       }
     }
 }

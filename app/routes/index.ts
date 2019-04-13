@@ -2,22 +2,65 @@
 import express from 'express';
 import {Request, Response, NextFunction, Router} from "express";
 import {UserController} from '../controllers/user.controller';
+import {SettingController} from '../controllers/setting.controller';
 import { messages } from "../middleware/common";
 
 export class Routes {    
-    public userController : UserController = new UserController();   
+  //Call all controllers required here  
+  public userController : UserController = new UserController();   
+  public settingController : SettingController = new SettingController();
 
-    public routes(app:Router): void {          
 
-  
-      app.use(express.json())
-      app.route('/')
+  public routes(app:Router): void {          
+
+      
+    app.route('/')
         .get((req: Request, res: Response, next: NextFunction) => {            
             res.status(200).send({
                 message: messages.description
             });
-        });
+    });
+
+/*
+    // Create a new Note
+    app.post('/notes', notes.create);
+
+    // Retrieve all Notes
+    app.get('/notes', notes.findAll);
+
+    // Retrieve a single Note with noteId
+    app.get('/notes/:noteId', notes.findOne);
+
+    // Update a Note with noteId
+    app.put('/notes/:noteId', notes.update);
+
+    // Delete a Note with noteId
+    app.delete('/notes/:noteId', notes.delete);
+*/
+
+    //NAMING CONVENTIONS ENDPOINTS
+    //  /api/<plural>/all        GET     : getAll (returns all records)
+    //  /api/<plural>/get/id     POST    : getOneById (returns found record or null)
+    //  /api/<plural>/get/field  POST    : getOneByField
+    //  /api/<plural>/create     POST    : add  (returns the new record)
+    //  /api/<plural>/delete     DELETE  : remove (by Id)
+
+
+    /////////////////////////////////////////////////////////////////
+    // SETTINGS CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
+      app.route('/api/settings/all')
+      .get(this.settingController.getAll);
+      app.route('/api/settings/get/key')
+      .post(this.settingController.getByKeyChecks(),this.settingController.getByKey);
+      app.route('/api/settings/create')
+      .post(this.settingController.addChecks(),this.settingController.add);
+    
+    /////////////////////////////////////////////////////////////////
+    // USER CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
         
+
         //Get all users
         app.route('/api/users')
         .get(this.userController.getUsers);

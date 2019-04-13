@@ -52,13 +52,6 @@ export class User extends Model {
                 sequelize: sequelize
             }};
         }
-    public static table(sequelize: Sequelize) {
-        return {                
-            tableName: 'users',
-            modelName: 'user',
-            sequelize: sequelize
-        }
-    }    
 
     //Seeds the table with plenty of users
     public static seed() {
