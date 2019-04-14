@@ -12,14 +12,9 @@
           "dialect" : "mariadb"
         }
     },
-    "user" : {
-        "firstName" : "include",
-        "lastName" : "include",
-        "email"    : "include"
-    },
-    "settings" : [
-        {"key": "firstName", "value":"include"},
-        {"key": "lastName", "value":"include"},
-        {"key": "email", "value":"include"}
+    "sharedSettings" : [
+        {"key": "signup_firstName", "value":"include"},
+        {"key": "signup_lastName", "value":"include"},
+        {"key": "signup_email", "value":"include"}
     ]
 }

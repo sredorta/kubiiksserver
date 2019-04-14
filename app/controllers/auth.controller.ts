@@ -4,12 +4,19 @@ import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
 import {User} from '../models/user';
 import AppConfig from '../config/config.json';
+import {messages} from '../middleware/common';
 
 import { IsNumber, IsEmail,IsString, MinLength, MaxLength } from 'class-validator';
+import {IsPassword} from '../classes/ParameterValidationDecorators';
+
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
 class DTOHasFirstName {
     @IsString()
-    @MinLength(2)
+    @MinLength(2, {
+        message: function (){
+            return messages.validationMinLength(messages.firstName,"2")
+        }
+    })
     @MaxLength(50)
     public firstName!: number;
 }
@@ -22,19 +29,30 @@ class DTOHasLastName {
 }
 
 class DTOHasEmail {
+    //@IsUnique(User)
     @IsEmail()
     public email!: string;
 }
 
 class DTOHasPassword {
-    @IsString()
-    @MinLength(8)
-    @MaxLength(50)
+    @IsPassword()
     public password!: string;
 }
 
 
 export class AuthController {
+
+    constructor() {
+        console.log("Just created AuthController");
+        console.log(messages.description);
+    }
+    private _needCheck(key:string, value:string) : boolean {
+        let obj = AppConfig.sharedSettings.find(obj => obj.key == key);
+        if (obj)
+            if (obj.value == value) 
+                return true;
+        return false;
+    }
 
     //User signup
     public signup(req: Request, res: Response, next: NextFunction) {
@@ -44,7 +62,10 @@ export class AuthController {
             email: req.body.email,
         }).then((result)=> {
             res.json(result);
-        }).catch( (error) => {
+        }).error(error => {
+            console.log(error);
+        })
+        .catch( (error) => {
             console.log("We got error !!!");
             next(new HttpException(400, "sequelize", error.message, error.errors));
         });
@@ -54,19 +75,16 @@ export class AuthController {
     public signupChecks() {
         let handlers : RequestHandler[] = [];
         handlers.push(Middleware.validation(DTOHasPassword)); //Allways include password
-        let obj = AppConfig.settings.find(obj => obj.key == "firstName");
-        if (obj)
-            if (obj.value == "include") {
-                console.log("INCLUDING FIRST NAME !!!!");    
-                handlers.push(Middleware.validation(DTOHasFirstName));
-            }
-        //TODO remove user from config.json and update here below !!!    
-        if (AppConfig.user.lastName == "include") {
+        if (this._needCheck("signup_firstName", "include"))
+            handlers.push(Middleware.validation(DTOHasFirstName));
+
+        if (this._needCheck("signup_lastName", "include")) {
             handlers.push(Middleware.validation(DTOHasLastName));
         }
-        if (AppConfig.user.email == "include") {
+        if (this._needCheck("signup_email", "include")) {
             handlers.push(Middleware.validation(DTOHasEmail));
         }
+
         return handlers;
     }
 

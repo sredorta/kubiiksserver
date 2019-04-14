@@ -1,6 +1,14 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelAttributes } from 'sequelize';
 import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
 import {Account} from './account';
+import {Helper} from '../classes/Helper';
+import { HttpException } from '../classes/HttpException';
+import {Response,Request,NextFunction, response} from 'express';
+import app from '../app';
+import { request } from 'http';
+import { IsNumber, IsEmail,IsString, MinLength, MaxLength } from 'class-validator';
+import validator from 'validator';
+import {messages} from '../middleware/common';
 
 export class User extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
@@ -35,6 +43,7 @@ export class User extends Model {
                 },
                 firstName: {
                     type: new DataTypes.STRING(50),
+                    isUUID: 4,
                     allowNull: true,
                 },
                 lastName: {
@@ -44,8 +53,12 @@ export class User extends Model {
                 email: {
                     type: new DataTypes.STRING(128),
                     allowNull: true,
-                    unique: true,
-                    validate : {isEmail:true}
+                    unique: true
+                    /*{
+                        args: true,
+                        msg: 'Oops. Looks like you already have an account with this email address. Please try to login.',
+                        fields: ['email']
+                    }*/
                 },
             }, table: {
                 tableName: 'users',
@@ -54,6 +67,22 @@ export class User extends Model {
             }};
         }
 
+    //Validates the data before adding an element to the database
+    public static validationHook() {
+/*        return function(user: User, options:any) {
+            async function unique()
+            {    
+                let userExists = await User.findOne({
+                    where: {
+                        "email": user.email
+                    }
+                });
+                if (userExists)
+                return Promise.reject(new HttpException(400, "custom", messages.validationUnique(messages.user),null));
+            }
+        return unique();
+        };*/
+    }
     //Seeds the table with plenty of users
     public static seed() {
 
@@ -61,6 +90,7 @@ export class User extends Model {
     }
 
 }
+
 
 
 

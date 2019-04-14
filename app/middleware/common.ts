@@ -3,7 +3,7 @@ import {Response,Request,NextFunction} from 'express';
 //i18n part
 //import { messages as en } from '../i18n/en';
 import { messages as en} from '../i18n/en';
-
+import {UniqueConstraintError} from 'sequelize';
 import * as path from 'path';
 import * as glob  from 'glob';
 import { config } from 'bluebird';
@@ -13,32 +13,6 @@ import { validate, ValidationError } from 'class-validator';
 import {HttpException} from '../classes/HttpException';
 
 export let messages = en; //Set default language and export messages
-
-/*
-export const cors = () => {
-    console.log("CORS ENABLED !");
-    return function (req:express.Request, res:express.Response, next:express.NextFunction) {
-        //Enabling CORS
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
-        next();
-    }
-};
-
-export const language = () => {
-    console.log("LANGUAGE ENABLED !!");
-    return function (req:express.Request, res:express.Response, next:express.NextFunction) {
-        //Languages supported
-        const acceptableLanguages = glob.sync(`${__dirname}/../i18n/*.ts`)
-                .map((file:any) => path.basename(file, '.ts'))
-                .filter((language:string) => language !== 'index');
-        var language = (req.acceptsLanguages(acceptableLanguages) || 'en') as string;
-        req.language = language;
-        next();
-    }    
-}
-*/
 
 
 export class Middleware {
@@ -84,6 +58,7 @@ export class Middleware {
         console.log("errorHandler enabled !!!");
         return function errorMiddleware(error: HttpException, request: Request, response: Response, next: NextFunction) {
             console.log("Running errorHandler !");
+            console.log(error);
             let text = "Error unknown";
             const name = error.name;
             const status : number = error.status || 500;
@@ -115,24 +90,5 @@ export class Middleware {
             });
         };
       }
-/*
-      public static validationMiddleware<T>(type: any): express.RequestHandler {
-        return (req, res, next) => {
-          console.log("Running validation middleware");  
-          validate(plainToClass(type, req.body))
-            .then((errors: ValidationError[]) => {
-              if (errors.length > 0) {
-                const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
-                console.log("We got here !!!!!");
-                next(new HttpException("validation", message,errors));
-              } else {
-                next();
-              }
-            });
-        };
-      }
-*/
-
-
 
 }

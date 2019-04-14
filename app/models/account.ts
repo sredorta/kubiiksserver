@@ -40,27 +40,6 @@ export class Account extends Model {
 
 
     }
-    //Creates an user with the data initialyzed on the user object
-/*    async insert() {
-        return await User.create({firstName:this.firstName, preferredName: this.preferredName});
-    }
-
-    create() {
-        let newUser;
-        async function addUser()
-            {    
-                newUser = await User.create({
-                    name: 'Johnny',
-                    preferredName: 'John',
-                });
-            }
-        addUser();
-      return newUser;*/
-      /*
-        User.create({name:this.name, preferredName:this.preferredName}).then(function(res){
-            return res;
-        })*/
-    //}
 
 
 }

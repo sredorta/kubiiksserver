@@ -5,6 +5,7 @@ import {Account} from './models/account';
 import {Setting} from './models/setting';
 
 import AppConfig from './config/config.json';
+import {Response,Request,NextFunction} from 'express';
 
 
 const PORT = 3000;
@@ -16,12 +17,17 @@ Setting.init(Setting.definition(sequelize).params, Setting.definition(sequelize)
 Account.init(Account.definition(sequelize).params,Account.definition(sequelize).table);
 User.init(User.definition(sequelize).params,User.definition(sequelize).table);
 User.hasMany(Account, {foreignKey: 'userId', as: 'accounts'});
-
+//User.addHook('beforeValidate', User.validationHook());
 async function startServer() {    
     await sequelize.sync({force:true});
-    await Setting.seed(); //Seed settings from the config.json for FE
-    //We should here read the settings and store them globally
+    await Setting.seed(); //Seed settings from the config.json for FE sharing
 
+    app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
+        console.log("STACK ERRO !!!!!");
+        console.error(err.stack);
+        //next(new HttpException(400, "sequelize", "Custom isUnique violation", null));
+        //res.status(500).send('Something broke!');
+      });
     //Start server listenning
     app.listen(PORT, () => {
         console.log('Express server listening on port ' + PORT);

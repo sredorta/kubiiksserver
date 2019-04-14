@@ -5,18 +5,22 @@ import { messages } from '../middleware/common';
 export class HttpException extends Error {
     status: number;
     message: string;
-    type : "validation"|"sequelize"|"general";
+    type : "validation"|"sequelize"|"custom";
     errors : any = null;
-    constructor(status:number, type:"validation"|"sequelize"|"general", message:string, errors:any[] | null) {
+    constructor(status:number, type:"validation"|"sequelize"|"custom", message:string, errors:any[] | null) {
       super(message);
       this.status = status;
       this.type = type;
       this.message = message;   //Default message
       this.errors = errors;     //Errors in case of validation for example
-      this.patchMessage();
+      
+      console.log(this);
+
+//      this.patchMessage();
     }
 
     private patchMessage() {
+      if (this.type != "custom")
       if (this.errors) {
         if (this.errors[0]) {
           switch (this.type) {
@@ -42,6 +46,7 @@ export class HttpException extends Error {
       console.log(myError);
       switch (myError.type) {
         case "Validation error": {
+          
           this.message = messages.validationParamsSequelize(myError.path);
           break;
         }

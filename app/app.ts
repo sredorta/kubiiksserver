@@ -17,21 +17,6 @@ class App {
     }
 
     private config(): void {
-        
- /*       async function _get() {
-            await Setting.create({
-                key: "test1",
-                value: "value1"
-            });
-        }
-        Setting.findOne({
-            where: {
-                "key": "akey"
-            }
-        }).then((result)=> {
-             app.routePrv        
-        }).catch( (error) => {
-        });*/
     }
 
     //Call herea all common to all routes middlewares

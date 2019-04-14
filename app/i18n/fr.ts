@@ -1,5 +1,11 @@
 export const messages = {
     description:"Ça c'est une api",
+    user: 'Utilizateur',
+    firstName: "Prénom",
+    validationMinLength:(name = 'field', value='value') => `Le ${name} doit avoir au moins ${value} characeters`,
+
+    validationUnique: (name = 'field') => `${name} déjà existent dans la base de donnees`,
+
     validation: (name = 'field') => `Le champ '${name}' est incorrect`,
     validationParamsSequelize: (name= 'field') => `Le champ '${name}' n'a pas le bon format pour la base de donnees`,
     validationUniqueSequelize: 'Violation de contrainte unique dans la base de donnees',

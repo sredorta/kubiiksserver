@@ -45,7 +45,7 @@ export class Setting extends Model {
 
     public static seed() {
         async function _seed() {
-            for(let item of AppConfig.settings) {
+            for(let item of AppConfig.sharedSettings) {
                 await Setting.create({
                     key: item.key,
                     value: item.value
