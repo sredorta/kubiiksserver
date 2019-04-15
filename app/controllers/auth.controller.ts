@@ -1,9 +1,8 @@
 import {Request, Response, NextFunction, RequestHandler} from 'express'; 
-import {Setting} from '../models/setting';
 import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
-import {User} from '../models/user';
-import {Account} from '../models/account';
+import nodemailer from 'nodemailer';
+
 import AppConfig from '../config/config.json';
 import {messages} from '../middleware/common';
 
@@ -11,8 +10,10 @@ import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile} from 
 import { Helper } from '../classes/Helper';
 
 import jwt from "jsonwebtoken";
-import { or } from 'sequelize/types';
 
+//Data models
+import {User} from '../models/user';
+import {Account} from '../models/account';
 
 
 
@@ -71,6 +72,28 @@ export class AuthController {
                 }
                 //Validation with email is the default
                 default: {
+                    const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+                    transporter.verify(function(error, success) {
+                        if (error) {
+                             console.log("EMAIL SERVICE FAILED !!!");
+                             console.log(error);
+                        } else {
+                             console.log('Server is ready to take our messages');
+                        }
+                     });
+                     let myEmail = {
+                        from: 'test@ecube-solutions.com',
+                        to: 'sergi.redorta@hotmail.com',
+                        subject: 'Email de test',
+                        text: 'Voila un bon email',
+                        //html: 'HTML version of the message'
+                     }
+                     transporter.sendMail(myEmail).then(result => {
+                         console.log("Email sent !!!");
+                     }).catch(error => {
+                         console.log("error happened");
+                         console.log(error);
+                     })
 
                 }
 

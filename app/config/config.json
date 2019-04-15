@@ -12,13 +12,23 @@
           "dialect" : "mariadb"
         }
     },
+    "emailSmtp" : {
+        "host" : "smtp.hostinger.com",
+        "port": 587,
+        "secure": false,
+        "auth": {
+            "user": "test@ecube-solutions.com",
+            "pass": "Secure=;"
+        }
+
+    },
     "sharedSettings" : [
         {"key": "signup_firstName", "value":"include"},
         {"key": "signup_lastName", "value":"include"},
         {"key": "signup_email", "value":"include"},
         {"key": "signup_phone", "value":"include"},
         {"key": "signup_mobile", "value":"include"},
-        {"key": "signup_validation_method", "value":"no_validation"},
+        {"key": "signup_validation_method", "value":"email"},
         {"key": "mode", "value":"demo"}
     ],
     "auth": {
