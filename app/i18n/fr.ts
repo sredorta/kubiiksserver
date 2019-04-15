@@ -3,8 +3,11 @@ export const messages = {
     user: 'Utilizateur',
     firstName: "Prénom",
     lastName: "Nom de famille",
+    email: "Adresse email",
+    password: "Mot de passe",
     validationMinLength:(name = 'field', value='value') => `Le ${name} doit avoir au moins ${value} characeters`,
-
+    validationMaxLength: (name = 'field', value='value') => `Le ${name} doit avoir moins de  ${value} characteres`,
+    validationPassword: (name = 'field') => `Le ${name} doit avoir au moins une majuscule, une minuscule et un numero et avoir plus de 5 characteres`,
     validationUnique: (name = 'field') => `${name} déjà existent dans la base de donnees`,
 
     validation: (name = 'field') => `Le champ '${name}' est incorrect`,

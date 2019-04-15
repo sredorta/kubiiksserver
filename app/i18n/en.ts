@@ -3,7 +3,12 @@ export const messages = {
     user: 'User',
     firstName: "First name",
     lastName: "Last name",
+    email: "Email",
+    password: "Password",
     validationMinLength: (name = 'field', value='value') => `${name} must have at least ${value} characters`,
+    validationMaxLength: (name = 'field', value='value') => `${name} must have less than ${value} characters`,
+    validationPassword: (name = 'field') => `The ${name} must have lowercases, uppercases, numbers and be more than 5 characters long`,
+
     validationUnique: (name = 'field') => `${name} already exists in the database`,
     validation: (name = 'field') => `Wrong value for for field '${name}'`,
     validationParamsSequelize: (name= 'field') => `Wrong database value for for field '${name}'`,

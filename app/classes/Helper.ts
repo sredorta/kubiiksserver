@@ -4,9 +4,19 @@ import {Response,Request,NextFunction} from 'express';
 import {User} from '../models/user';
 import {Model} from 'sequelize';
 import {validate, ValidationError } from 'class-validator';
+import AppConfig from '../config/config.json';
 
 export class Helper {
-/*
+    
+    public static isValidationCheckRequired(key:string, value:string) : boolean {
+        let obj = AppConfig.sharedSettings.find(obj => obj.key == key);
+        if (obj)
+            if (obj.value == value) 
+                return true;
+        return false;
+    }    
+    
+    /*
     public static validate<T>(objects:T[]) : Promise<boolean> {
 
         console.log("Running Helper.validate");

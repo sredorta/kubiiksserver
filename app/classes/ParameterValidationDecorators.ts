@@ -17,10 +17,10 @@ class PasswordValidator implements ValidatorConstraintInterface {
         //Do the validation
         //TODO improve this password validation check
         var re = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{5,}';
+        //return false;
         if (!value.match(re))
             return false
         return true;
-        //return text.length > validationArguments.constraints[0] && text.length < args.constraints[1];
     }
  
 }

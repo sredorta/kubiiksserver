@@ -11,6 +11,7 @@ import AppConfig from '../config/config.json';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import {HttpException} from '../classes/HttpException';
+import * as ts from "typescript";
 
 export let messages = en; //Set default language and export messages
 
@@ -57,7 +58,12 @@ export class Middleware {
         console.log("errorHandler enabled !!!");
         return function errorMiddleware(error: HttpException, request: Request, response: Response, next: NextFunction) {
             console.log("Running errorHandler !");
-            let send : boolean = false;
+            console.log("//////////////////////////////////////////////");
+            console.log(error);
+            console.log("//////////////////////////////////////////////");
+
+            console.log("Message: " + error.message);
+
             const status : number = error.status || 500;
             let message = error.message || 'Something went wrong';;
             //Override unique violation message
@@ -67,6 +73,15 @@ export class Middleware {
                         if (error.errors[0].type =="unique violation") {
                             const elem = error.errors[0].instance._modelOptions.name.singular;
                             //TODO fix this in case it doesn't exist and remove error
+                            /*let code: string = `({
+                                Run: (messages: any, elem:string): string => {
+                                    return Promise.resolve(messages.validationUnique(messages[elem])); }
+                                })`;
+                            let result = ts.transpile(code);
+                            let runnalbe :any = eval(result);
+                            runnalbe.Run(messages,elem).then((result:string)=>{
+                                message = result
+                            });*/
                             message = messages.validationUnique(messages[elem]);
                         }          
             response.status(status).send({
@@ -85,8 +100,11 @@ export class Middleware {
             .then((errors: ValidationError[]) => {
               if (errors.length > 0) {
                 const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
-                console.log("We got here !!!!!");
-                next(new HttpException(400, "validation", message, errors));
+                console.log("VALIDATION ERROR INTERCEPTOR !!!!");
+                console.log("message: " + message);
+                console.log("errors :")
+                console.log(errors);
+                next(new HttpException(400, message, errors));
               } else {
                 next();
               }

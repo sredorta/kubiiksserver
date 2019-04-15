@@ -6,83 +6,9 @@ import {User} from '../models/user';
 import AppConfig from '../config/config.json';
 import {messages} from '../middleware/common';
 
-import { IsNumber, IsEmail,IsString, MinLength, MaxLength, ValidateIf, validate,ValidatorConstraint } from 'class-validator';
-import {IsPassword} from '../classes/ParameterValidationDecorators';
-import { Helper } from '../classes/Helper';
-
-//DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
-class DTOHasFirstName {
-    @ValidateIf(o=> AuthController.needCheck("signup_firstName", "include"))
-    @IsString()
-    @MinLength(2, {
-        message: function (){
-            return messages.validationMinLength(messages.firstName,"2")
-        }
-    })
-    @MaxLength(50, {
-        message: function() {
-            return "Message trop long bidon";
-        }
-    })
-    public firstName!: string;
-}
-
-class DTOHasLastName {
-    @ValidateIf(o=> AuthController.needCheck("signup_lastName", "include"))
-    @IsString()
-    @MinLength(2, {
-        message: function (){
-            return messages.validationMinLength(messages.lastName,"2")
-        }
-    })
-    @MaxLength(50)
-    public lastName!: string;
-}
-
-class DTOHasEmail {
-    @ValidateIf(o=> AuthController.needCheck("signup_email", "include"))
-    @IsEmail()
-    public email!: string;
-}
-
-class DTOHasPassword {
-    @IsPassword()
-    public password!: string;
-}
+import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword} from '../routes/dto';
 
 
-/*class DTOHasFirstName {
-    @IsString()
-    @MinLength(2, {
-        message: function (){
-            return messages.validationMinLength(messages.firstName,"2")
-        }
-    })
-    @MaxLength(50)
-    public firstName!: number;
-}
-
-class DTOHasLastName {
-    @IsString()
-    @MinLength(2)
-    @MaxLength(50)
-    public lastName!: number;
-}
-
-class DTOHasEmail {
-    @IsUnique(User,"email", {
-        message: function() {
-            return messages.validationUnique(messages.user);
-        }
-    })
-    @IsEmail()
-    public email!: string;
-}
-
-class DTOHasPassword {
-    @IsPassword()
-    public password!: string;
-}*/
 
 
 export class AuthController {
@@ -100,6 +26,7 @@ export class AuthController {
     //User signup
     public signup(req: Request, res: Response, next: NextFunction) {
 
+        console.log("Provided email : "+ req.body.email);
         User.create({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -116,15 +43,15 @@ export class AuthController {
     //ADD CHECKS
     public signupChecks() {
         let handlers : RequestHandler[] = [];
-        handlers.push(Middleware.validation(DTOHasPassword)); //Allways include password
+        handlers.push(Middleware.validation(DTOPassword)); //Allways include password
         if (AuthController.needCheck("signup_firstName", "include"))
-            handlers.push(Middleware.validation(DTOHasFirstName));
+            handlers.push(Middleware.validation(DTOFirstName));
 
         if (AuthController.needCheck("signup_lastName", "include")) {
-            handlers.push(Middleware.validation(DTOHasLastName));
+            handlers.push(Middleware.validation(DTOLastName));
         }
         if (AuthController.needCheck("signup_email", "include")) {
-            handlers.push(Middleware.validation(DTOHasEmail));
+            handlers.push(Middleware.validation(DTOEmail));
         }
         return handlers;
     }

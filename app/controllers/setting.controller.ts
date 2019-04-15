@@ -2,19 +2,28 @@ import {Request, Response, NextFunction} from 'express';
 import {Setting} from '../models/setting';
 import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
+import {messages} from '../middleware/common';
 
 
 import { IsNumber, IsEmail,IsString } from 'class-validator';
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
-class DTOHasKey {
-    @IsString()
-    public key!: number;
+class DTOKey {
+    @IsString({
+        message: function() {
+            return messages.validation("key");
+        }
+    })
+    public key!: string;
 }
 
-class DTOHasValue {
-    @IsString()
-    public value!: number;
-}
+/*class DTOValue {
+    @IsString({
+        message: function() {
+            return messages.validation("value");
+        }
+    })
+    public value!: string;
+}*/
 
 
 export class SettingController {
@@ -43,7 +52,7 @@ export class SettingController {
     }   
     //Get user by ID CHECKS
     public getByKeyChecks() {
-        return Middleware.validation(DTOHasKey);
+        return Middleware.validation(DTOKey);
     }
 
 
