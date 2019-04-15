@@ -1,9 +1,11 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelAttributes } from 'sequelize';
 import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
+import bcrypt from "bcryptjs";
 
 export class Account extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
     public level!: string;
+    public password!: string;
   
     // timestamps!
     public readonly createdAt!: Date;
@@ -11,7 +13,15 @@ export class Account extends Model {
 
 //    public getAccounts: HasManyGetAssociationsMixin<Accounts>;
 
+    //Hashes a password to store in db
+    public static hashPassword(unencrypted:string) : string {
+        return bcrypt.hashSync(unencrypted,8);
+    }
 
+    //Checks matching for unencrypted password against encrypted
+    public checkPassword(unencryptedPassword:string) : boolean {
+        return bcrypt.compareSync(unencryptedPassword, this.password);
+    }
 
     public static definition(sequelize : Sequelize) {
         return { params :{
@@ -24,10 +34,16 @@ export class Account extends Model {
                 type: new DataTypes.INTEGER().UNSIGNED,
                 allowNull: false,
                 },
-            level: {
-                type: new DataTypes.STRING(128),
+            password: {
+                type: new DataTypes.STRING(255),
+                allowNull:false
+            },
+            access: {
+                type: new DataTypes.STRING(50),
                 allowNull: false,
+                defaultValue: "standard"
                 }
+
             }, table: {
                 tableName: 'accounts',
                 modelName: 'account',

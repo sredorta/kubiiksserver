@@ -11,17 +11,17 @@ export class DTOFirstName {
     @IsString()
     @IsNotEmpty({
         message:function() {
-            return messages.validationEmpty(messages.firstName);
+            return messages.validationEmpty("firstName");
         }
     })
     @MinLength(2, {
         message: function (){
-            return messages.validationMinLength(messages.firstName,"2")
+            return messages.validationMinLength("firstName","2")
         }
     })
     @MaxLength(50, {
         message: function() {
-            return messages.validationMaxLength(messages.firstName,"50")
+            return messages.validationMaxLength("firstName","50")
         }
     })
     public firstName!: string;
@@ -31,17 +31,17 @@ export class DTOLastName {
     @IsString()
     @IsNotEmpty({
         message:function() {
-            return messages.validationEmpty(messages.lastName);
+            return messages.validationEmpty("lastName");
         }
     })
     @MinLength(2, {
         message: function (){
-            return messages.validationMinLength(messages.lastName,"2")
+            return messages.validationMinLength("lastName","2")
         }
     })
     @MaxLength(50, {
         message: function() {
-            return messages.validationMaxLength(messages.lastName,"50")
+            return messages.validationMaxLength("lastName","50")
         }
     })
     public lastName!: string;
@@ -50,12 +50,12 @@ export class DTOLastName {
 export class DTOEmail {
     @IsNotEmpty({
         message:function() {
-            return messages.validationEmpty(messages.email);
+            return messages.validationEmpty("email");
         }
     })
     @IsEmail({}, {
         message: function() {
-            return messages.validation(messages.email);
+            return messages.validation("email");
         }
     })
     public email!: string;
@@ -64,12 +64,12 @@ export class DTOEmail {
 export class DTOPassword {
     @IsNotEmpty({
         message:function() {
-            return messages.validationEmpty(messages.password);
+            return messages.validationEmpty("password");
         }
     })
     @IsPassword({
         message:function() {
-            return messages.validationPassword(messages.password);
+            return messages.validationPassword("password");
         }
     })
     public password!: string;
@@ -78,12 +78,12 @@ export class DTOPassword {
 export class DTOPhone {
     @IsNotEmpty({
         message:function() {
-            return messages.validationEmpty(messages.phone);
+            return messages.validationEmpty("phone");
         }
     })
     @IsPhone("fr",{
         message:function() {
-            return messages.validation(messages.phone);
+            return messages.validation("phone");
         }
     })
     public phone!: string;
@@ -92,12 +92,12 @@ export class DTOPhone {
 export class DTOMobile {
     @IsNotEmpty({
         message:function() {
-            return messages.validationEmpty(messages.mobile);
+            return messages.validationEmpty("mobile");
         }
     })
     @IsMobile("fr",{
         message:function() {
-            return messages.validation(messages.mobile);
+            return messages.validation("mobile");
         }
     })
     public mobile!: string;

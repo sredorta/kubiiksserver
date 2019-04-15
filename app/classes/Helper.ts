@@ -8,14 +8,35 @@ import AppConfig from '../config/config.json';
 
 export class Helper {
     
-    public static isValidationCheckRequired(key:string, value:string) : boolean {
+    //Check if sharedSettings key matches a value
+    public static isSharedSettingMatch(key:string, value:string) : boolean {
         let obj = AppConfig.sharedSettings.find(obj => obj.key == key);
         if (obj)
             if (obj.value == value) 
                 return true;
         return false;
-    }    
+    }  
+
+    //Get sharedSettings key if exists
+    public static getSharedSetting(key:string) : string | undefined {
+        let obj = AppConfig.sharedSettings.find(obj => obj.key == key);
+        if (obj)
+            return obj.value;
+        else 
+            return undefined;    
+    }
     
+    
+    
+    public static generateRandomString(length:number) : string {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < length; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
     /*
     public static validate<T>(objects:T[]) : Promise<boolean> {
 

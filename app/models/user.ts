@@ -10,7 +10,6 @@ import { IsNumber, IsEmail,IsString, MinLength, MaxLength } from 'class-validato
 import validator from 'validator';
 import {messages} from '../middleware/common';
 
-
 export interface IUser {
     id?: number;
     firstName?:string;
@@ -42,6 +41,14 @@ export class User extends Model {
         accounts: Association<User, Account>;
     }
 
+
+    //TODO move to Account !!!!!
+    //Checks if the password matches the encrypted one
+    /*public checkPassword(unencryptedPassword:string) {
+        return bcrypt.compareSync(unencryptedPassword, this.checkPassword);
+    }*/
+
+
     public static definition(sequelize : Sequelize) {
         return { params :{
                id: {
@@ -72,13 +79,22 @@ export class User extends Model {
                     type: new DataTypes.STRING(50),
                     allowNull: true,
                     unique:true
-                },                    
+                },
+                isValidated: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull:false,
+                    defaultValue:false
+                },
+                emailValidationKey: {
+                    type: new DataTypes.STRING(30),
+                    allowNull: false,
+                }                
             }, table: {
                 tableName: 'users',
                 modelName: 'user',
                 sequelize: sequelize
             }};
-        }
+    }
 
     //Validates the data before adding an element to the database
     public static validationHook() {

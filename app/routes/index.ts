@@ -55,7 +55,7 @@ export class Routes {
 
 
         app.route('/api/auth/signup')
-        .post(this.authController.signupChecks(),this.authController.signup);
+        .post(AuthController.signupChecks(),AuthController.signup);
 
         //Get user by ID
         app.route('/api/users')
