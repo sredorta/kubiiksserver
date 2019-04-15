@@ -12,6 +12,7 @@ import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import {HttpException} from '../classes/HttpException';
 import * as ts from "typescript";
+import jwt from "jsonwebtoken";
 
 export let messages = en; //Set default language and export messages
 
@@ -121,5 +122,35 @@ export class Middleware {
             });
         };
       }
+
+
+    //Checks if header contains JWT and needs to be called at each route that requires auth
+    public static checkJwt() {
+        return function (req:express.Request, res:express.Response, next:express.NextFunction) {
+            console.log("Running checkJWT middleware");
+            const token = <string>req.headers["authorization"];
+            console.log("Found token : " + token);
+
+            let jwtPayload;
+            if (!token) {
+                next(new HttpException(401, messages.authTokenMissing, null));
+            } else {
+            //Now check if token is valid
+                //Try to validate the token and get data
+                try {
+                    jwtPayload = <any>jwt.verify(token, AppConfig.auth.jwtSecret);
+                    res.locals.jwtPayload = jwtPayload;
+                    console.log("Stored in locals for next request:");
+                    console.log(jwtPayload);
+                } catch (error) {
+                    console.log("An error happened here !!!!!");
+                    //If token is not valid, respond with 401 (unauthorized)
+                    res.status(401).send(messages.authTokenInvalid);
+                    return;
+                }       
+            }     
+            next();
+        }
+    }      
 
 }

@@ -53,7 +53,6 @@ export class AuthController {
             switch (method) {
                 //Login to the admin account if exists or to the standard if admin does not exist
                 case "no_validation": {
-                    console.log("Before JWT creation !!!!!!!!!!!!!!!!!");
                     //Generate short period token and send it to user
                     const token = jwt.sign(
                         { userId: myUser.id, accountId: myAccount.id, accountLevel: myAccount.level }, //Payload !
@@ -63,8 +62,9 @@ export class AuthController {
                     res.send({token: token});  
                     break;
                 }
+                //Requires mobile phone validation
                 case "mobile": {
-
+                    next( new HttpException(500, messages.featureNotAvailable("signup_validation_method : mobile"),null))
                     break;
                 }
                 //Validation with email is the default

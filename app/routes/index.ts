@@ -5,8 +5,7 @@ import {UserController} from '../controllers/user.controller';
 import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
 import { messages } from "../middleware/common";
-import {Setting} from "../models/setting";
-import AppConfig from '../config/config.json';
+import {Middleware} from '../middleware/common';
 
 
 export class Routes {    
@@ -48,18 +47,22 @@ export class Routes {
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
         
+        const router = Router();
 
         //Get all users
-        app.route('/api/users')
-        .get(this.userController.getUsers);
+        //app.route('/api/users')
+        //.get([Middleware.checkJwt],);
+        app.route("/api/users/all")
+        .get(Middleware.checkJwt(),UserController.getAll);
+
+        //Get user by ID
+        app.route('/api/users/get/id')
+        .post(this.userController.getUserByIdChecks(),UserController.getOneById);
 
 
         app.route('/api/auth/signup')
         .post(AuthController.signupChecks(),AuthController.signup);
 
-        //Get user by ID
-        app.route('/api/users')
-        .post(this.userController.getUserByIdChecks(),this.userController.getUserById);
 
 
         //Create new user

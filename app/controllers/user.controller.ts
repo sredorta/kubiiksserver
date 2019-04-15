@@ -34,10 +34,14 @@ export class UserController {
             next(new HttpException(400, error.message, error.errors));
         });
     }
+
+
     //Get all users
-    public getUsers(req: Request, res: Response, next: NextFunction) {
+    static getAll = async(req: Request, res: Response, next: NextFunction) => {
         console.log("Get all users");
-        User.findAll().then((result)=> {
+        User.findAll({
+            attributes: ["id", "firstName", "lastName", "email","phone","mobile"]  
+            }).then((result)=> {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");
@@ -46,9 +50,13 @@ export class UserController {
     }
 
     //Get user by ID
-    public getUserById(req: Request, res: Response, next: NextFunction) {
+    static getOneById = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.body.id;
-        User.findByPk(id).then((result)=> {
+         //Do not include password and others
+        User.findByPk(id,{
+            attributes: ["id", "firstName", "lastName", "email","phone","mobile"]  
+            }
+        ).then((result)=> {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");

@@ -7,9 +7,14 @@ export const messages = {
     validationEmpty: (name = 'field') => `El campo '${name}' no puede estar vacio`,
     validationUnique: (name = 'field') => `${name} ya existente en la base de datos`,
     validation: (name = 'field') => `El campo '${name}' est incorrecto`,
-    //validationParamsSequelize: (name= 'field') => `El campo '${name}' tiene un formato incorrecto para la base de datos`,
-    //validationUniqueSequelize: 'Un campo tiene que ser unico en la base de datos',
-    //validationNotNullSequelize: (name= 'field') => `El campo '${name}' no puede estar vacio`,
+
+    //Other system messages
+    featureNotAvailable: (name = 'field') => `Funcionalidad '${name}' no disponible`,
+
+    //Auth
+    authTokenMissing: 'Autentification necessaria para acceder',
+    authTokenInvalid: 'El token enviado es invalido',
+
 
     title: 'Implementation simple de i18n avec TypeScript',
     greeting: (name = 'John Doe') => `Bonjour, ${name}.`,
