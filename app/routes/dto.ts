@@ -1,14 +1,19 @@
 import {messages} from '../middleware/common';
 import {Helper} from '../classes/Helper';
-import { IsNumber, IsEmail,IsString, MinLength, MaxLength, ValidateIf, validate,ValidatorConstraint } from 'class-validator';
-import {IsPassword} from '../classes/ParameterValidationDecorators';
+import { IsNotEmpty,IsNumber, IsEmail,IsString, MinLength, MaxLength, ValidateIf, validate,ValidatorConstraint } from 'class-validator';
+import {IsPassword, IsPhone, IsMobile} from '../classes/ParameterValidationDecorators';
 
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
 //Each controller can have it's own classes if they are specific to the Controller
 
 export class DTOFirstName {
-    @ValidateIf(o=> Helper.isValidationCheckRequired("signup_firstName", "include"))
+    //@ValidateIf(o=> Helper.isValidationCheckRequired("signup_firstName", "include"))
     @IsString()
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty(messages.firstName);
+        }
+    })
     @MinLength(2, {
         message: function (){
             return messages.validationMinLength(messages.firstName,"2")
@@ -23,8 +28,12 @@ export class DTOFirstName {
 }
 
 export class DTOLastName {
-    @ValidateIf(o=> Helper.isValidationCheckRequired("signup_lastName", "include"))
     @IsString()
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty(messages.lastName);
+        }
+    })
     @MinLength(2, {
         message: function (){
             return messages.validationMinLength(messages.lastName,"2")
@@ -39,7 +48,11 @@ export class DTOLastName {
 }
 
 export class DTOEmail {
-    @ValidateIf(o=> Helper.isValidationCheckRequired("signup_email", "include"))
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty(messages.email);
+        }
+    })
     @IsEmail({}, {
         message: function() {
             return messages.validation(messages.email);
@@ -49,10 +62,43 @@ export class DTOEmail {
 }
 
 export class DTOPassword {
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty(messages.password);
+        }
+    })
     @IsPassword({
         message:function() {
             return messages.validationPassword(messages.password);
         }
     })
     public password!: string;
+}
+
+export class DTOPhone {
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty(messages.phone);
+        }
+    })
+    @IsPhone("fr",{
+        message:function() {
+            return messages.validation(messages.phone);
+        }
+    })
+    public phone!: string;
+}
+
+export class DTOMobile {
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty(messages.mobile);
+        }
+    })
+    @IsMobile("fr",{
+        message:function() {
+            return messages.validation(messages.mobile);
+        }
+    })
+    public mobile!: string;
 }

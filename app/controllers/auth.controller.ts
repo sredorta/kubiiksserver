@@ -6,7 +6,8 @@ import {User} from '../models/user';
 import AppConfig from '../config/config.json';
 import {messages} from '../middleware/common';
 
-import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword} from '../routes/dto';
+import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile} from '../routes/dto';
+import { Helper } from '../classes/Helper';
 
 
 
@@ -14,14 +15,6 @@ import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword} from '../routes/dto';
 export class AuthController {
 
     constructor() {}
-
-    public static needCheck(key:string, value:string) : boolean {
-        let obj = AppConfig.sharedSettings.find(obj => obj.key == key);
-        if (obj)
-            if (obj.value == value) 
-                return true;
-        return false;
-    }
 
     //User signup
     public signup(req: Request, res: Response, next: NextFunction) {
@@ -31,6 +24,8 @@ export class AuthController {
             firstName: req.body.firstName,
             lastName: req.body.lastName,
             email: req.body.email,
+            phone:req.body.phone,
+            mobile:req.body.mobile
         }).then((result)=> {
             res.json(result);
         })
@@ -44,15 +39,16 @@ export class AuthController {
     public signupChecks() {
         let handlers : RequestHandler[] = [];
         handlers.push(Middleware.validation(DTOPassword)); //Allways include password
-        if (AuthController.needCheck("signup_firstName", "include"))
+        if (Helper.isValidationCheckRequired("signup_firstName", "include"))
             handlers.push(Middleware.validation(DTOFirstName));
-
-        if (AuthController.needCheck("signup_lastName", "include")) {
+        if (Helper.isValidationCheckRequired("signup_lastName", "include")) 
             handlers.push(Middleware.validation(DTOLastName));
-        }
-        if (AuthController.needCheck("signup_email", "include")) {
+        if (Helper.isValidationCheckRequired("signup_email", "include")) 
             handlers.push(Middleware.validation(DTOEmail));
-        }
+        if (Helper.isValidationCheckRequired("signup_phone", "include")) 
+            handlers.push(Middleware.validation(DTOPhone));
+        if (Helper.isValidationCheckRequired("signup_mobile", "include")) 
+            handlers.push(Middleware.validation(DTOMobile));
         return handlers;
     }
 

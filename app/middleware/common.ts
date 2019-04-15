@@ -67,28 +67,30 @@ export class Middleware {
             const status : number = error.status || 500;
             let message = error.message || 'Something went wrong';;
             //Override unique violation message
-            if (error.errors)
+
+            async function _generateError() {
+                if (error.errors)
                 if (error.errors[0])
                     if (error.errors[0].type)
                         if (error.errors[0].type =="unique violation") {
                             const elem = error.errors[0].instance._modelOptions.name.singular;
                             //TODO fix this in case it doesn't exist and remove error
-                            /*let code: string = `({
+                            let code: string = `({
                                 Run: (messages: any, elem:string): string => {
                                     return Promise.resolve(messages.validationUnique(messages[elem])); }
                                 })`;
                             let result = ts.transpile(code);
                             let runnalbe :any = eval(result);
-                            runnalbe.Run(messages,elem).then((result:string)=>{
-                                message = result
-                            });*/
-                            message = messages.validationUnique(messages[elem]);
+                            message = await runnalbe.Run(messages,elem);
                         }          
-            response.status(status).send({
-                status:status,
-                message: message
-                });
-          }
+                response.status(status).send({
+                    status:status,
+                    message: message
+                    });
+
+            }
+            _generateError();
+        }
     }
 
 
@@ -99,11 +101,19 @@ export class Middleware {
           validate(plainToClass(type, req.body))
             .then((errors: ValidationError[]) => {
               if (errors.length > 0) {
-                const message = errors.map((error: ValidationError) => Object.values(error.constraints)).join(', ');
-                console.log("VALIDATION ERROR INTERCEPTOR !!!!");
-                console.log("message: " + message);
-                console.log("errors :")
-                console.log(errors);
+                let message : string = "Unknown error";  
+                errors.map((error: ValidationError) => {
+                    //Get priority of isNotEmpty (missing parameter)
+                    if (error.constraints.isNotEmpty)
+                        message = error.constraints["isNotEmpty"];
+                    else {
+                        message = Object.values(error.constraints)[0];
+                    }
+                    console.log("THIS IS THE MESSAGE AFTER TAKING FIRST: " + message);
+                    console.log(error.constraints);
+                    console.log(Object.values(error.constraints)[0])
+                    //Object.values(error.constraints[0])
+                });
                 next(new HttpException(400, message, errors));
               } else {
                 next();

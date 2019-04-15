@@ -15,6 +15,9 @@
     "sharedSettings" : [
         {"key": "signup_firstName", "value":"include"},
         {"key": "signup_lastName", "value":"include"},
-        {"key": "signup_email", "value":"include"}
+        {"key": "signup_email", "value":"include"},
+        {"key": "signup_phone", "value":"include"},
+        {"key": "signup_mobile", "value":"include"}
+
     ]
 }

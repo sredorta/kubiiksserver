@@ -1,9 +1,11 @@
 import {registerDecorator, ValidationArguments, ValidationOptions,ValidatorConstraint, ValidatorConstraintInterface} from "class-validator";
 import { User } from "../models/user";
 import {Model} from "sequelize";
+import {Validator} from "class-validator";
 
+const validator = new Validator();
 ////////////////////////////////////////////////////////////////////////////
-// PASSWORD VALIDATOR : IsPassword()
+// PASSWORD VALIDATOR : IsPassword(params)
 //  description: Validates password quality
 ////////////////////////////////////////////////////////////////////////////
 @ValidatorConstraint()
@@ -37,6 +39,86 @@ export function IsPassword(validationOptions?: ValidationOptions) {
          });
     };
 }
+
+////////////////////////////////////////////////////////////////////////////
+// PHONE VALIDATOR: IsPhone(locale,params)
+//  description: Validates if string is land line phone
+////////////////////////////////////////////////////////////////////////////
+@ValidatorConstraint()
+class PhoneValidator implements ValidatorConstraintInterface {
+    validate(value: string, args: ValidationArguments) {
+        const locale = args.constraints[0];
+        //TODO : Do the corresponding checkings depending on locale
+        //console.log("VALUE: " + value);
+        //console.log("Using locale: " + locale);
+        //console.log(value.length);
+        if (value) {
+            if (value.length!= 10) return false;
+            let re = /^\d+$/;
+            if(!re.test(value)) return false;
+            re =/^0[1-5].*$/;
+            if (!value.match(re))
+            return false;
+        }
+        return true;   
+    }
+ 
+}
+
+export function IsPhone(locale:string, validationOptions?: ValidationOptions) {
+    return function (object: Object, propertyName: string) {
+         registerDecorator({
+             name: "IsPhone",
+             target: object.constructor,
+             propertyName: propertyName,
+             options: validationOptions,
+             constraints: [locale],
+             validator: PhoneValidator
+         });
+    };
+}
+
+////////////////////////////////////////////////////////////////////////////
+// MOBILE VALIDATOR: IsMobile(locale, params)
+//  description: Validates if string is land line phone
+////////////////////////////////////////////////////////////////////////////
+@ValidatorConstraint()
+class MobileValidator implements ValidatorConstraintInterface {
+    validate(value: string, args: ValidationArguments) {
+        const locale = args.constraints[0];
+        console.log("Value is : "+ value);
+        //TODO : Do the corresponding checkings depending on locale
+        //console.log("VALUE: " + value);
+        //console.log("Using locale: " + locale);
+        //console.log(value.length);
+        if (value) {        //Do the check if there is a value
+            if (value.length!= 10) return false;
+            let re = /^\d+$/;
+            if(!re.test(value)) return false;
+            re =/^0[6-7].*$/;
+            if (!value.match(re))
+            return false;
+        }
+        return true;   
+    }
+ 
+}
+
+export function IsMobile(locale:string, validationOptions?: ValidationOptions) {
+    return function (object: Object, propertyName: string) {
+         registerDecorator({
+             name: "IsMobile",
+             target: object.constructor,
+             propertyName: propertyName,
+             options: validationOptions,
+             constraints: [locale],
+             validator: MobileValidator
+         });
+    };
+}
+
+
+
 
 
 /*

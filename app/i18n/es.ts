@@ -5,9 +5,13 @@ export const messages = {
     lastName: 'Apellido',
     email: "Correo electronico",
     password: "Contraseña",
+    phone: "Telefono fijo",
+    mobile: "Mobil",
+
     validationMinLength:(name = 'field', value='value') => `El ${name} debe tener como minimo ${value} caracteres`,
     validationMaxLength: (name = 'field', value='value') => `El ${name} debe tener menos de ${value} caracteres`,
     validationPassword: (name = 'field') => `La ${name} debe tener como minimo una mayuscula, una minuscula y mas de 5 caracteres`,
+    validationEmpty: (name = 'field') => `${name} no puede estar vacio`,
 
     validationUnique: (name = 'field') => `${name} ya existente en la base de datos`,
 

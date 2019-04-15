@@ -24,6 +24,8 @@ export class User extends Model {
     public firstName!: string;
     public lastName!:string;
     public email!:string;
+    public phone!:string;
+    public mobile!:string;
     //public preferredName!: string | null; // for nullable fields
   
     // timestamps!
@@ -60,20 +62,17 @@ export class User extends Model {
                     type: new DataTypes.STRING(128),
                     allowNull: true,
                     unique: true
-                    /*unique: {
-                        args: true,
-                        msg: 'Oops. Looks like you already have an account with this email address. Please try to login.',
-                        fields: ['email']
-                    }*/
                 },
-                
-                /*indexes: [
-                    {
-                      unique: true,
-                      name: 'profileUniqueNickname',
-                      fields: ['email']
-                    }
-                  ]*/
+                phone:{
+                    type: new DataTypes.STRING(50),
+                    allowNull: true,
+                    unique:true
+                },          
+                mobile:{
+                    type: new DataTypes.STRING(50),
+                    allowNull: true,
+                    unique:true
+                },                    
             }, table: {
                 tableName: 'users',
                 modelName: 'user',
