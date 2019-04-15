@@ -31,7 +31,7 @@ export class UserController {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");
-            next(new HttpException(400, "sequelize", error.message, error.errors));
+            next(new HttpException(400, error.message, error.errors));
         });
     }
     //Get all users
@@ -41,7 +41,7 @@ export class UserController {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");
-            next(new HttpException(500, "sequelize", error.message, error.errors));
+            next(new HttpException(500, error.message, error.errors));
         });
     }
 
@@ -53,7 +53,7 @@ export class UserController {
         }).catch( (error) => {
             console.log("We got error !!!");
             console.log(error);
-            next(new HttpException(500, "sequelize", error.message, error.errors));
+            next(new HttpException(500, error.message, error.errors));
         });
     }   
     //Get user by ID CHECKS

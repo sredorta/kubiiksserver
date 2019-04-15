@@ -2,6 +2,7 @@ export const messages = {
     description: "Esto es una api",
     user: 'Usuario',
     firstName: 'Nombre',
+    lastName: 'Apellido',
     validationMinLength:(name = 'field', value='value') => `El '${name}' debe tener como minimo ${value} caracteres`,
 
     validationUnique: (name = 'field') => `${name} ya existente en la base de datos`,

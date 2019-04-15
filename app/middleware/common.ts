@@ -3,7 +3,7 @@ import {Response,Request,NextFunction} from 'express';
 //i18n part
 //import { messages as en } from '../i18n/en';
 import { messages as en} from '../i18n/en';
-import {UniqueConstraintError} from 'sequelize';
+import {UniqueConstraintError, ValidationErrorItem} from 'sequelize';
 import * as path from 'path';
 import * as glob  from 'glob';
 import { config } from 'bluebird';
@@ -38,7 +38,6 @@ export class Middleware {
                     .filter((language:string) => language !== 'index');
             let language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
             console.log("Answering with language : " + language);
-            //req.language = language; //TODO REMOVE AS NOT NEEDED !!!
             //Override messages so that it uses correct language
             let acc : any = [];
             acc[language] = require(`../i18n/${language}`).messages;
@@ -58,17 +57,22 @@ export class Middleware {
         console.log("errorHandler enabled !!!");
         return function errorMiddleware(error: HttpException, request: Request, response: Response, next: NextFunction) {
             console.log("Running errorHandler !");
-            console.log(error);
-            let text = "Error unknown";
-            const name = error.name;
+            let send : boolean = false;
             const status : number = error.status || 500;
-            let message = error.message || 'Something went wrong';
-            const errors = error.errors;
-            response.status(status)
-              .send({
+            let message = error.message || 'Something went wrong';;
+            //Override unique violation message
+            if (error.errors)
+                if (error.errors[0])
+                    if (error.errors[0].type)
+                        if (error.errors[0].type =="unique violation") {
+                            const elem = error.errors[0].instance._modelOptions.name.singular;
+                            //TODO fix this in case it doesn't exist and remove error
+                            message = messages.validationUnique(messages[elem]);
+                        }          
+            response.status(status).send({
                 status:status,
-                message: error.message
-              })
+                message: message
+                });
           }
     }
 
@@ -77,7 +81,6 @@ export class Middleware {
     public static validation<T>(type: any): express.RequestHandler {
         console.log("Validation middleWare enabled !");
         return function validationMiddleware(req:Request, res:Response, next: NextFunction) {
-          console.log("Running validation middleware");  
           validate(plainToClass(type, req.body))
             .then((errors: ValidationError[]) => {
               if (errors.length > 0) {

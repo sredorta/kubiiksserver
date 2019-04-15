@@ -28,6 +28,7 @@ class PasswordValidator implements ValidatorConstraintInterface {
 export function IsPassword(validationOptions?: ValidationOptions) {
     return function (object: Object, propertyName: string) {
          registerDecorator({
+             name: "IsPassword",
              target: object.constructor,
              propertyName: propertyName,
              options: validationOptions,
@@ -36,6 +37,8 @@ export function IsPassword(validationOptions?: ValidationOptions) {
          });
     };
 }
+
+
 /*
 ////////////////////////////////////////////////////////////////////////////
 // UNIQUE VALIDATOR : IsUnique()
@@ -48,15 +51,18 @@ class UniqueValidator implements ValidatorConstraintInterface {
     validate(value: string, args: ValidationArguments) {
         console.log("IS UNIQUE VALIDATOR : " + value);
         let MyClass = args.constraints[0];
-
+        let field = args.constraints[1];
         console.log("Using class : " + MyClass.name);
-        console.log(MyClass.name);
+        console.log("Using fields: " + field);
+        console.log(MyClass);
+
+        let query :any =  {};
+        query[field] =value;
         const myPromise =  new Promise<boolean>((resolve,reject) => {
             MyClass.findOne({
-                where: {
-                    "email": value
-                }
+                where: query
                 }).then((result:any)=> {
+                    console.log(result);
                     if(result) resolve(false);
                     return resolve(true);
                 }).catch((error: Error) => {
@@ -64,22 +70,18 @@ class UniqueValidator implements ValidatorConstraintInterface {
                 });
         });
         return myPromise;
-
-        //return text.length > validationArguments.constraints[0] && text.length < args.constraints[1];
     }
  
 }
 
-export function IsUnique<T extends Model>(myClass:new() => T,validationOptions?: ValidationOptions) {
-    console.log("RHO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! : ");
+export function IsUnique<T extends Model>(myClass:new() => T,field:string,validationOptions?: ValidationOptions) {
     console.log(myClass.name);
     return function (object: Object, propertyName: string) {
-        console.log("JERE")
          registerDecorator({
              target: object.constructor,
              propertyName: propertyName,
              options: validationOptions,
-             constraints: [myClass],
+             constraints: [myClass, field],
              validator: UniqueValidator
          });
     };

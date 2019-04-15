@@ -17,8 +17,6 @@ class DTOHasValue {
 }
 
 
-
-
 export class SettingController {
 
     //Get all settings from the table 
@@ -26,7 +24,7 @@ export class SettingController {
         Setting.findAll().then((result)=> {
             res.json(result);
         }).catch( (error) => {
-            next(new HttpException(500, "sequelize", error.message, error.errors));
+            next(new HttpException(500, error.message, error.errors));
         });
     }
 
@@ -40,7 +38,7 @@ export class SettingController {
         }).then((result)=> {
             res.json(result);
         }).catch( (error) => {
-            next(new HttpException(500, "sequelize", error.message, error.errors));
+            next(new HttpException(500, error.message, error.errors));
         });
     }   
     //Get user by ID CHECKS

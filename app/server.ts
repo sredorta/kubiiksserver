@@ -17,7 +17,7 @@ Setting.init(Setting.definition(sequelize).params, Setting.definition(sequelize)
 Account.init(Account.definition(sequelize).params,Account.definition(sequelize).table);
 User.init(User.definition(sequelize).params,User.definition(sequelize).table);
 User.hasMany(Account, {foreignKey: 'userId', as: 'accounts'});
-//User.addHook('beforeValidate', User.validationHook());
+User.addHook('afterValidate', User.validationHook());
 async function startServer() {    
     await sequelize.sync({force:true});
     await Setting.seed(); //Seed settings from the config.json for FE sharing

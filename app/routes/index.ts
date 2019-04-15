@@ -44,7 +44,6 @@ export class Routes {
       .get(this.settingController.getAll);
       app.route('/api/settings/get/key')
       .post(this.settingController.getByKeyChecks(),this.settingController.getByKey);
-    
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////

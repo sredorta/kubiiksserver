@@ -10,12 +10,21 @@ import { IsNumber, IsEmail,IsString, MinLength, MaxLength } from 'class-validato
 import validator from 'validator';
 import {messages} from '../middleware/common';
 
+
+export interface IUser {
+    id?: number;
+    firstName?:string;
+    lastName?:string;
+    email?:string;
+
+}
+
 export class User extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
-
     public firstName!: string;
+    public lastName!:string;
     public email!:string;
-    public preferredName!: string | null; // for nullable fields
+    //public preferredName!: string | null; // for nullable fields
   
     // timestamps!
     public readonly createdAt!: Date;
@@ -30,9 +39,6 @@ export class User extends Model {
     public static associations: {
         accounts: Association<User, Account>;
     }
-
-    
-
 
     public static definition(sequelize : Sequelize) {
         return { params :{
@@ -54,12 +60,20 @@ export class User extends Model {
                     type: new DataTypes.STRING(128),
                     allowNull: true,
                     unique: true
-                    /*{
+                    /*unique: {
                         args: true,
                         msg: 'Oops. Looks like you already have an account with this email address. Please try to login.',
                         fields: ['email']
                     }*/
                 },
+                
+                /*indexes: [
+                    {
+                      unique: true,
+                      name: 'profileUniqueNickname',
+                      fields: ['email']
+                    }
+                  ]*/
             }, table: {
                 tableName: 'users',
                 modelName: 'user',
@@ -69,7 +83,7 @@ export class User extends Model {
 
     //Validates the data before adding an element to the database
     public static validationHook() {
-/*        return function(user: User, options:any) {
+        /*return function(user: User, options:any) {
             async function unique()
             {    
                 let userExists = await User.findOne({
@@ -82,6 +96,10 @@ export class User extends Model {
             }
         return unique();
         };*/
+        return function(user: User, options:any) {
+            console.log("AFTER VALIDATE HOOK !!!!!!!!!!!!!!!!!!!!");            
+
+        };
     }
     //Seeds the table with plenty of users
     public static seed() {
