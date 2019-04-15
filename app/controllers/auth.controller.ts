@@ -94,7 +94,7 @@ export class AuthController {
                          console.log("error happened");
                          console.log(error);
                      })
-
+                     res.send({done: "Email sent"});  
                 }
 
             }
