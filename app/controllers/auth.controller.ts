@@ -11,6 +11,7 @@ import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile} from 
 import { Helper } from '../classes/Helper';
 
 import jwt from "jsonwebtoken";
+import { or } from 'sequelize/types';
 
 
 
@@ -24,7 +25,6 @@ export class AuthController {
     }
 
     //User signup
-    //public signup(req: Request, res: Response, next: NextFunction) {
     static signup = async (req: Request, res: Response, next:NextFunction) => {
         let myUser : User;
         let myAccount : Account;
@@ -43,7 +43,8 @@ export class AuthController {
                 password: Account.hashPassword(req.body.password)
             });
             //If we are the first user, then we need to create an additional account as admin with same password
-            if (myUser.id ==1) {
+            //If we are in demo mode each new user has an admin account
+            if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
                 myAccount = await myUser.createAccount({
                     access: "admin",
                     password: Account.hashPassword(req.body.password)
@@ -59,6 +60,7 @@ export class AuthController {
                         AppConfig.auth.jwtSecret,
                         { expiresIn: AppConfig.auth.accessShort }
                       );
+                    console.log("GENERATED TOKEN : " + token);  
                     res.send({token: token});  
                     break;
                 }

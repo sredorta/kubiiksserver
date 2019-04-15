@@ -19,7 +19,7 @@ class GetUserByIdDTO {
 
 
 export class UserController {
-    public addNewUser (req: Request, res: Response, next: NextFunction) {                
+    static create = async(req: Request, res: Response, next: NextFunction) => {                 
         //TODO switch to await/async
         let params = User.build({id:"test"});
 
@@ -65,7 +65,7 @@ export class UserController {
         });
     }   
     //Get user by ID CHECKS
-    public getUserByIdChecks() {
+    public static getUserByIdChecks() {
         return Middleware.validation(GetUserByIdDTO);
     }
 

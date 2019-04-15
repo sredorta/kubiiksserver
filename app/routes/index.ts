@@ -10,9 +10,6 @@ import {Middleware} from '../middleware/common';
 
 export class Routes {    
   //Call all controllers required here  
-  public userController : UserController = new UserController();   
-  public settingController : SettingController = new SettingController();
-  public authController : AuthController = new AuthController();
 
 
   public routes(app:Router): void {          
@@ -40,9 +37,9 @@ export class Routes {
     //  FE can only read this table to has access to the server config
     ////////////////////////////////////////////////////////////////
       app.route('/api/settings/all')
-      .get(this.settingController.getAll);
+      .get(SettingController.getAll);
       app.route('/api/settings/get/key')
-      .post(this.settingController.getByKeyChecks(),this.settingController.getByKey);
+      .post(SettingController.getByKeyChecks(),SettingController.getByKey);
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
@@ -50,65 +47,30 @@ export class Routes {
         const router = Router();
 
         //Get all users
-        //app.route('/api/users')
-        //.get([Middleware.checkJwt],);
+        //TODO remove the checkJwt
         app.route("/api/users/all")
         .get(Middleware.checkJwt(),UserController.getAll);
 
         //Get user by ID
         app.route('/api/users/get/id')
-        .post(this.userController.getUserByIdChecks(),UserController.getOneById);
+        .post(UserController.getUserByIdChecks(),UserController.getOneById);
+
+        //Create new user
+        app.route('/api/usercreate')
+        .get(UserController.create);
 
 
+        //AUTH: Signup
         app.route('/api/auth/signup')
         .post(AuthController.signupChecks(),AuthController.signup);
 
 
 
-        //Create new user
-        app.route('/api/usercreate')
-        .get(this.userController.addNewUser);
+
 
 
         
-        // Contact 
-        app.route('/contact') 
-        // GET endpoint 
-        .get((req: Request, res: Response) => {
-        // Get all contacts            
-            res.status(200).send({
-                message: 'GET request successfulll!!!!'
-            });
-        })        
-        // POST endpoint
-        .post((req: Request, res: Response) => {   
-        // Create new contact         
-            res.status(200).send({
-                message: 'POST request successfulll!!!!'
-            });
-        })
 
-        // Contact detail
-        app.route('/contact/:contactId')
-        // get specific contact
-        .get((req: Request, res: Response) => {
-        // Get a single contact detail            
-            res.status(200).send({
-                message: 'GET request successfulll!!!!'
-            });
-        })
-        .put((req: Request, res: Response) => {
-        // Update a contact           
-            res.status(200).send({
-                message: 'PUT request successfulll!!!!'
-            });
-        })
-        .delete((req: Request, res: Response) => {       
-        // Delete a contact     
-            res.status(200).send({
-                message: 'DELETE request successfulll!!!!'
-            });
-        })
 
 
     }

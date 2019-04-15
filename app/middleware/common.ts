@@ -134,21 +134,31 @@ export class Middleware {
             let jwtPayload;
             if (!token) {
                 next(new HttpException(401, messages.authTokenMissing, null));
-            } else {
+                return;
+            }
             //Now check if token is valid
-                //Try to validate the token and get data
-                try {
-                    jwtPayload = <any>jwt.verify(token, AppConfig.auth.jwtSecret);
-                    res.locals.jwtPayload = jwtPayload;
-                    console.log("Stored in locals for next request:");
-                    console.log(jwtPayload);
-                } catch (error) {
-                    console.log("An error happened here !!!!!");
-                    //If token is not valid, respond with 401 (unauthorized)
-                    res.status(401).send(messages.authTokenInvalid);
-                    return;
-                }       
-            }     
+            //Try to validate the token and get data
+            try {
+                jwtPayload = <any>jwt.verify(token, AppConfig.auth.jwtSecret);
+                res.locals.jwtPayload = jwtPayload;
+                console.log("Stored in locals for next request:");
+                console.log(jwtPayload);
+            } catch (error) {
+                console.log("An error happened here !!!!!");
+                console.log(error);
+                //If token is not valid, respond with 401 (unauthorized)
+                next(new HttpException(401, messages.authTokenInvalid, null));
+                //res.status(401).send(messages.authTokenInvalid);
+                return;
+            }      
+                //The token is valid for 1 hour
+                //We want to send a new token on every request
+                /*const { userId, username } = jwtPayload;
+                const newToken = jwt.sign({ userId, username }, config.jwtSecret, {
+                    expiresIn: "1h"
+                });
+                res.setHeader("token", newToken); */
+
             next();
         }
     }      

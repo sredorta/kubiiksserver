@@ -5,9 +5,14 @@ import { Middleware } from '../middleware/common';
 import {messages} from '../middleware/common';
 
 
-import { IsNumber, IsEmail,IsString } from 'class-validator';
-//DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
+import { IsString, IsNotEmpty } from 'class-validator';
+//DEFINE HERE ALL LOCAL DTO CLASSES FOR PARAMETER CHECKING
 class DTOKey {
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty("key");
+        }
+    })
     @IsString({
         message: function() {
             return messages.validation("key");
@@ -16,20 +21,11 @@ class DTOKey {
     public key!: string;
 }
 
-/*class DTOValue {
-    @IsString({
-        message: function() {
-            return messages.validation("value");
-        }
-    })
-    public value!: string;
-}*/
-
 
 export class SettingController {
 
     //Get all settings from the table 
-    public getAll(req: Request, res: Response, next: NextFunction) {
+    static getAll = async (req: Request, res: Response, next:NextFunction) => {
         Setting.findAll().then((result)=> {
             res.json(result);
         }).catch( (error) => {
@@ -38,7 +34,7 @@ export class SettingController {
     }
 
     //Get user by key
-    public getByKey(req: Request, res: Response, next: NextFunction) {
+    static getByKey = async (req: Request, res: Response, next:NextFunction) => {
         const key = req.body.key;
         Setting.findOne({
             where: {
@@ -51,7 +47,7 @@ export class SettingController {
         });
     }   
     //Get user by ID CHECKS
-    public getByKeyChecks() {
+    public static getByKeyChecks() {
         return Middleware.validation(DTOKey);
     }
 
