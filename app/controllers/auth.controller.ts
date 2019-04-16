@@ -78,7 +78,7 @@ export class AuthController {
                 default: {
                     //Generate email html
                     const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/api/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
-                    const html = pug.renderFile(path.join(__dirname, "../emails/validation.pug"), {validationLink: link});
+                    const html = pug.renderFile(path.join(__dirname, "../emails/validation."+ res.locals.language + ".pug"), {validationLink: link});
                     const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
                      let myEmail = {
                         from: AppConfig.emailSmtp.sender,
@@ -99,7 +99,6 @@ export class AuthController {
             }
 
         } catch(error) {
-            console.log("Sedning error !!!!!!!!!!!!!!!!!!!!!!!!!");
             next(new HttpException(400, error.message, error.errors));
         }
     }
@@ -151,9 +150,8 @@ export class AuthController {
                 await myUser.save();
             }
         }
- 
         //Render now the result view page and return it
-        const html = pug.renderFile(path.join(__dirname, "../views/validation.pug"), {result: result});
+        const html = pug.renderFile(path.join(__dirname, "../views/validation."+res.locals.language+ ".pug"), {result: result});
         res.send(html);
     }
 
