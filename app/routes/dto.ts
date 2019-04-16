@@ -138,11 +138,5 @@ export class DTOKeepConnected {
             return messages.validation("keepconnected");
         }
     })
-    /*@IsNotEmpty({
-        message:function() {
-            return messages.validationEmpty("keepconnected");
-        }
-    })*/
     public keepconnected!: boolean;
-
 }

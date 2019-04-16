@@ -9,7 +9,7 @@ export const messages = {
     validationEmpty: (name = 'field') => `Le champ '${name}' ne peut pas etre vide`,
     validationUnique: (name = 'field') => `${name} déjà existent dans la base de donnees`,
     validation: (name = 'field') => `Le champ '${name}' est incorrect`,
-    validationNotFound: (name = 'field') => `Impossible de trouver un '${name}' avec les paramètres donnés`,
+    validationNotFound: (name = 'field') => `Pas de '${name}' enregistrée dans nos bases de donnees avec les paramètres donnés`,
 
     //Other system messages
     featureNotAvailable: (name = 'field') => `Functionalité '${name}' pas encore disponible`,
@@ -17,10 +17,12 @@ export const messages = {
     //auth
     authTokenMissing: 'Authentification necessaire pour acceder',
     authTokenInvalid: 'Le token fourni est invalide',
+    authTokenInvalidAdmin: "Droit d'administrateur requis pour cette operation",
     authInvalidCredentials: 'Credentiels invalides',
 
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,
-    authEmailSentError: "Le courriel de validation de compte email n'a pas pu etre envoyé, contactez l'administrateur",
+    authResetPasswordSubject: (name = 'field') => `${name} : Nouveau mot de passe`,
+    authEmailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
 
     title: 'Implementation simple de i18n avec TypeScript',
     greeting: (name = 'John Doe') => `Bonjour, ${name}.`,

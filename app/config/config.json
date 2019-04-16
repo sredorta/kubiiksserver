@@ -3,15 +3,16 @@
         "version" : "1.0.0",
         "defaultLanguage": "en",
         "appName": "kubiiks",
-        "host": "127.0.0.1",
-        "port": 3000
+        "host": "http://localhost",
+        "port": 3000,
+        "angularPort": 4200
     },
     "db" : {
         "username": "test2",
         "password": "Secure=;",
         "database": "express",
         "options": {
-          "host": "127.0.0.1",
+          "host": "localhost",
           "dialect" : "mariadb"
         }
     },

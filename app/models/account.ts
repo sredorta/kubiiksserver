@@ -23,6 +23,7 @@ export class Account extends Model {
         return bcrypt.compareSync(unencryptedPassword, this.password);
     }
 
+
     public static definition(sequelize : Sequelize) {
         return { params :{
             id: {

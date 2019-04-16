@@ -2,6 +2,7 @@ import {registerDecorator, ValidationArguments, ValidationOptions,ValidatorConst
 import { User } from "../models/user";
 import {Model} from "sequelize";
 import {Validator} from "class-validator";
+import { Helper } from "./Helper";
 
 const validator = new Validator();
 ////////////////////////////////////////////////////////////////////////////
@@ -12,17 +13,7 @@ const validator = new Validator();
 class PasswordValidator implements ValidatorConstraintInterface {
  
     validate(value: string, args: ValidationArguments) {
-        if (value ==undefined) return false;
-        if (value == null) return false;
-        if (value.length<5) return false;
-        if (value.length>50) return false;
-        //Do the validation
-        //TODO improve this password validation check
-        var re = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{5,}';
-        //return false;
-        if (!value.match(re))
-            return false
-        return true;
+        return Helper.passwordPassQualityRequired(value);
     }
  
 }

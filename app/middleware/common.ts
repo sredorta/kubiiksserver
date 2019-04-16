@@ -23,7 +23,7 @@ export class Middleware {
         console.log("Cors enabled !!!");
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             //Enabling CORS
-            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Origin", AppConfig.api.host + ":"+ AppConfig.api.angularPort);
             res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
             next();
@@ -127,13 +127,11 @@ export class Middleware {
 
 
     //Checks if header contains JWT and needs to be called at each route that requires auth
-    public static checkJwt() {
+    public static registered() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
-            console.log("Running checkJWT middleware");
             const token = <string>req.headers["authorization"];
-            console.log("Found token : " + token);
+            console.log("Found token in Header : " + token);
 
-            let jwtPayload;
             if (!token) {
                 next(new HttpException(401, messages.authTokenMissing, null));
                 return;
@@ -141,28 +139,24 @@ export class Middleware {
             //Now check if token is valid
             //Try to validate the token and get data
             try {
-                jwtPayload = <any>jwt.verify(token, AppConfig.auth.jwtSecret);
+                const jwtPayload = <any>jwt.verify(token, AppConfig.auth.jwtSecret);
                 res.locals.jwtPayload = jwtPayload;
                 console.log("Stored in locals for next request:");
                 console.log(jwtPayload);
             } catch (error) {
-                console.log("An error happened here !!!!!");
-                console.log(error);
                 //If token is not valid, respond with 401 (unauthorized)
                 next(new HttpException(401, messages.authTokenInvalid, null));
-                //res.status(401).send(messages.authTokenInvalid);
                 return;
             }      
-                //The token is valid for 1 hour
-                //We want to send a new token on every request
-                /*const { userId, username } = jwtPayload;
-                const newToken = jwt.sign({ userId, username }, config.jwtSecret, {
-                    expiresIn: "1h"
-                });
-                res.setHeader("token", newToken); */
-
             next();
         }
-    }      
+    }
+    //Checks that the registered user is an administrator if not errors      
+    public static admin() {
+        return function (req:express.Request, res:express.Response, next:express.NextFunction) {
+            if (res.locals.jwtPayload.access!= "admin")
+                next(new HttpException(401, messages.authTokenInvalidAdmin, null));
+        }
+    }
 
 }

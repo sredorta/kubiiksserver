@@ -127,7 +127,7 @@ export class AuthController {
         if (Helper.isSharedSettingMatch("login_email", "include"))
             query["email"] = req.body.email;
         if (Helper.isSharedSettingMatch("login_mobile", "include"))
-            query["mobile"] = req.body.email;
+            query["mobile"] = req.body.mobile;
         let accessTime : string;    
         if (req.body.keepconnected)
             accessTime = AppConfig.auth.accessShort;
@@ -139,7 +139,7 @@ export class AuthController {
         //Get user with accounts
         User.findOne({ 
             include:[{model: Account.scope("all")}],
-            where: {email: req.body.email} }).then(user => {
+            where: query }).then(user => {
             if (!user) 
                 next( new HttpException(400, messages.authInvalidCredentials,null));
             else if(!user.accounts) {
@@ -248,6 +248,76 @@ export class AuthController {
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // resetPasswordEmail:  Resets the password by sending new one by email
+    ///////////////////////////////////////////////////////////////////////////
+    static resetPasswordByEmail = async (req: Request, res: Response, next:NextFunction) => {
+        let query :any =  {};
+        query["email"] = req.body.email;
+ 
+        User.findOne({where: query,include:[{model: Account.scope("all")}]}).then(user => {
+            if (!user)
+                next( new HttpException(400, messages.validationNotFound(messages.user),null));
+            else if(!user.accounts) {
+                    next( new HttpException(500, messages.validationNotFound(messages.account),null));
+            } else {
+                 //More than one account and access not provided !
+                 if(!req.body.access && user.accounts.length>1) {
+                    res.json({access: Helper.pluck(user.accounts,"access")});
+                } else {
+                    //One account in the db or access provided as param
+                    let myAccount : Account | undefined = user.accounts[0];
+                    if (req.body.access) {
+                        myAccount = user.accounts.find(obj => obj.access == req.body.access);
+                    }    
+                    if (!myAccount)
+                        next( new HttpException(400, messages.validationNotFound(messages.account),null));
+                    else {
+                        //We got here, so reset the password and send email with new password
+                        const password = Helper.generatePassword();
+                        myAccount.password = Account.hashPassword(password);
+                        myAccount.save();
+                        console.log("New password : " + password);
+                        //Send email with new password
+                        const html = pug.renderFile(path.join(__dirname, "../emails/resetpassword."+ res.locals.language + ".pug"), {password: password, access: myAccount.access});
+                        const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+                        let myEmail = {
+                                from: AppConfig.emailSmtp.sender,
+                                to: user.email,
+                                subject: messages.authResetPasswordSubject(AppConfig.api.appName),
+                                text: 'Voila un bon email',
+                                html: html
+                            }
+                        console.log(html);
 
-
+                        transporter.sendMail(myEmail).then(result => {
+                                res.send({done: "Email sent"});  
+                        }).catch(error => {
+                                next(new HttpException(500, messages.authEmailSentError,null));
+                        });          
+                    }
+                }
+            }
+        });
+    }
+    //ADD CHECKS
+    public static resetPasswordByEmailChecks() {
+        let handlers : RequestHandler[] = [];
+        handlers.push(Middleware.validation(DTOAccess));
+        handlers.push(Middleware.validation(DTOEmail));
+        return handlers;
+    }    
+    ///////////////////////////////////////////////////////////////////////////
+    // resetPasswordEmail:  Resets the password by sending new one by email
+    ///////////////////////////////////////////////////////////////////////////
+    static resetPasswordByMobile = async (req: Request, res: Response, next:NextFunction) => {
+        next( new HttpException(400, messages.featureNotAvailable('password reset mobile'), null))
+    }
+    //ADD CHECKS
+    public static resetPasswordByMobileChecks() {
+        let handlers : RequestHandler[] = [];
+        handlers.push(Middleware.validation(DTOAccess));
+        handlers.push(Middleware.validation(DTOMobile));
+        return handlers;
+    }    
 }

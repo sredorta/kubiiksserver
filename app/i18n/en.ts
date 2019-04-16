@@ -18,9 +18,11 @@ export const messages = {
     //auth
     authTokenMissing: 'Authentification is required and not provided',
     authTokenInvalid: 'The token provided is invalid',
+    authTokenInvalidAdmin: 'Administrator rights are required',
     authInvalidCredentials: 'Invalid credentials',
+    authResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
-    authEmailSentError: 'The validation email could not be sent, please contact the administrator',
+    authEmailSentError: 'An error happened when sending the email, please contact the administrator',
     //authAccountNotFound: (name = 'field') => `${name} not found in the database with the given requirements`,
 
 

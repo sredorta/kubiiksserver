@@ -22,6 +22,10 @@ export class Routes {
             });
     });
 
+    //ACCESS CONTROL:
+    // use Middleware.registered() for actions required access standard or admin
+    // use Middleware.registered() + Middleware.admin() for actions requiring admin rights
+
 
     //NAMING CONVENTIONS ENDPOINTS
     //  /api/<plural>/all        GET     : getAll (returns all records)
@@ -58,14 +62,22 @@ export class Routes {
     
     //getAuthUser
     app.route('/api/auth/get')
-      .get(Middleware.checkJwt(),AuthController.getAuthUser);
-
+      .get(Middleware.registered(),AuthController.getAuthUser);
 
     //Email validation endpoint
     app.route('/api/auth/validate-email')
       .get(AuthController.emailValidation);
 
-    //View
+    //Reset password and send new one by email
+    app.route('/api/auth/reset-password/email')
+       .post(AuthController.resetPasswordByEmailChecks(), AuthController.resetPasswordByEmail);  
+
+    //Reset password and send new one by mobile
+    app.route('/api/auth/reset-password/mobile')
+       .post(AuthController.resetPasswordByMobileChecks(), AuthController.resetPasswordByMobile);  
+
+
+    //Debug only to be removed
     app.route("/api/test")
       .get(UserController.tmp);
     
@@ -78,7 +90,7 @@ export class Routes {
         //Get all users
         //TODO remove the checkJwt
         app.route("/api/users/all")
-        .get(Middleware.checkJwt(),UserController.getAll);
+        .get(Middleware.registered(),UserController.getAll);
 
         //Get user by ID
         app.route('/api/users/get/id')
