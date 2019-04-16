@@ -27,7 +27,7 @@ export class Helper {
     }
     
     
-    
+    //Generate random string of the given length
     public static generateRandomString(length:number) : string {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -37,6 +37,18 @@ export class Helper {
 
         return text;
     }
+
+    //Generate random string with numbers of the given length
+    public static generateRandomNumber(length:number) : string {
+        var text = "";
+        var possible = "0123456789";
+
+        for (var i = 0; i < length; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
     /*
     public static validate<T>(objects:T[]) : Promise<boolean> {
 

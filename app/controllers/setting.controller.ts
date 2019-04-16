@@ -3,6 +3,8 @@ import {Setting} from '../models/setting';
 import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
 import {messages} from '../middleware/common';
+import nodemailer from 'nodemailer';
+import AppConfig from '../config/config.json';
 
 
 import { IsString, IsNotEmpty } from 'class-validator';
@@ -49,6 +51,25 @@ export class SettingController {
     //Get user by ID CHECKS
     public static getByKeyChecks() {
         return Middleware.validation(DTOKey);
+    }
+
+    //Test email settings
+    public static emailCheck = async (req: Request, res: Response, next:NextFunction) => {
+        const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+        let myResult = {
+            host: AppConfig.emailSmtp.host,
+            port: AppConfig.emailSmtp.port,
+            secure: AppConfig.emailSmtp.secure,
+            sender: AppConfig.emailSmtp.sender,
+            verification: ""
+        }
+        transporter.verify(function(error, success) {
+            if (error) 
+                 myResult.verification = "error";
+            else 
+                myResult.verification = "success";
+            res.send(myResult);
+         });
     }
 
 

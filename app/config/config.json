@@ -1,7 +1,10 @@
 {
     "api" : {
         "version" : "1.0.0",
-        "defaultLanguage": "en"
+        "defaultLanguage": "en",
+        "appName": "kubiiks",
+        "host": "127.0.0.1",
+        "port": 3000
     },
     "db" : {
         "username": "test2",
@@ -16,6 +19,7 @@
         "host" : "smtp.hostinger.com",
         "port": 587,
         "secure": false,
+        "sender": "test@ecube-solutions.com",
         "auth": {
             "user": "test@ecube-solutions.com",
             "pass": "Secure=;"

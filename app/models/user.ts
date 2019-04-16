@@ -27,6 +27,11 @@ export class User extends Model {
     public mobile!:string;
     //public preferredName!: string | null; // for nullable fields
   
+    public isEmailValidated!: boolean;
+    public emailValidationKey!: string;
+    public isMobileValidated!: boolean;
+    public mobileValidationKey!:string;
+
     // timestamps!
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;
@@ -80,7 +85,7 @@ export class User extends Model {
                     allowNull: true,
                     unique:true
                 },
-                isValidated: {
+                isEmailValidated: {
                     type: DataTypes.BOOLEAN,
                     allowNull:false,
                     defaultValue:false
@@ -88,7 +93,16 @@ export class User extends Model {
                 emailValidationKey: {
                     type: new DataTypes.STRING(30),
                     allowNull: false,
-                }                
+                },
+                isMobileValidated: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull:false,
+                    defaultValue:false
+                },
+                mobileValidationKey: {
+                    type: new DataTypes.STRING(4),
+                    allowNull: false,
+                },                              
             }, table: {
                 tableName: 'users',
                 modelName: 'user',

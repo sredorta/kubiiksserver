@@ -36,10 +36,30 @@ export class Routes {
     //  This table is mapped from the config.json on the server start
     //  FE can only read this table to has access to the server config
     ////////////////////////////////////////////////////////////////
-      app.route('/api/settings/all')
+    app.route('/api/settings/all')
       .get(SettingController.getAll);
-      app.route('/api/settings/get/key')
+    app.route('/api/settings/get/key')
       .post(SettingController.getByKeyChecks(),SettingController.getByKey);
+
+    app.route('/api/settings/email')
+      .get(SettingController.emailCheck);
+
+    /////////////////////////////////////////////////////////////////
+    // AUTH CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
+
+    //Signup
+    app.route('/api/auth/signup')
+      .post(AuthController.signupChecks(),AuthController.signup);
+
+    //Email validation endpoint
+    app.route('/api/auth/validate-email')
+      .get(AuthController.emailValidation);
+
+    //View
+    app.get("/koko", (req, res) => {
+          res.render("test");
+    });
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
@@ -59,10 +79,6 @@ export class Routes {
         app.route('/api/usercreate')
         .get(UserController.create);
 
-
-        //AUTH: Signup
-        app.route('/api/auth/signup')
-        .post(AuthController.signupChecks(),AuthController.signup);
 
 
 

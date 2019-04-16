@@ -6,10 +6,13 @@ import nodemailer from 'nodemailer';
 import AppConfig from '../config/config.json';
 import {messages} from '../middleware/common';
 
-import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile} from '../routes/dto';
+import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile, DTOId} from '../routes/dto';
 import { Helper } from '../classes/Helper';
 
 import jwt from "jsonwebtoken";
+import pug from 'pug';
+import path from 'path';
+import {Validator} from "class-validator";
 
 //Data models
 import {User} from '../models/user';
@@ -38,7 +41,8 @@ export class AuthController {
                 email: req.body.email,
                 phone:req.body.phone,
                 mobile:req.body.mobile,
-                emailValidationKey: Helper.generateRandomString(30)
+                emailValidationKey: Helper.generateRandomString(30),
+                mobileValidationKey: Helper.generateRandomNumber(4)
             });
             myAccount = await myUser.createAccount({
                 password: Account.hashPassword(req.body.password)
@@ -72,29 +76,24 @@ export class AuthController {
                 }
                 //Validation with email is the default
                 default: {
+                    //Generate email html
+                    const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/api/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
+                    const html = pug.renderFile(path.join(__dirname, "../emails/validation.pug"), {validationLink: link});
                     const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-                    transporter.verify(function(error, success) {
-                        if (error) {
-                             console.log("EMAIL SERVICE FAILED !!!");
-                             console.log(error);
-                        } else {
-                             console.log('Server is ready to take our messages');
-                        }
-                     });
                      let myEmail = {
-                        from: 'test@ecube-solutions.com',
-                        to: 'sergi.redorta@hotmail.com',
-                        subject: 'Email de test',
+                        from: AppConfig.emailSmtp.sender,
+                        to: myUser.email,
+                        subject: messages.authEmailValidateSubject(AppConfig.api.appName),
                         text: 'Voila un bon email',
-                        //html: 'HTML version of the message'
+                        html: html
                      }
+                     console.log(html);
+
                      transporter.sendMail(myEmail).then(result => {
-                         console.log("Email sent !!!");
+                        res.send({done: "Email sent"});  
                      }).catch(error => {
-                         console.log("error happened");
-                         console.log(error);
+                        next(new HttpException(500, messages.authEmailSentError,null));
                      })
-                     res.send({done: "Email sent"});  
                 }
 
             }
@@ -122,6 +121,42 @@ export class AuthController {
         return handlers;
     }
 
+    //Validate Email when clicking to email link
+    static emailValidation = async (req: Request, res: Response, next:NextFunction) => {
+        const validator = new Validator();
+        console.log("emailValidation !!!");
+        console.log(req.query);
+        //We do parameters checking here as we got parameters from the query
+        let result : boolean = true;
+        let myUser : User | null;
+
+        if (!req.query.id) result = false;
+        if (result)
+            if (!validator.isNumberString(req.query.id)) result = false;
+        if (!req.query.key) result = false;
+        if (result)
+            if (req.query.key.length!=30) result = false;
+        //Check that we have a matching user with the given id and key
+        if (result) {
+            myUser = await User.findOne({
+                where: {
+                    id: req.query.id,
+                    emailValidationKey: req.query.key 
+                }
+            });
+            if (!myUser) result=false;
+            else {
+                myUser.isEmailValidated = true;
+                myUser.emailValidationKey = Helper.generateRandomString(30);
+                await myUser.save();
+            }
+        }
  
+        //Render now the result view page and return it
+        const html = pug.renderFile(path.join(__dirname, "../views/validation.pug"), {result: result});
+        res.send(html);
+    }
+
+
 
 }

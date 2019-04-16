@@ -6,6 +6,15 @@ import {IsPassword, IsPhone, IsMobile} from '../classes/ParameterValidationDecor
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
 //Each controller can have it's own classes if they are specific to the Controller
 
+export class DTOId {
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty("id");
+        }
+    })
+    public id!:number;
+}
+
 export class DTOFirstName {
     //@ValidateIf(o=> Helper.isValidationCheckRequired("signup_firstName", "include"))
     @IsString()

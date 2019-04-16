@@ -11,7 +11,6 @@ export class HttpException extends Error {
       this.status = status;
       this.message = message;   //Default message
       this.errors = errors;     //Errors in case of validation for example
-      
     }
 
 }
