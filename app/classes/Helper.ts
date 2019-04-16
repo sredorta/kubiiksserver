@@ -49,6 +49,10 @@ export class Helper {
         return text;
     }
 
+    public static pluck<T, K extends keyof T>(objs: T[], key: K): T[K][] {
+        return objs.map(obj => obj[key]);
+    }
+
     /*
     public static validate<T>(objects:T[]) : Promise<boolean> {
 

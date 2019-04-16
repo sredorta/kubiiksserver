@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import AppConfig from '../config/config.json';
 import {messages} from '../middleware/common';
 
-import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile, DTOId} from '../routes/dto';
+import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile, DTOId, DTOAccess, DTOKeepConnected} from '../routes/dto';
 import { Helper } from '../classes/Helper';
 
 import jwt from "jsonwebtoken";
@@ -17,6 +17,7 @@ import {Validator} from "class-validator";
 //Data models
 import {User} from '../models/user';
 import {Account} from '../models/account';
+import { createPublicKey } from 'crypto';
 
 
 
@@ -24,15 +25,14 @@ export class AuthController {
 
     constructor() {}
 
-    private static _createUser(account: Account, req: Request, res: Response, next:NextFunction) {
-        console.log("We are here in test !!!");
-    }
 
+
+    ///////////////////////////////////////////////////////////////////////////
     //User signup
+    ///////////////////////////////////////////////////////////////////////////
     static signup = async (req: Request, res: Response, next:NextFunction) => {
         let myUser : User;
         let myAccount : Account;
-        console.log("Provided email : "+ req.body.email);
         let method = Helper.getSharedSetting("signup_validation_method")
         try {
             myUser = await User.create({
@@ -61,7 +61,7 @@ export class AuthController {
                 case "no_validation": {
                     //Generate short period token and send it to user
                     const token = jwt.sign(
-                        { userId: myUser.id, accountId: myAccount.id, accountLevel: myAccount.level }, //Payload !
+                        { userId: myUser.id, accountId: myAccount.id, access: myAccount.access }, //Payload !
                         AppConfig.auth.jwtSecret,
                         { expiresIn: AppConfig.auth.accessShort }
                       );
@@ -95,9 +95,7 @@ export class AuthController {
                         next(new HttpException(500, messages.authEmailSentError,null));
                      })
                 }
-
             }
-
         } catch(error) {
             next(new HttpException(400, error.message, error.errors));
         }
@@ -120,7 +118,98 @@ export class AuthController {
         return handlers;
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // login
+    ///////////////////////////////////////////////////////////////////////////
+    static login = async (req: Request, res: Response, next:NextFunction) => {
+        console.log("We are here in the signIn !!!");
+        let query :any =  {};
+        if (Helper.isSharedSettingMatch("login_email", "include"))
+            query["email"] = req.body.email;
+        if (Helper.isSharedSettingMatch("login_mobile", "include"))
+            query["mobile"] = req.body.email;
+        let accessTime : string;    
+        if (req.body.keepconnected)
+            accessTime = AppConfig.auth.accessShort;
+        else
+            accessTime = AppConfig.auth.accessLong;
+
+        //TODO find with email or with mobile or with both !!!! using query !!!!
+
+        //Get user with accounts
+        User.findOne({ 
+            include:[{model: Account.scope("all")}],
+            where: {email: req.body.email} }).then(user => {
+            if (!user) 
+                next( new HttpException(400, messages.authInvalidCredentials,null));
+            else if(!user.accounts) {
+                next( new HttpException(500, messages.validationNotFound(messages.account),null));
+            }    
+            else {
+                 //More than one account and access not provided !
+                if(!req.body.access && user.accounts.length>1) {
+                    res.json({access: Helper.pluck(user.accounts,"access")});
+                } else {
+                    //One account in the db or access provided as param
+                    let myAccount : Account | undefined = user.accounts[0];
+                    if (req.body.access) {
+                        myAccount = user.accounts.find(obj => obj.access == req.body.access);
+                    }    
+                    if (!myAccount)
+                        next( new HttpException(400, messages.validationNotFound(messages.account),null));
+                    else {
+                        if (!myAccount.checkPassword(req.body.password)) {
+                            next( new HttpException(400, messages.authInvalidCredentials,null));
+                        } else {
+                            //We got here so we can create a new token and provide it !
+                            const token = jwt.sign(
+                                { userId: user.id, accountId: myAccount.id, access: myAccount.access }, //Payload !
+                                AppConfig.auth.jwtSecret,
+                                { expiresIn: accessTime }
+                            );
+                            console.log("GENERATED TOKEN : " + token);  
+                            res.send({token: token});  
+                        }
+                    }
+                }  
+            }         
+        }).catch(error => {
+            next(new HttpException(500, error.message, error.errors));    
+        });
+    }    
+    //ADD CHECKS
+    public static loginChecks() {
+        let handlers : RequestHandler[] = [];
+        handlers.push(Middleware.validation(DTOPassword)); //Allways include password
+        handlers.push(Middleware.validation(DTOAccess));
+        handlers.push(Middleware.validation(DTOKeepConnected));
+
+        if (Helper.isSharedSettingMatch("login_email", "include")) 
+            handlers.push(Middleware.validation(DTOEmail));
+
+        if (Helper.isSharedSettingMatch("login_mobile", "include")) 
+            handlers.push(Middleware.validation(DTOMobile));
+
+        return handlers;
+    }    
+
+    ///////////////////////////////////////////////////////////////////////////
+    // getAuthUser
+    ///////////////////////////////////////////////////////////////////////////
+    static getAuthUser = async (req: Request, res: Response, next:NextFunction) => {
+        console.log(res.locals.jwtPayload);
+        User.findOne({where: {id: res.locals.jwtPayload.userId}}).then(myUser => {
+            if (!myUser)
+                next( new HttpException(400, messages.authTokenInvalid,null));
+            else {
+                res.json(myUser);
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
     //Validate Email when clicking to email link
+    ///////////////////////////////////////////////////////////////////////////
     static emailValidation = async (req: Request, res: Response, next:NextFunction) => {
         const validator = new Validator();
         console.log("emailValidation !!!");
@@ -136,23 +225,27 @@ export class AuthController {
         if (result)
             if (req.query.key.length!=30) result = false;
         //Check that we have a matching user with the given id and key
-        if (result) {
-            myUser = await User.findOne({
-                where: {
-                    id: req.query.id,
-                    emailValidationKey: req.query.key 
+        try {
+            if (result) {
+                myUser = await User.scope("all").findOne({
+                    where: {
+                        id: req.query.id,
+                        emailValidationKey: req.query.key 
+                    }
+                });
+                if (!myUser) result=false;
+                else {
+                    myUser.isEmailValidated = true;
+                    myUser.emailValidationKey = Helper.generateRandomString(30);
+                    await myUser.save();
                 }
-            });
-            if (!myUser) result=false;
-            else {
-                myUser.isEmailValidated = true;
-                myUser.emailValidationKey = Helper.generateRandomString(30);
-                await myUser.save();
             }
+            //Render now the result view page and return it
+            const html = pug.renderFile(path.join(__dirname, "../views/validation."+res.locals.language+ ".pug"), {result: result});
+            res.send(html);
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));
         }
-        //Render now the result view page and return it
-        const html = pug.renderFile(path.join(__dirname, "../views/validation."+res.locals.language+ ".pug"), {result: result});
-        res.send(html);
     }
 
 

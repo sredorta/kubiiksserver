@@ -1,12 +1,14 @@
 import {Request, Response, NextFunction, RequestHandler} from 'express'; //= require('express');
 import {User} from '../models/user';
+import {Account} from '../models/account';
+
 import check from 'express-validator';
 import {HttpException} from '../classes/HttpException';
 import bodyParser = require('body-parser');
 import { checkServerIdentity } from 'tls';
 import { body } from 'express-validator/check';
 import { Middleware } from '../middleware/common';
-
+import { Helper } from '../classes/Helper';
 
 import { IsNumber, IsEmail } from 'class-validator';
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
@@ -35,8 +37,9 @@ export class UserController {
         });
     }
 
-
+    ///////////////////////////////////////////////////////////////////////////
     //Get all users
+    ///////////////////////////////////////////////////////////////////////////
     static getAll = async(req: Request, res: Response, next: NextFunction) => {
         console.log("Get all users");
         User.findAll({
@@ -49,14 +52,16 @@ export class UserController {
         });
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     //Get user by ID
+    ///////////////////////////////////////////////////////////////////////////
     static getOneById = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.body.id;
          //Do not include password and others
-        User.findByPk(id,{
-            attributes: ["id", "firstName", "lastName", "email","phone","mobile"]  
+        User.scope("render").findByPk(id,{
+            //attributes: ["id", "firstName", "lastName", "email","phone","mobile"]  
             }
-        ).then((result)=> {
+        ).then(result => {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");
@@ -68,5 +73,34 @@ export class UserController {
     public static getUserByIdChecks() {
         return Middleware.validation(GetUserByIdDTO);
     }
+
+    static tmp = async (req: Request, res: Response, next: NextFunction) => {
+        let myUser : User | null;
+        let myAccount : Account;
+        try {
+            myUser = await User.create({
+                firstName: "sergi",
+                lastName: "redorta",
+                email: "sergi.redorta@hotmail.com",
+                phone: "0423133212",
+                mobile: "0623133212",
+                password: "Hello1234",
+                emailValidationKey: Helper.generateRandomString(30),
+                mobileValidationKey: Helper.generateRandomNumber(4)
+            });
+            myAccount = await myUser.createAccount({
+                password: Account.hashPassword("Hello1234")
+            });
+            myAccount = await myUser.createAccount({
+                    access: "admin",
+                    password: Account.hashPassword("Hello1234")
+                });   
+            myUser = await User.findOne({include:[{model: Account}] });
+            res.json(myUser);
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));    
+        };
+    }
+
 
 }

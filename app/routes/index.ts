@@ -52,14 +52,23 @@ export class Routes {
     app.route('/api/auth/signup')
       .post(AuthController.signupChecks(),AuthController.signup);
 
+    //Login
+    app.route('/api/auth/login')
+      .post(AuthController.loginChecks(),AuthController.login);      
+    
+    //getAuthUser
+    app.route('/api/auth/get')
+      .get(Middleware.checkJwt(),AuthController.getAuthUser);
+
+
     //Email validation endpoint
     app.route('/api/auth/validate-email')
       .get(AuthController.emailValidation);
 
     //View
-    app.get("/koko", (req, res) => {
-          res.render("test");
-    });
+    app.route("/api/test")
+      .get(UserController.tmp);
+    
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////

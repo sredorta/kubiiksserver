@@ -1,6 +1,8 @@
 export const messages = {
     description:"Ça c'est une api",
     user: 'Utilizateur',
+    account: 'Compte',
+
     validationMinLength:(name = 'field', value='value') => `Le champ '${name}' doit avoir au moins ${value} characeters`,
     validationMaxLength: (name = 'field', value='value') => `Le champ '${name}' doit avoir moins de  ${value} characteres`,
     validationPassword: (name = 'field') => `Le champ '${name}' doit avoir au moins une majuscule, une minuscule et un numero et avoir plus de 5 characteres`,
@@ -15,6 +17,8 @@ export const messages = {
     //auth
     authTokenMissing: 'Authentification necessaire pour acceder',
     authTokenInvalid: 'Le token fourni est invalide',
+    authInvalidCredentials: 'Credentiels invalides',
+
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,
     authEmailSentError: "Le courriel de validation de compte email n'a pas pu etre envoyé, contactez l'administrateur",
 

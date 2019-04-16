@@ -106,7 +106,15 @@ export class User extends Model {
             }, table: {
                 tableName: 'users',
                 modelName: 'user',
-                sequelize: sequelize
+                sequelize: sequelize,
+                defaultScope: {
+                    attributes: { exclude: ['password','isEmailValidated','emailValidationKey','isMobileValidated', 'mobileValidationKey'] },
+                }, 
+                scopes: {
+                    all: {
+                        attributes: { }
+                    }
+                }
             }};
     }
 

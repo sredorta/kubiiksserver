@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 export class Account extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
-    public level!: string;
+    public access!: string;
     public password!: string;
   
     // timestamps!
@@ -47,7 +47,15 @@ export class Account extends Model {
             }, table: {
                 tableName: 'accounts',
                 modelName: 'account',
-                sequelize: sequelize
+                sequelize: sequelize,
+                defaultScope: {
+                    attributes: { exclude: ['password'] },
+                }, 
+                scopes: {
+                    all: {
+                        attributes: { }
+                    }
+                }
             }};
     }    
 

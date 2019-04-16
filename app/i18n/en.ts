@@ -3,6 +3,7 @@ export const messages = {
 
     //Validation messages
     user: 'User',
+    account: 'Account',
     validationMinLength: (name = 'field', value='value') => `Field '${name}' must have at least ${value} characters`,
     validationMaxLength: (name = 'field', value='value') => `Field '${name}' must have less than ${value} characters`,
     validationPassword: (name = 'field') => `Field '${name}' must have lowercases, uppercases, numbers and be more than 5 characters long`,
@@ -17,8 +18,14 @@ export const messages = {
     //auth
     authTokenMissing: 'Authentification is required and not provided',
     authTokenInvalid: 'The token provided is invalid',
+    authInvalidCredentials: 'Invalid credentials',
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
     authEmailSentError: 'The validation email could not be sent, please contact the administrator',
+    //authAccountNotFound: (name = 'field') => `${name} not found in the database with the given requirements`,
+
+
+
+
 
     title: 'Simple i18n implementation with TypeScript',
     greeting: (name = 'John Doe') => `Hello, ${name}.`,

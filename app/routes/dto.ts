@@ -1,6 +1,6 @@
 import {messages} from '../middleware/common';
 import {Helper} from '../classes/Helper';
-import { IsNotEmpty,IsNumber, IsEmail,IsString, MinLength, MaxLength, ValidateIf, validate,ValidatorConstraint } from 'class-validator';
+import {IsBoolean, IsNotEmpty,IsOptional, IsEmail,IsString, MinLength, MaxLength, ValidateIf, validate,ValidatorConstraint } from 'class-validator';
 import {IsPassword, IsPhone, IsMobile} from '../classes/ParameterValidationDecorators';
 
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
@@ -110,4 +110,39 @@ export class DTOMobile {
         }
     })
     public mobile!: string;
+}
+
+export class DTOAccess {
+    @IsOptional()
+    @IsString()
+    @IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty("lastName");
+        }
+    })
+    @MinLength(2, {
+        message: function (){
+            return messages.validationMinLength("lastName","2")
+        }
+    })
+    @MaxLength(50, {
+        message: function() {
+            return messages.validationMaxLength("lastName","50")
+        }
+    })
+    public access!:number;
+}
+export class DTOKeepConnected {
+    @IsBoolean({
+        message:function() {
+            return messages.validation("keepconnected");
+        }
+    })
+    /*@IsNotEmpty({
+        message:function() {
+            return messages.validationEmpty("keepconnected");
+        }
+    })*/
+    public keepconnected!: boolean;
+
 }

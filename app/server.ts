@@ -1,5 +1,5 @@
 import app from "./app";
-import { Sequelize } from 'sequelize';
+import { Sequelize, InitOptions } from 'sequelize';
 import {User} from './models/user';
 import {Account} from './models/account';
 import {Setting} from './models/setting';
@@ -14,19 +14,19 @@ const sequelize = new Sequelize(AppConfig.db.database, AppConfig.db.username, Ap
 //Init all tables
 //This needs to be moved somewhere else most provably
 Setting.init(Setting.definition(sequelize).params, Setting.definition(sequelize).table);
-Account.init(Account.definition(sequelize).params,Account.definition(sequelize).table);
-User.init(User.definition(sequelize).params,User.definition(sequelize).table);
-User.hasMany(Account, {foreignKey: 'userId', as: 'accounts'});
+Account.init(Account.definition(sequelize).params,<InitOptions><unknown>Account.definition(sequelize).table);
+User.init(User.definition(sequelize).params,<InitOptions><unknown>User.definition(sequelize).table);
+User.hasMany(Account, {foreignKey: 'userId'});
+Account.belongsTo(User, {foreignKey:'userId'});
+
 User.addHook('afterValidate', User.validationHook());
 async function startServer() {    
     await sequelize.sync({force:true});
     await Setting.seed(); //Seed settings from the config.json for FE sharing
 
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
-        console.log("STACK ERRO !!!!!");
+        console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");
         console.error(err.stack);
-        //next(new HttpException(400, "sequelize", "Custom isUnique violation", null));
-        //res.status(500).send('Something broke!');
       });
     //Start server listenning
     app.listen(PORT, () => {

@@ -26,7 +26,9 @@ class DTOKey {
 
 export class SettingController {
 
+    ///////////////////////////////////////////////////////////////////////////
     //Get all settings from the table 
+    ///////////////////////////////////////////////////////////////////////////
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
         Setting.findAll().then((result)=> {
             res.json(result);
@@ -35,7 +37,9 @@ export class SettingController {
         });
     }
 
+    ///////////////////////////////////////////////////////////////////////////
     //Get user by key
+    ///////////////////////////////////////////////////////////////////////////
     static getByKey = async (req: Request, res: Response, next:NextFunction) => {
         const key = req.body.key;
         Setting.findOne({
@@ -48,12 +52,15 @@ export class SettingController {
             next(new HttpException(500, error.message, error.errors));
         });
     }   
+
     //Get user by ID CHECKS
     public static getByKeyChecks() {
         return Middleware.validation(DTOKey);
     }
 
-    //Test email settings
+    ///////////////////////////////////////////////////////////////////////////
+    //Get email settings and make a transporter check
+    ///////////////////////////////////////////////////////////////////////////
     public static emailCheck = async (req: Request, res: Response, next:NextFunction) => {
         const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
         let myResult = {
