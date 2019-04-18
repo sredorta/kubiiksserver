@@ -33,7 +33,7 @@
         {"key": "signup_email", "value":"include"},
         {"key": "signup_phone", "value":"include"},
         {"key": "signup_mobile", "value":"include"},
-        {"key": "signup_validation_method", "value":"email"},
+        {"key": "signup_validation_method", "value":"no_validation"},
         {"key": "login_email", "value":"include"},
         {"key": "login_mobile", "value":"exclude"},
         {"key": "mode", "value":"demo"}

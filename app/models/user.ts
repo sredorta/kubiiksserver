@@ -25,8 +25,7 @@ export class User extends Model {
     public email!:string;
     public phone!:string;
     public mobile!:string;
-    //public preferredName!: string | null; // for nullable fields
-  
+    public password!: string;  
     public isEmailValidated!: boolean;
     public emailValidationKey!: string;
     public isMobileValidated!: boolean;
@@ -102,7 +101,12 @@ export class User extends Model {
                 mobileValidationKey: {
                     type: new DataTypes.STRING(4),
                     allowNull: false,
-                },                              
+                },   
+                password: {
+                    type: new DataTypes.STRING(255),
+                    allowNull:false
+                },  
+                                         
             }, table: {
                 tableName: 'users',
                 modelName: 'user',

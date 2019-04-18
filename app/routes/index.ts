@@ -6,7 +6,15 @@ import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
 import { messages } from "../middleware/common";
 import {Middleware} from '../middleware/common';
-
+import * as passportConfig from "../passports/local";
+import passport from "passport";
+import passportLocal from 'passport-local';
+import passportFacebook from "passport-jwt";
+import passportJWT from "passport-facebook";
+import {ExtractJwt} from "passport-jwt";
+import {User} from '../models/user';
+import {Account} from '../models/account';
+import {Helper} from '../classes/Helper';
 
 export class Routes {    
   //Call all controllers required here  
@@ -14,7 +22,7 @@ export class Routes {
 
   public routes(app:Router): void {          
 
-      
+
     app.route('/')
         .get((req: Request, res: Response, next: NextFunction) => {            
             res.status(200).send({
@@ -34,7 +42,12 @@ export class Routes {
     //  /api/<plural>/create     POST    : add  (returns the new record)
     //  /api/<plural>/delete     DELETE  : remove (by Id)
 
-
+   /* app.route('/api/auth/passport')
+    .get(passportConfig.isAuthenticated, UserController.getAll);*/
+    app.get('/api/auth/passport', passport.authenticate('jwt', {session: false}), function (req, res) {
+      res.json({'success': true});
+  }
+);
     /////////////////////////////////////////////////////////////////
     // SETTINGS CONTROLLER PART
     //  This table is mapped from the config.json on the server start
@@ -56,10 +69,26 @@ export class Routes {
     app.route('/api/auth/signup')
       .post(AuthController.signupChecks(),AuthController.signup);
 
+
+
+
+      
     //Login
+    //app.route('/api/auth/login')
+      //.post(AuthController.loginChecks(),AuthController.login);      
+      //.get(passportConfig.isAuthenticated,AuthController.login);
+    app.post('/api/auth', passport.authenticate('local'), function(req, res){
+      console.log("passport user", req.user);
+      res.json("hello world");
+    });  
     app.route('/api/auth/login')
-      .post(AuthController.loginChecks(),AuthController.login);      
-    
+      .post( AuthController.login);
+/*      passport.authenticate('local', {session:false}, (err, user,info) => {
+        console.log("We are here in authenticate !!!!");
+        console.log("User is: " + user.email);
+    }),*/
+
+
     //getAuthUser
     app.route('/api/auth/get')
       .get(Middleware.registered(),AuthController.getAuthUser);
@@ -90,7 +119,8 @@ export class Routes {
         //Get all users
         //TODO remove the checkJwt
         app.route("/api/users/all")
-        .get(Middleware.registered(),UserController.getAll);
+          .get(UserController.getAll);
+        //.get(Middleware.registered(),UserController.getAll);
 
         //Get user by ID
         app.route('/api/users/get/id')

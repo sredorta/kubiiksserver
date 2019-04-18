@@ -18,7 +18,10 @@ import {Validator} from "class-validator";
 import {User} from '../models/user';
 import {Account} from '../models/account';
 import { createPublicKey } from 'crypto';
-
+import passport from 'passport';
+import passportLocal from 'passport-local';
+import passportFacebook from "passport-jwt";
+import passportJWT from "passport-facebook";
 
 
 export class AuthController {
@@ -35,14 +38,15 @@ export class AuthController {
         let myAccount : Account;
         let method = Helper.getSharedSetting("signup_validation_method")
         try {
-            myUser = await User.create({
+            myUser = await User.scope("all").create({
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 email: req.body.email,
                 phone:req.body.phone,
                 mobile:req.body.mobile,
                 emailValidationKey: Helper.generateRandomString(30),
-                mobileValidationKey: Helper.generateRandomNumber(4)
+                mobileValidationKey: Helper.generateRandomNumber(4),
+                password: Account.hashPassword(req.body.password)
             });
             myAccount = await myUser.createAccount({
                 password: Account.hashPassword(req.body.password)
@@ -121,7 +125,29 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     // login
     ///////////////////////////////////////////////////////////////////////////
+    //Debug with passports
     static login = async (req: Request, res: Response, next:NextFunction) => {
+        console.log("body parsing", req.body);
+        //Create an user
+        let myUser : User | null;
+        let myAccount : Account;
+        let method = Helper.getSharedSetting("signup_validation_method")
+            //Remove all users
+            User.scope("all").create({
+                firstName: "Sergi",
+                lastName: "Redorta",
+                email: "test@test.com",
+                phone: "0423133212",
+                mobile: "0623133212",
+                emailValidationKey: Helper.generateRandomString(30),
+                mobileValidationKey: Helper.generateRandomNumber(4),
+                password: Account.hashPassword("Hello1234")
+            }).then(user => {
+                console.log("user is:")
+                console.log(user);
+           });
+    }
+/*    static login = async (req: Request, res: Response, next:NextFunction) => {
         console.log("We are here in the signIn !!!");
         let query :any =  {};
         if (Helper.isSharedSettingMatch("login_email", "include"))
@@ -192,7 +218,7 @@ export class AuthController {
 
         return handlers;
     }    
-
+*/
     ///////////////////////////////////////////////////////////////////////////
     // getAuthUser
     ///////////////////////////////////////////////////////////////////////////
