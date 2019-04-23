@@ -11,11 +11,8 @@ import AppConfig from '../config/config.json';
 import { Request, Response, NextFunction } from "express";
 import {HttpException} from '../classes/HttpException';
 import {User} from '../models/user';
-import {Account} from '../models/account';
+import { isNamedExports } from 'typescript';
 
-export const JWTStrategy = passportJWT.Strategy;
-export const LocalStrategy = passportLocal.Strategy;
-export const FacebookStrategy = passportFacebook.Strategy;
 
 
 export class Passport {
@@ -32,7 +29,7 @@ export class Passport {
         });
     }
 
-    //Local passport usage
+    //Passport that validates login from local system
     public static local() {
         console.log("Enabling local passport");
         passport.use('local',new passportLocal.Strategy({
@@ -68,28 +65,84 @@ export class Passport {
                 });
         }));
     }
+
+    //Passport to decode JWT and pass user to next middleware
     public static jwt() {
         console.log("Enabling jwt passport");
-        let opts :any = {};
-        opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-        console.log("GOT TOKEN: "+ ExtractJwt.fromAuthHeaderAsBearerToken());
-        opts.secretOrKey = AppConfig.auth.jwtSecret;
-        //opts.issuer = 'accounts.examplesoft.com';
-        //opts.audience = 'yoursite.net';
-        //opts.clientID = "test";
-        passport.use('jwt',new JWTStrategy(opts,
-            function (jwtPayload:any, cb:any){
-                console.log("Payload is :");
-                console.log(jwtPayload);
-                return User.findOne()
-                .then(user => {
-                    return cb(null, user);
-                })
-                .catch(err => {
-                    return cb(err);
-                });
+        passport.use('jwt',new passportJWT.Strategy({
+            jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey : AppConfig.auth.jwtSecret
+        },
+        async function (jwtPayload, cb) {
+            try {
+                const user = await User.findByPk(jwtPayload.userId);
+                if (!user) {
+                    return cb(new HttpException(401, messages.authTokenInvalid, null), false);
+                }
+                return cb(null, user);
+            }
+            catch (error) {
+                return cb(error);
+            }
+
             }
         ));
     }
-
+/*passport.use(new FacebookStrategy({
+    clientID: "FB ID", //process.env.FACEBOOK_ID,
+    clientSecret: "FB SECRET", //process.env.FACEBOOK_SECRET,
+    callbackURL: "/api/auth/facebook/callback",
+    profileFields: ["name", "email", "link", "locale", "timezone"],
+    passReqToCallback: true
+  }, (req: any, accessToken, refreshToken, profile, done) => {
+      console.log("Using facebook passport !");*/
+/*    if (req.user) {
+      User.findOne({ facebook: profile.id }, (err, existingUser) => {
+        if (err) { return done(err); }
+        if (existingUser) {
+          req.flash("errors", { msg: "There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account." });
+          done(err);
+        } else {
+          User.findById(req.user.id, (err, user: any) => {
+            if (err) { return done(err); }
+            user.facebook = profile.id;
+            user.tokens.push({ kind: "facebook", accessToken });
+            user.profile.name = user.profile.name || `${profile.name.givenName} ${profile.name.familyName}`;
+            user.profile.gender = user.profile.gender || profile._json.gender;
+            user.profile.picture = user.profile.picture || `https://graph.facebook.com/${profile.id}/picture?type=large`;
+            user.save((err: Error) => {
+              req.flash("info", { msg: "Facebook account has been linked." });
+              done(err, user);
+            });
+          });
+        }
+      });
+    } else {
+      User.findOne({ facebook: profile.id }, (err, existingUser) => {
+        if (err) { return done(err); }
+        if (existingUser) {
+          return done(undefined, existingUser);
+        }
+        User.findOne({ email: profile._json.email }, (err, existingEmailUser) => {
+          if (err) { return done(err); }
+          if (existingEmailUser) {
+            req.flash("errors", { msg: "There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings." });
+            done(err);
+          } else {
+            const user: any = new User();
+            user.email = profile._json.email;
+            user.facebook = profile.id;
+            user.tokens.push({ kind: "facebook", accessToken });
+            user.profile.name = `${profile.name.givenName} ${profile.name.familyName}`;
+            user.profile.gender = profile._json.gender;
+            user.profile.picture = `https://graph.facebook.com/${profile.id}/picture?type=large`;
+            user.profile.location = (profile._json.location) ? profile._json.location.name : "";
+            user.save((err: Error) => {
+              done(err, user);
+            });
+          }
+        });
+      });
+    }*/
+//  }));
 }

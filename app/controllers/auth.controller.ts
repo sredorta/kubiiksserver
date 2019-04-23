@@ -16,7 +16,6 @@ import {Validator} from "class-validator";
 
 //Data models
 import {User} from '../models/user';
-import {Account} from '../models/account';
 import { createPublicKey } from 'crypto';
 import passport from 'passport';
 import passportLocal from 'passport-local';
@@ -150,6 +149,7 @@ export class AuthController {
         let handlers : RequestHandler[] = [];
         handlers.push(Middleware.validation(DTOPassword)); //Allways include password
         handlers.push(Middleware.validation(DTOKeepConnected));
+        //TODO validate username here !!!!!
 
 /*        if (Helper.isSharedSettingMatch("login_email", "include")) 
             handlers.push(Middleware.validation(DTOEmail));

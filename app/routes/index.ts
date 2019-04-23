@@ -6,14 +6,12 @@ import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
 import { messages } from "../middleware/common";
 import {Middleware} from '../middleware/common';
-import * as passportConfig from "../passports/local";
 import passport from "passport";
 import passportLocal from 'passport-local';
 import passportFacebook from "passport-jwt";
 import passportJWT from "passport-facebook";
 import {ExtractJwt} from "passport-jwt";
 import {User} from '../models/user';
-import {Account} from '../models/account';
 import {Helper} from '../classes/Helper';
 
 export class Routes {    
@@ -108,18 +106,20 @@ export class Routes {
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
-        
+    app.route("/api/users/test")
+    .get(UserController.testRoles);
+
         const router = Router();
 
         //Get all users
         //TODO remove the checkJwt
         app.route("/api/users/all")
+          //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
           .get(UserController.getAll);
-        //.get(Middleware.registered(),UserController.getAll);
 
         //Get user by ID
         app.route('/api/users/get/id')
-        .post([passport.authenticate('jwt',{session: false}),UserController.getUserByIdChecks()],UserController.getOneById);
+        .post(UserController.getUserByIdChecks(),UserController.getOneById);
 
         //Create new user
         app.route('/api/usercreate')
