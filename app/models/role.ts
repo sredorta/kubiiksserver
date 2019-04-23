@@ -37,7 +37,7 @@ export class Role extends Model<Role> {
                 console.log("ERROR: Could not seed ROLES !!!")
             }
         }
-        _seed();
+        return _seed();
     }  
 }
 

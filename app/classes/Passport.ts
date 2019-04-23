@@ -87,7 +87,29 @@ export class Passport {
 
             }
         ));
-    }/*
+    }
+    public static facebook() {
+      passport.use('facebook', new passportFacebook.Strategy({
+        clientID: "2088315884799260",
+        clientSecret: "fb201644535275033ad2af2fac26784f",
+        callbackURL: "http://127.0.0.1:3000/auth/facebook/callback",
+        passReqToCallback:true
+      },
+      function(req, accessToken, refreshToken, profile, cb) {
+        console.log("We are in facebook passport !!!!!!!!!!!!!!!!!");
+        process.nextTick(() => {
+          if (!req.user) console.log(profile);
+          return cb(null, profile);
+        });
+      /*  User.findOrCreate({name: profile.displayName}, {name: profile.displayName,userid: profile.id}, function(err, user) {
+          if (err) { return done(err); }
+          done(null, user);
+        });*/
+      }
+    ));
+
+    }
+    /*
 passport.use(new FacebookStrategy({
     clientID: "FB ID", //process.env.FACEBOOK_ID,
     clientSecret: "FB SECRET", //process.env.FACEBOOK_SECRET,

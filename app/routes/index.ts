@@ -81,6 +81,18 @@ export class Routes {
         console.log("User is: " + user.email);
     }),*/
 
+    app.route('/api/auth/facebook')
+      .get([passport.authenticate('facebook', {session:false})], AuthController.loginFB);
+
+    app.route('/api/auth/facebook/callback')
+    .get(
+    passport.authenticate('facebook', { failureRedirect: '/login' }),
+    function(req, res) {
+      // Successful authentication, redirect home.
+      res.json('We are here !!!!');
+    });
+
+    
 
     //getAuthUser
     app.route('/api/auth/get')

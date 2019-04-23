@@ -157,6 +157,10 @@ export class AuthController {
         return handlers;
     }    
 
+    static loginFB =  (req:Request, res:Response,next:NextFunction) => {
+        console.log("We are in LoginFB !!!");
+        res.json("We are here !");
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // getAuthUser

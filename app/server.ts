@@ -9,7 +9,6 @@ import {AppConfig} from './utils/config';
 import {Response,Request,NextFunction} from 'express';
 
 
-const PORT = 3000;
 const sequelize = new Sequelize({
     database: AppConfig.db.database,
     dialect: 'mariadb',
@@ -33,8 +32,8 @@ async function startServer() {
         console.error(err.stack);
       });
     //Start server listenning
-    app.listen(PORT, () => {
-        console.log('Express server listening on port ' + PORT);
+    app.listen(AppConfig.api.port, () => {
+        console.log('Express server listening on port ' + AppConfig.api.port);
     });
 }
 startServer();
