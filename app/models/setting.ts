@@ -1,6 +1,6 @@
 import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 
 export const SettingN = 'Not a model';
 export const NSetting = 'Not a model';
@@ -47,7 +47,7 @@ export class Setting extends Model<Setting> {
 
 import app from "../app";
 import { Sequelize, Model, DataTypes } from 'sequelize';
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 
 export class Setting extends Model {
     public id!: number; // Note that the `null assertion` `!` is required in strict mode.
@@ -88,7 +88,7 @@ export class Setting extends Model {
         }
 
     //Seeds the table with all the defaults copies the data from the config.json to the settings table for the front-end
-    //import AppConfig from '../config/config.json';
+    //import {AppConfig} from '../utils/Config';
 
     public static seed() {
         async function _seed() {

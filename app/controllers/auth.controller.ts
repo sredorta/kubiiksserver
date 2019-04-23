@@ -3,7 +3,7 @@ import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
 import nodemailer from 'nodemailer';
 
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 import {messages} from '../middleware/common';
 
 import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile, DTOId, DTOAccess, DTOKeepConnected} from '../routes/dto';

@@ -6,8 +6,7 @@ import { messages as en} from '../i18n/en';
 import {UniqueConstraintError, ValidationErrorItem} from 'sequelize';
 import * as path from 'path';
 import * as glob  from 'glob';
-import { config } from 'bluebird';
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import {HttpException} from '../classes/HttpException';
@@ -27,7 +26,7 @@ export class Middleware {
         console.log("Cors enabled !!!");
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             //Enabling CORS
-            res.header("Access-Control-Allow-Origin", AppConfig.api.host + ":"+ AppConfig.api.angularPort);
+            res.header("Access-Control-Allow-Origin", AppConfig.api.host + ":"+ AppConfig.api.fePort);
             res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
             next();

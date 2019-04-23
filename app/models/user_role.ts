@@ -1,6 +1,6 @@
 import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, ForeignKey,DefaultScope} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 import {User} from './user';
 import {Role} from './role';
 

@@ -4,7 +4,7 @@ import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
 import {messages} from '../middleware/common';
 import nodemailer from 'nodemailer';
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 
 
 import { IsString, IsNotEmpty } from 'class-validator';

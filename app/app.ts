@@ -5,7 +5,7 @@ import passport from "passport";
 import { Routes } from "./routes/index";
 import {Middleware} from "./middleware/common";
 import {Passport} from "./classes/Passport";
-
+import * as dotenv from "dotenv";
 
 class App {
 
@@ -23,6 +23,8 @@ class App {
         //Setup views setting
         this.app.set("view engine", "pug"); 
         this.app.set("views", path.join(__dirname, "views"));
+        console.log(`Current NODE_ENV is ${process.env.NODE_ENV}`);
+        //console.log(dotenv.config());
     }
 
     //Call herea all common to all routes middlewares

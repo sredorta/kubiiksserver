@@ -5,7 +5,7 @@ import passportFacebook from "passport-facebook";
 import {ExtractJwt} from "passport-jwt";
 import {messages} from '../middleware/common';
 import { Helper } from './Helper';
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 
 
 import { Request, Response, NextFunction } from "express";
@@ -87,16 +87,16 @@ export class Passport {
 
             }
         ));
-    }
-/*passport.use(new FacebookStrategy({
+    }/*
+passport.use(new FacebookStrategy({
     clientID: "FB ID", //process.env.FACEBOOK_ID,
     clientSecret: "FB SECRET", //process.env.FACEBOOK_SECRET,
     callbackURL: "/api/auth/facebook/callback",
     profileFields: ["name", "email", "link", "locale", "timezone"],
     passReqToCallback: true
   }, (req: any, accessToken, refreshToken, profile, done) => {
-      console.log("Using facebook passport !");*/
-/*    if (req.user) {
+      console.log("Using facebook passport !");
+    if (req.user) {
       User.findOne({ facebook: profile.id }, (err, existingUser) => {
         if (err) { return done(err); }
         if (existingUser) {
@@ -143,6 +143,6 @@ export class Passport {
           }
         });
       });
-    }*/
-//  }));
+    }
+  }));*/
 }

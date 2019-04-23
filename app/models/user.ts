@@ -1,7 +1,7 @@
 import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import jwt from "jsonwebtoken";
-import AppConfig from '../config/config.json';
+import {AppConfig} from '../utils/Config';
 import bcrypt from "bcryptjs";
 
 import {Role} from './role';
