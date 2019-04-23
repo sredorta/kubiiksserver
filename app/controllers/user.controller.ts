@@ -58,10 +58,8 @@ export class UserController {
     static getOneById = async (req: Request, res: Response, next: NextFunction) => {
         const id = req.body.id;
          //Do not include password and others
-        User.scope("render").findByPk(id,{
-            //attributes: ["id", "firstName", "lastName", "email","phone","mobile"]  
-            }
-        ).then(result => {
+        User.findByPk(id)
+        .then(result => {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");

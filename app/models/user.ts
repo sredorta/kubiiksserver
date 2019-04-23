@@ -1,5 +1,7 @@
 import { Sequelize, Model, DataTypes, BuildOptions, ModelAttributes } from 'sequelize';
 import { HasManyGetAssociationsMixin, HasManyAddAssociationMixin, HasManyHasAssociationMixin, Association, HasManyCountAssociationsMixin, HasManyCreateAssociationMixin } from 'sequelize';
+import bcrypt from "bcryptjs";
+
 import {Account} from './account';
 import {Helper} from '../classes/Helper';
 import { HttpException } from '../classes/HttpException';
@@ -46,6 +48,16 @@ export class User extends Model {
     }
 
 
+    //Hashes a password to store in db
+    /*public static hashPassword(unencrypted:string) : string {
+        return bcrypt.hashSync(unencrypted,8);
+    }*/
+
+    //Checks matching for unencrypted password against encrypted
+    public checkPassword(unencryptedPassword:string) : boolean {
+        console.log("Running checkPassword !!!");
+        return bcrypt.compareSync(unencryptedPassword, this.password);
+    }
     //TODO move to Account !!!!!
     //Checks if the password matches the encrypted one
     /*public checkPassword(unencryptedPassword:string) {

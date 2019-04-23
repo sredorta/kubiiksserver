@@ -23,6 +23,10 @@ import passportLocal from 'passport-local';
 import passportFacebook from "passport-jwt";
 import passportJWT from "passport-facebook";
 
+interface IJwtPayload {
+    userId:string
+
+}
 
 export class AuthController {
 
@@ -126,8 +130,37 @@ export class AuthController {
     // login
     ///////////////////////////////////////////////////////////////////////////
     //Debug with passports
-    static login = async (req: Request, res: Response, next:NextFunction) => {
-        console.log("body parsing", req.body);
+    static login =  (req:Request, res:Response,next:NextFunction) => {
+        //Thanks to passports we have the user in req.user if we get here credentials are valid
+            console.log("LOGIN ROUTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            //console.log(req.user);
+            const payload : IJwtPayload = {userId: req.user.id};
+            let accessTime : string;    
+            if (!req.body.keepconnected)
+                accessTime = AppConfig.auth.accessShort;
+            else
+                accessTime = AppConfig.auth.accessLong;
+            //We just need to create a token and provide it
+            const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: accessTime });
+            console.log("GENERATED TOKEN : " + token);  
+            res.json({token: token});              
+    }
+    //ADD CHECKS
+    public static loginChecks() {
+        let handlers : RequestHandler[] = [];
+        handlers.push(Middleware.validation(DTOPassword)); //Allways include password
+        handlers.push(Middleware.validation(DTOKeepConnected));
+
+/*        if (Helper.isSharedSettingMatch("login_email", "include")) 
+            handlers.push(Middleware.validation(DTOEmail));
+
+        if (Helper.isSharedSettingMatch("login_mobile", "include")) 
+            handlers.push(Middleware.validation(DTOMobile));*/
+
+        return handlers;
+    }    
+
+ /*       console.log("body parsing", req.body);
         //Create an user
         let myUser : User | null;
         let myAccount : Account;
@@ -145,8 +178,8 @@ export class AuthController {
             }).then(user => {
                 console.log("user is:")
                 console.log(user);
-           });
-    }
+           });*/
+    
 /*    static login = async (req: Request, res: Response, next:NextFunction) => {
         console.log("We are here in the signIn !!!");
         let query :any =  {};

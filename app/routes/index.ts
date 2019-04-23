@@ -42,12 +42,7 @@ export class Routes {
     //  /api/<plural>/create     POST    : add  (returns the new record)
     //  /api/<plural>/delete     DELETE  : remove (by Id)
 
-   /* app.route('/api/auth/passport')
-    .get(passportConfig.isAuthenticated, UserController.getAll);*/
-    app.get('/api/auth/passport', passport.authenticate('jwt', {session: false}), function (req, res) {
-      res.json({'success': true});
-  }
-);
+ 
     /////////////////////////////////////////////////////////////////
     // SETTINGS CONTROLLER PART
     //  This table is mapped from the config.json on the server start
@@ -74,15 +69,15 @@ export class Routes {
 
       
     //Login
+    app.route('/api/auth/login')
+      .post([passport.authenticate('local',{session: false}),AuthController.loginChecks()], AuthController.login);
     //app.route('/api/auth/login')
       //.post(AuthController.loginChecks(),AuthController.login);      
       //.get(passportConfig.isAuthenticated,AuthController.login);
-    app.post('/api/auth', passport.authenticate('local'), function(req, res){
-      console.log("passport user", req.user);
-      res.json("hello world");
-    });  
-    app.route('/api/auth/login')
-      .post( AuthController.login);
+
+   // app.post('/api/auth/login', passport.authenticate('local',{session: false}), AuthController.login);  
+/*    app.route('/api/auth/login')
+      .post( AuthController.login);*/
 /*      passport.authenticate('local', {session:false}, (err, user,info) => {
         console.log("We are here in authenticate !!!!");
         console.log("User is: " + user.email);
@@ -124,7 +119,7 @@ export class Routes {
 
         //Get user by ID
         app.route('/api/users/get/id')
-        .post(UserController.getUserByIdChecks(),UserController.getOneById);
+        .post([passport.authenticate('jwt',{session: false}),UserController.getUserByIdChecks()],UserController.getOneById);
 
         //Create new user
         app.route('/api/usercreate')

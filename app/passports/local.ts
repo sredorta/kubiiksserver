@@ -13,6 +13,41 @@ export const JWTStrategy = passportJWT.Strategy;
 export const LocalStrategy = passportLocal.Strategy;
 export const FacebookStrategy = passportFacebook.Strategy;
 
+
+
+       //PASSPORT PART !!!!!!
+       passport.serializeUser(function(user, done) {
+        done(null, user);
+    });
+    
+    passport.deserializeUser(function(obj, done) {
+        done(null, obj);
+    });
+
+    console.log("Before passport.use");
+    passport.use('local',new passportLocal.Strategy({
+        usernameField: 'username',
+        passwordField: 'password',
+    }, 
+    function (email, password, done)  {
+      console.log("LOCAL STRATEGY !!!!");
+      let user = User.build({email:"test"});
+      return done(null, user, {message: 'Incorrect email or password.'});
+    }));
+
+    console.log("After passport.use");
+
+
+
+
+
+
+
+
+
+/*
+
+
 //define REST proxy options based on logged in user
 passport.serializeUser(function(user, done) {
     done(null, user);
@@ -63,7 +98,7 @@ passport.use(new LocalStrategy({
           .catch(err => cb(err));
     }
 ));
-
+*/
 /*passport.use(new FacebookStrategy({
     clientID: "FB ID", //process.env.FACEBOOK_ID,
     clientSecret: "FB SECRET", //process.env.FACEBOOK_SECRET,

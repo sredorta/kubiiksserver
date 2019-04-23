@@ -19,18 +19,6 @@ export let messages = en; //Set default language and export messages
 
 
 
-import passport from 'passport';
-import passportLocal from 'passport-local';
-import passportFacebook from "passport-jwt";
-import passportJWT from "passport-facebook";
-import {ExtractJwt} from "passport-jwt";
-import {User} from '../models/user';
-import {Account} from '../models/account';
-import { Result } from 'range-parser';
-
-export const JWTStrategy = passportJWT.Strategy;
-export const LocalStrategy = passportLocal.Strategy;
-export const FacebookStrategy = passportFacebook.Strategy;
 
 
 export class Middleware {
@@ -172,37 +160,6 @@ export class Middleware {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             if (res.locals.jwtPayload.access!= "admin")
                 next(new HttpException(401, messages.authTokenInvalidAdmin, null));
-        }
-    }
-
-
-
-    public static authenticate() {
-        return  function(req:express.Request, res:express.Response, next:express.NextFunction) {
-            console.log("Before authenticate !");
-            passport.authenticate('local', {session:false}, (err, user,info) => {
-                console.log("We are here in authenticate !!!!");
-                console.log("User is: " + user.email);
-                if (err || !user) {
-                    return res.status(400).json({
-                        message: 'Something is not right',
-                        user   : user
-                    });
-                }
-                req.login(user, {session: false}, (err) => {
-                    if (err) {
-                        res.send(err);
-                    }
-                    const token = jwt.sign(
-                        { userId: user.id }, //Payload !
-                        AppConfig.auth.jwtSecret,
-                        { expiresIn: AppConfig.auth.accessShort }
-                      );
-                    console.log(token);
-                    return res.json({user, token});
-                });
-            })(req,res,next);
-            //next();
         }
     }
 
