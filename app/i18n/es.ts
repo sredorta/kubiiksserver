@@ -1,7 +1,6 @@
 export const messages = {
     description: "Esto es una api",
-    user: 'Usuario',
-    account: 'Cuenta',
+    User: 'Usuario',
 
     validationMinLength:(name = 'field', value='value') => `El campo '${name}' debe tener como minimo ${value} caracteres`,
     validationMaxLength: (name = 'field', value='value') => `El campo '${name}' debe tener menos de ${value} caracteres`,
@@ -19,9 +18,10 @@ export const messages = {
     authTokenInvalid: 'El token enviado es invalido',
     authTokenInvalidAdmin: 'Tienes que ser administrador para acceder aqui',
     authInvalidCredentials: 'Credenciales incorrectas',
-
+    authEmailResetPassword: (name = 'field') => `Un correo electronico con el nuevo password ha sido enviado a : ${name}`,
+    authEmailValidate: (name = 'field') => `Un correo electronico de confirmacion a sido enviado a : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Verificacion de la cuenta de correo`,
-    authResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
+    authEmailResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
     authEmailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
 
 

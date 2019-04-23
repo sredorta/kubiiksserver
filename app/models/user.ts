@@ -1,13 +1,17 @@
 import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
+import jwt from "jsonwebtoken";
+import AppConfig from '../config/config.json';
 import bcrypt from "bcryptjs";
+
 import {Role} from './role';
 import {UserRole} from './user_role';
 
+
+
+
 export const UserN = 'Not a model';
 export const NUser = 'Not a model';
-
-
 
 @DefaultScope({
   attributes: {exclude : ['password','isEmailValidated','emailValidationKey','isMobileValidated', 'mobileValidationKey']}
@@ -18,6 +22,9 @@ export const NUser = 'Not a model';
     include: [() => Role]
   },
   full: {
+    attributes: {exclude : []}
+  },
+  fullWidthRoles: {
     attributes: {exclude : []},
     include: [() => Role]
   }
@@ -83,13 +90,25 @@ export class User extends Model<User> {
 
 
   //Hashes a password to store in db
-  /*public static hashPassword(unencrypted:string) : string {
+  public static hashPassword(unencrypted:string) : string {
         return bcrypt.hashSync(unencrypted,8);
-  }*/
+  }
 
   //Checks matching for unencrypted password against encrypted
   public checkPassword(unencryptedPassword:string) : boolean {
-      console.log("Running checkPassword !!!");
       return bcrypt.compareSync(unencryptedPassword, this.password);
+  }
+
+  //Generates a token
+  public createToken(time: "short" | "long") {
+    let expires = AppConfig.auth.accessLong;
+    if (time == "short") {
+      expires = AppConfig.auth.accessShort;
+    }
+    return jwt.sign(
+      { id: this.id }, //Payload !
+      AppConfig.auth.jwtSecret,
+      { expiresIn: expires }
+    );
   }
 }

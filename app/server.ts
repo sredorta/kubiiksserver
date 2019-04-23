@@ -20,7 +20,7 @@ const sequelize = new Sequelize({
     password: AppConfig.db.password,
     modelPaths: [__dirname + './models/*.ts'],
     modelMatch: (filename, member) => {
-      return filename.substring(0, filename.indexOf('.model')) === member.toLowerCase();
+      return filename.substring(0, filename.indexOf('.ts')) === member.toLowerCase();
     },
   });
  sequelize.addModels([User,Setting,Role, UserRole]);

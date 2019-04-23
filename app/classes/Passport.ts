@@ -46,7 +46,7 @@ export class Passport {
             let query :any =  {};
             query[field] = username;
             console.log(query);
-            User.scope("all").findOne({
+            User.scope("full").findOne({
                     where: query
                 }).then((user:User|null)=> {
                     //Check user existance

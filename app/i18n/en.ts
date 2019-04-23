@@ -2,8 +2,7 @@ export const messages = {
     description: 'This is an api',
 
     //Validation messages
-    user: 'User',
-    account: 'Account',
+    User: 'User',
     validationMinLength: (name = 'field', value='value') => `Field '${name}' must have at least ${value} characters`,
     validationMaxLength: (name = 'field', value='value') => `Field '${name}' must have less than ${value} characters`,
     validationPassword: (name = 'field') => `Field '${name}' must have lowercases, uppercases, numbers and be more than 5 characters long`,
@@ -20,7 +19,9 @@ export const messages = {
     authTokenInvalid: 'The token provided is invalid',
     authTokenInvalidAdmin: 'Administrator rights are required',
     authInvalidCredentials: 'Invalid credentials',
-    authResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
+    authEmailResetPassword: (name = 'field') => `An email with your new password has been sent to : ${name}`,
+    authEmailValidate: (name = 'field') => `A validation email has been sent to : ${name}`,
+    authEmailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
     authEmailSentError: 'An error happened when sending the email, please contact the administrator',
     //authAccountNotFound: (name = 'field') => `${name} not found in the database with the given requirements`,

@@ -1,7 +1,6 @@
 export const messages = {
     description:"Ça c'est une api",
-    user: 'Utilizateur',
-    account: 'Compte',
+    User: 'Utilizateur',
 
     validationMinLength:(name = 'field', value='value') => `Le champ '${name}' doit avoir au moins ${value} characeters`,
     validationMaxLength: (name = 'field', value='value') => `Le champ '${name}' doit avoir moins de  ${value} characteres`,
@@ -19,9 +18,10 @@ export const messages = {
     authTokenInvalid: 'Le token fourni est invalide',
     authTokenInvalidAdmin: "Droit d'administrateur requis pour cette operation",
     authInvalidCredentials: 'Credentiels invalides',
-
+    authEmailResetPassword: (name = 'field') => `Un courriel avec le nouvea mot de passe à été envoyé à : ${name}`,
+    authEmailValidate: (name = 'field') => `Un courriel de validation de compte à été envoyé à : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,
-    authResetPasswordSubject: (name = 'field') => `${name} : Nouveau mot de passe`,
+    authEmailResetPasswordSubject: (name = 'field') => `${name} : Nouveau mot de passe`,
     authEmailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
 
     title: 'Implementation simple de i18n avec TypeScript',

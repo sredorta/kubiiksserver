@@ -81,6 +81,8 @@ export class Middleware {
                     if (error.errors[0].type)
                         if (error.errors[0].type =="unique violation") {
                             const elem = error.errors[0].instance._modelOptions.name.singular;
+                            console.log("Found unique violation !!!!!");
+                            console.log(elem);
                             //TODO fix this in case it doesn't exist and remove error
                             let code: string = `({
                                 Run: (messages: any, elem:string): string => {
