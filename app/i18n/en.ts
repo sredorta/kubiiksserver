@@ -24,8 +24,7 @@ export const messages = {
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
     authEmailSentError: 'An error happened when sending the email, please contact the administrator',
-    //authAccountNotFound: (name = 'field') => `${name} not found in the database with the given requirements`,
-
+    oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
 
 
 

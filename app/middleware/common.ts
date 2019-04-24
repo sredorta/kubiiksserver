@@ -166,4 +166,11 @@ export class Middleware {
         }
     }
 
+    public static catchFacebookResponse() {
+        return function (req:express.Request, res:express.Response, next:express.NextFunction) {
+            console.log("CATCHFACEBOOKRESPONSE !!!!!!!!!!!!");
+            next();
+        }
+    }
+
 }

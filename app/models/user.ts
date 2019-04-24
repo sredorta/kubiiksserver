@@ -61,27 +61,40 @@ export class User extends Model<User> {
   @Column(DataTypes.STRING(50))
   mobile!:string;
 
-  @AllowNull(true)
+  @AllowNull(false)
   @Default(false)
-  @Column(DataTypes.STRING(50))
+  @Column(DataTypes.BOOLEAN)
   isEmailValidated!:boolean;
 
   @AllowNull(false)
   @Column(DataTypes.STRING(30))
   emailValidationKey!:string;
 
-  @AllowNull(true)
+  @AllowNull(false)
   @Default(false)
-  @Column(DataTypes.STRING(50))
+  @Column(DataTypes.BOOLEAN)
   isMobileValidated!:boolean;
 
   @AllowNull(false)
   @Column(DataTypes.STRING(4))
   mobileValidationKey!:string;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataTypes.STRING(100))
   password!:string;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataTypes.BOOLEAN)
+  isSocial!:boolean;
+
+  @AllowNull(true)
+  @Column(DataTypes.STRING(50))
+  facebookId!:string;
+
+  @AllowNull(true)
+  @Column(DataTypes.STRING(255))
+  facebookToken!:string;
 
 
   //Relations
@@ -111,4 +124,38 @@ export class User extends Model<User> {
       { expiresIn: expires }
     );
   }
+
+  public attachRole(role: string) : Promise<boolean> {
+    let myPromise : Promise<boolean>;
+    let obj = this;
+    myPromise =  new Promise<boolean>((resolve,reject) => {
+      async function _addRole() {
+        let message :string ="";
+
+          let myRole = await Role.findOne({where:{"role":role}});
+          if (!myRole) {
+            reject("Role could not be found");
+          } else {
+            await obj.$add('Role',[myRole]); 
+            resolve(true);
+          }
+      }
+      _addRole();
+    });
+    return myPromise;
+  }
+/*
+  let adminRole = await Role.findOne({where:{role:"admin"}});
+
+  console.log(adminRole);   
+  if (!adminRole) {
+      return next( new HttpException(500, "Admin role not found !!!",null));
+  }
+  //If we are the first user, then we need to add the admin role
+  //If we are in demo mode each new user has an admin role
+  if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
+      await myUser.$add('Role',[adminRole]); 
+  }
+*/
+
 }

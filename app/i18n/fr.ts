@@ -23,6 +23,7 @@ export const messages = {
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nouveau mot de passe`,
     authEmailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
+    oauth2MissingField : (name = 'field') => `Erreur penant l'authentifition, impossible de recuperer le champ ${name} `,
 
     title: 'Implementation simple de i18n avec TypeScript',
     greeting: (name = 'John Doe') => `Bonjour, ${name}.`,

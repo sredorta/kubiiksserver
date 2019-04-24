@@ -16,13 +16,7 @@ import {Validator} from "class-validator";
 
 //Data models
 import {User} from '../models/user';
-import {Role} from '../models/role';
 
-import { createPublicKey } from 'crypto';
-import passport from 'passport';
-import passportLocal from 'passport-local';
-import passportFacebook from "passport-jwt";
-import passportJWT from "passport-facebook";
 
 interface IJwtPayload {
     userId:string
@@ -52,18 +46,12 @@ export class AuthController {
                 mobileValidationKey: Helper.generateRandomNumber(4),
                 password: User.hashPassword(req.body.password)
             });
-            let adminRole = await Role.findOne({where:{role:"admin"}});
 
-            console.log(adminRole);   
-            if (!adminRole) {
-                return next( new HttpException(500, "Admin role not found !!!",null));
-            }
-            await myUser.$add('Role',[adminRole]); 
-            //If we are the first user, then we need to add the admin role
-            //If we are in demo mode each new user has an admin role
+            //Attach admin role if required
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
-                await myUser.$add('Role',[adminRole]); 
+                await myUser.attachRole("admin"); 
             }
+
             //Depending on the signup_validation method we need to authenticate or not
             switch (method) {
                 //Login to the admin account if exists or to the standard if admin does not exist
@@ -159,7 +147,9 @@ export class AuthController {
 
     static loginFB =  (req:Request, res:Response,next:NextFunction) => {
         console.log("We are in LoginFB !!!");
-        res.json("We are here !");
+        console.log("loginFB, user is :");
+        console.log(req.user);
+        res.json(req.user);
     }
 
     ///////////////////////////////////////////////////////////////////////////

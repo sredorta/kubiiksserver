@@ -23,6 +23,7 @@ export const messages = {
     authEmailValidateSubject: (name = 'field') => `${name} : Verificacion de la cuenta de correo`,
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
     authEmailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
+    oauth2MissingField : (name = 'field') => `Error de autentificacion, impossible de recuperar el campo ${name} `,
 
 
     title: 'Implementation simple de i18n avec TypeScript',

@@ -92,79 +92,57 @@ export class Passport {
       passport.use('facebook', new passportFacebook.Strategy({
         clientID: AppConfig.auth.facebook.clientId,
         clientSecret: AppConfig.auth.facebook.clientSecret,
-        callbackURL: "http://127.0.0.1:3000/auth/facebook/callback",
-        passReqToCallback:true
+        callbackURL: "https://localhost:3000/api/auth/facebook/callback",
+        passReqToCallback:true,
+        profileFields: ['id', 'emails', 'name', "link","locale","timezone"]
       },
       function(req, accessToken, refreshToken, profile, cb) {
         console.log("We are in facebook passport !!!!!!!!!!!!!!!!!");
-        process.nextTick(() => {
-          if (!req.user) console.log(profile);
-          return cb(null, profile);
-        });
-      /*  User.findOrCreate({name: profile.displayName}, {name: profile.displayName,userid: profile.id}, function(err, user) {
-          if (err) { return done(err); }
-          done(null, user);
-        });*/
+        //Now we need to see if user already exists in database and if not then add it
+        async function _work() {
+            //Check that we got all the required minimum fields
+            if (!profile._json.email)
+              return cb(new HttpException(400, messages.oauth2MissingField('email'), null), false);
+
+            let myUser = await User.findOne({where: {email:profile._json.email}});
+            if (myUser) {
+              console.log("Overriding user data with facebook data !!!");
+              //We already have an user so just update fields if required
+              if (profile._json.first_name)
+                myUser.firstName = profile._json.first_name;
+              if (profile._json.last_name)
+                myUser.lastName = profile._json.last_name;
+                myUser.isSocial = true;
+                myUser.facebookId = profile.id;
+                myUser.facebookToken = accessToken;
+                myUser = await myUser.save();
+                return cb(null, myUser);
+            }
+            //LIKE SIGNUP
+            console.log("Creating user data with facebook data !!!");
+            //We got a new user so we register him
+            myUser = await User.create({
+              firstName: profile._json.first_name,
+              lastName: profile._json.last_name,
+              email: profile._json.email,
+              emailValidationKey: Helper.generateRandomString(30),
+              mobileValidationKey: Helper.generateRandomNumber(4),
+              isSocial:true,
+              facebookId : profile.id,
+              facebookToken: accessToken            
+            });
+            //Attach admin role if required
+            if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
+              await myUser.attachRole("admin"); 
+            }
+            //return cb(new HttpException(100, "SEND THE TOKEN PLEASE", null), false);
+
+            console.log("Sending user to callback");
+            //return cb(new HttpException(100, "HERE WE SHOULD PROVIDE TOKEN !", null), false);
+            return cb(null,myUser);
+        }
+        _work();
       }
     ));
-
-    }
-    /*
-passport.use(new FacebookStrategy({
-    clientID: "FB ID", //process.env.FACEBOOK_ID,
-    clientSecret: "FB SECRET", //process.env.FACEBOOK_SECRET,
-    callbackURL: "/api/auth/facebook/callback",
-    profileFields: ["name", "email", "link", "locale", "timezone"],
-    passReqToCallback: true
-  }, (req: any, accessToken, refreshToken, profile, done) => {
-      console.log("Using facebook passport !");
-    if (req.user) {
-      User.findOne({ facebook: profile.id }, (err, existingUser) => {
-        if (err) { return done(err); }
-        if (existingUser) {
-          req.flash("errors", { msg: "There is already a Facebook account that belongs to you. Sign in with that account or delete it, then link it with your current account." });
-          done(err);
-        } else {
-          User.findById(req.user.id, (err, user: any) => {
-            if (err) { return done(err); }
-            user.facebook = profile.id;
-            user.tokens.push({ kind: "facebook", accessToken });
-            user.profile.name = user.profile.name || `${profile.name.givenName} ${profile.name.familyName}`;
-            user.profile.gender = user.profile.gender || profile._json.gender;
-            user.profile.picture = user.profile.picture || `https://graph.facebook.com/${profile.id}/picture?type=large`;
-            user.save((err: Error) => {
-              req.flash("info", { msg: "Facebook account has been linked." });
-              done(err, user);
-            });
-          });
-        }
-      });
-    } else {
-      User.findOne({ facebook: profile.id }, (err, existingUser) => {
-        if (err) { return done(err); }
-        if (existingUser) {
-          return done(undefined, existingUser);
-        }
-        User.findOne({ email: profile._json.email }, (err, existingEmailUser) => {
-          if (err) { return done(err); }
-          if (existingEmailUser) {
-            req.flash("errors", { msg: "There is already an account using this email address. Sign in to that account and link it with Facebook manually from Account Settings." });
-            done(err);
-          } else {
-            const user: any = new User();
-            user.email = profile._json.email;
-            user.facebook = profile.id;
-            user.tokens.push({ kind: "facebook", accessToken });
-            user.profile.name = `${profile.name.givenName} ${profile.name.familyName}`;
-            user.profile.gender = profile._json.gender;
-            user.profile.picture = `https://graph.facebook.com/${profile.id}/picture?type=large`;
-            user.profile.location = (profile._json.location) ? profile._json.location.name : "";
-            user.save((err: Error) => {
-              done(err, user);
-            });
-          }
-        });
-      });
-    }
-  }));*/
+  }
 }

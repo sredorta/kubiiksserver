@@ -1,5 +1,7 @@
 import app from "./app";
 import {Sequelize} from 'sequelize-typescript';
+import fs from 'fs';
+import https from 'https';
 import {Setting} from './models/setting';
 import {User} from './models/user';
 import {Role} from './models/role';
@@ -8,6 +10,10 @@ import {UserRole} from './models/user_role';
 import {AppConfig} from './utils/config';
 import {Response,Request,NextFunction} from 'express';
 
+
+//const ca =  fs.readFileSync("./ssl.ca-bundle");
+const privateKey = fs.readFileSync('server.key');
+const certificate = fs.readFileSync('server.crt');
 
 const sequelize = new Sequelize({
     database: AppConfig.db.database,
@@ -31,9 +37,14 @@ async function startServer() {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");
         console.error(err.stack);
       });
-    //Start server listenning
-    app.listen(AppConfig.api.port, () => {
-        console.log('Express server listening on port ' + AppConfig.api.port);
-    });
+    console.log('STARTED SERVER ON PORT : ' + AppConfig.api.port);
+    //Serve with SSL or not
+    if (!AppConfig.api.ssl)
+        app.listen(AppConfig.api.port, () => {});
+    else
+        https.createServer({
+            key: privateKey,
+            cert: certificate
+        }, app).listen(AppConfig.api.port);
 }
 startServer();

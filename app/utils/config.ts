@@ -21,7 +21,8 @@ import * as dotenv from "dotenv";
             "appName": <string>process.env.API_NAME,
             "host": <string>process.env.API_HOST,
             "port": <string>process.env.API_PORT,
-            "fePort": <string>process.env.API_FE_PORT
+            "fePort": <string>process.env.API_FE_PORT,
+            "ssl": Boolean(JSON.parse(<string>process.env.API_SSL))
         },
         "db" : {
             "username": <string>process.env.DB_USERNAME,

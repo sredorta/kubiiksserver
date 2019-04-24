@@ -7,6 +7,9 @@ import {AuthController} from '../controllers/auth.controller';
 import { messages } from "../middleware/common";
 import {Middleware} from '../middleware/common';
 import passport from "passport";
+import jwt from "jsonwebtoken";
+import {AppConfig} from '../utils/Config';
+
 import passportLocal from 'passport-local';
 import passportFacebook from "passport-jwt";
 import passportJWT from "passport-facebook";
@@ -82,14 +85,20 @@ export class Routes {
     }),*/
 
     app.route('/api/auth/facebook')
-      .get([passport.authenticate('facebook', {session:false})], AuthController.loginFB);
+      .get(passport.authenticate('facebook', {scope:['email']}), AuthController.loginFB);
 
     app.route('/api/auth/facebook/callback')
     .get(
-    passport.authenticate('facebook', { failureRedirect: '/login' }),
+    passport.authenticate('facebook', { failureRedirect: '/api/auth/facebook/callback/fail' }),
     function(req, res) {
-      // Successful authentication, redirect home.
-      res.json('We are here !!!!');
+      console.log("FACEBOOK PASSPORT CALLBACK :");
+      console.log(req.user);
+      const payload = {userId: req.user.id};
+
+      //We just need to create a token and provide it
+      const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });
+      console.log("GENERATED TOKEN : " + token);  
+      res.json({token: token});            
     });
 
     

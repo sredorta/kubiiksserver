@@ -3,3 +3,5 @@ build/
 .env.development
 .env.production
 .env.test
+server.crt
+server.key
