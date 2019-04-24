@@ -85,21 +85,16 @@ export class Routes {
     }),*/
 
     app.route('/api/auth/facebook')
-      .get(passport.authenticate('facebook', {scope:['email']}), AuthController.loginFB);
+      .get(passport.authenticate('facebook', {scope:['email'], session:false}));
 
     app.route('/api/auth/facebook/callback')
-    .get(
-    passport.authenticate('facebook', { failureRedirect: '/api/auth/facebook/callback/fail' }),
-    function(req, res) {
-      console.log("FACEBOOK PASSPORT CALLBACK :");
-      console.log(req.user);
-      const payload = {userId: req.user.id};
+    .get(passport.authenticate('facebook', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
 
-      //We just need to create a token and provide it
-      const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });
-      console.log("GENERATED TOKEN : " + token);  
-      res.json({token: token});            
-    });
+    //Fail callback to any oauth2
+    //We just redirect to the login page
+    app.route('/api/auth/oauth2/callback/fail')
+      .get(AuthController.oauth2Fail);
+
 
     
 

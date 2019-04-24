@@ -1,13 +1,27 @@
-import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, BelongsToMany} from 'sequelize-typescript';
+import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, BelongsToMany, DefaultScope,Scopes} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/Config';
 import {UserRole} from './user_role';
 import {User} from './user';
 
 
-export const SettingN = 'Not a model';
-export const NSetting = 'Not a model';
+export const RoleN = 'Not a model';
+export const NRole = 'Not a model';
 
+@DefaultScope({
+    attributes: {exclude : []}
+  })
+  @Scopes({
+    withUsers: {
+      attributes: {exclude : []},
+      include: [() => User]
+    },
+    reduced: {
+      attributes: {exclude : []}
+    }
+
+  })
+  
 @Table
 export class Role extends Model<Role> {
 

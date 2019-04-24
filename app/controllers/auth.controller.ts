@@ -145,12 +145,24 @@ export class AuthController {
         return handlers;
     }    
 
-    static loginFB =  (req:Request, res:Response,next:NextFunction) => {
-        console.log("We are in LoginFB !!!");
-        console.log("loginFB, user is :");
-        console.log(req.user);
-        res.json(req.user);
+    ///////////////////////////////////////////////////////////////////////////
+    // FACEBOOK OAUTH2
+    ///////////////////////////////////////////////////////////////////////////
+    //When any of the oauth2 gets a success then redirect to /login/success and provide the token we have generated
+    //Angular should recover the token from the page and redirect to home afterwards
+    static oauth2Success =  (req:Request, res:Response,next:NextFunction) => {
+            const payload = {userId: req.user.id};
+      
+            //We just need to create a token and provide it
+            const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });
+            res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login/success?token="+token);      
     }
+
+    //When any of the oauth2 gets a fail then redirect to /login/fail
+    //Angular should do nothing
+    static oauth2Fail =  (req:Request, res:Response,next:NextFunction) => {
+        res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login");
+    };
 
     ///////////////////////////////////////////////////////////////////////////
     // getAuthUser

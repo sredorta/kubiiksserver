@@ -18,7 +18,7 @@ export const NUser = 'Not a model';
 })
 @Scopes({
   withRoles: {
-    attributes: {exclude : ['password','isEmailValidated','emailValidationKey','isMobileValidated', 'mobileValidationKey']},
+    attributes: {exclude : ['password','isEmailValidated','emailValidationKey','isMobileValidated', 'mobileValidationKey','UserRole']},
     include: [() => Role]
   },
   full: {

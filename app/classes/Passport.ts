@@ -102,7 +102,7 @@ export class Passport {
         async function _work() {
             //Check that we got all the required minimum fields
             if (!profile._json.email)
-              return cb(new HttpException(400, messages.oauth2MissingField('email'), null), false);
+              return cb(null,null,null);
 
             let myUser = await User.findOne({where: {email:profile._json.email}});
             if (myUser) {
@@ -134,11 +134,11 @@ export class Passport {
             //Attach admin role if required
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
               await myUser.attachRole("admin"); 
-            }
+            }           
             //return cb(new HttpException(100, "SEND THE TOKEN PLEASE", null), false);
 
             console.log("Sending user to callback");
-            //return cb(new HttpException(100, "HERE WE SHOULD PROVIDE TOKEN !", null), false);
+            //return cb(new HttpException(400, "HERE WE SHOULD PROVIDE TOKEN !", null), false);
             return cb(null,myUser);
         }
         _work();
