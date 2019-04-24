@@ -45,7 +45,11 @@ import * as dotenv from "dotenv";
         "auth": {
             "jwtSecret": <string>process.env.AUTH_JWT_SECRET,
             "accessShort": <string>process.env.AUTH_ACCESS_SHORT,
-            "accessLong": <string>process.env.AUTH_ACCESS_LONG
+            "accessLong": <string>process.env.AUTH_ACCESS_LONG,
+            "facebook": {
+                "clientId": <string>process.env.AUTH_FACEBOOK_CLIENT_ID,
+                "clientSecret": <string>process.env.AUTH_FACEBOOK_CLIENT_SECRET
+            }
         },
         "sharedSettings" : [
             {"key": "signup_firstName", "value":"include"},

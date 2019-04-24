@@ -90,8 +90,8 @@ export class Passport {
     }
     public static facebook() {
       passport.use('facebook', new passportFacebook.Strategy({
-        clientID: "2088315884799260",
-        clientSecret: "fb201644535275033ad2af2fac26784f",
+        clientID: AppConfig.auth.facebook.clientId,
+        clientSecret: AppConfig.auth.facebook.clientSecret,
         callbackURL: "http://127.0.0.1:3000/auth/facebook/callback",
         passReqToCallback:true
       },
