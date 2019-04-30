@@ -71,11 +71,52 @@ export class Middleware {
             console.log("//////////////////////////////////////////////");
 
             console.log("Message: " + error.message);
-
+            console.log(typeof error);
             const status : number = error.status || 500;
             let message = error.message || 'Something went wrong';;
-            //Override unique violation message
+            let send = false;
+            if (error.errors) {
+                if (error.errors[0])
+                    if (error.errors[0].type == "Validation error") {
+                        message = messages.validation(error.errors[0].path);
+                        response.status(status).send({
+                                status:status,
+                                message: message
+                                });
+                    } else if (error.errors[0].type =="unique violation") {
+                        async function _generateError() {
+                            const elem = error.errors[0].instance._modelOptions.name.singular;
+                            console.log("Found unique violation !!!!!");
+                            console.log(elem);
+                            //TODO fix this in case it doesn't exist and remove error
+                            let code: string = `({
+                                Run: (messages: any, elem:string): string => {
+                                    return Promise.resolve(messages.validationUnique(messages[elem])); }
+                                })`;
+                            let result = ts.transpile(code);
+                            let runnalbe :any = eval(result);
+                            message = await runnalbe.Run(messages,elem);
+                            response.status(status).send({
+                                status:status,
+                                message: message
+                                });
+                        }
+                        _generateError();
+                    } else {
+                        response.status(status).send({
+                            status:status,
+                            message: message
+                        });             
+                    } 
+            } else {
+                response.status(status).send({
+                    status:status,
+                    message: message
+                });                  
+            }         
+/*
 
+            //Override unique violation message
             async function _generateError() {
                 if (error.errors)
                 if (error.errors[0])
@@ -99,15 +140,15 @@ export class Middleware {
                     });
 
             }
-            _generateError();
+            _generateError();*/
         }
     }
 
-
-    //Middleware that handles parameter input validation
+    /** Middleware that handles parameter input validation using class-validator and DTOs*/
     public static validation<T>(type: any): express.RequestHandler {
         console.log("Validation middleWare enabled !");
         return function validationMiddleware(req:Request, res:Response, next: NextFunction) {
+          console.log("VALIDATING PARAMETERS !!!!");  
           validate(plainToClass(type, req.body))
             .then((errors: ValidationError[]) => {
               if (errors.length > 0) {
@@ -134,7 +175,7 @@ export class Middleware {
 
 
     //Checks if header contains JWT and needs to be called at each route that requires auth
-    public static registered() {
+/*    public static registered() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             const token = <string>req.headers["authorization"];
             console.log("Found token in Header : " + token);
@@ -157,7 +198,7 @@ export class Middleware {
             }      
             next();
         }
-    }
+    }*/
     //Checks that the registered user is an administrator if not errors      
     public static admin() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {

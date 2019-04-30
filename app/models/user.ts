@@ -1,4 +1,4 @@
-import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany} from 'sequelize-typescript';
+import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany, Is} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import jwt from "jsonwebtoken";
 import {AppConfig} from '../utils/Config';
@@ -52,12 +52,10 @@ export class User extends Model<User> {
   email!:string;
 
   @AllowNull(true)
-  @Unique(true)
   @Column(DataTypes.STRING(50))
   phone!:string;
 
   @AllowNull(true)
-  @Unique(true)
   @Column(DataTypes.STRING(50))
   mobile!:string;
 

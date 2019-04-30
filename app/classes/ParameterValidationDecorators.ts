@@ -2,9 +2,39 @@ import {registerDecorator, ValidationArguments, ValidationOptions,ValidatorConst
 import { User } from "../models/user";
 import {Model} from "sequelize";
 import {Validator} from "class-validator";
+import {messages} from '../middleware/common';
+
 import { Helper } from "./Helper";
+import {HttpException} from './HttpException';
 
 const validator = new Validator();
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// Is VALIDATORS ONLY FOR MODELS WITH TABLES
+/////////////////////////////////////////////////////////////////////////////////////////
+//MOVE THIS TO ANOTHER FILE !!!!!!!!!!
+
+/**Validates mobile format */
+/*export const isUniqueIfNotNull = async function(value:any): Promise<void> {
+    console.log("isUniqueIfNotNull : " + value);
+    console.log(value);
+    if (value) {
+
+        if (value.length!= 10) throw new HttpException(400,"invalid",null);
+        let re = /^\d+$/;
+        if(!re.test(value))  throw new HttpException(400,"invalid",null);
+        re =/^0[1-5].*$/;
+        if (value.match(re))
+          throw new HttpException(400,"invalid",null);
+    }
+}*/
+
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////
 // PASSWORD VALIDATOR : IsPassword(params)
 //  description: Validates password quality
@@ -13,6 +43,7 @@ const validator = new Validator();
 class PasswordValidator implements ValidatorConstraintInterface {
  
     validate(value: string, args: ValidationArguments) {
+        
         return Helper.passwordPassQualityRequired(value);
     }
  
@@ -37,20 +68,24 @@ export function IsPassword(validationOptions?: ValidationOptions) {
 ////////////////////////////////////////////////////////////////////////////
 @ValidatorConstraint()
 class PhoneValidator implements ValidatorConstraintInterface {
+
     validate(value: string, args: ValidationArguments) {
         const locale = args.constraints[0];
         //TODO : Do the corresponding checkings depending on locale
         //console.log("VALUE: " + value);
         //console.log("Using locale: " + locale);
         //console.log(value.length);
+        console.log("WE ARE HERE NOW AND CHECKING: " + value);
         if (value) {
             if (value.length!= 10) return false;
             let re = /^\d+$/;
             if(!re.test(value)) return false;
             re =/^0[1-5].*$/;
-            if (!value.match(re))
-            return false;
+            if (value.match(re))
+                return false;
+
         }
+
         return true;   
     }
  
@@ -112,7 +147,7 @@ export function IsMobile(locale:string, validationOptions?: ValidationOptions) {
 
 
 
-/*
+
 ////////////////////////////////////////////////////////////////////////////
 // UNIQUE VALIDATOR : IsUnique()
 //  description: Validates is Unique in database
@@ -158,4 +193,4 @@ export function IsUnique<T extends Model>(myClass:new() => T,field:string,valida
              validator: UniqueValidator
          });
     };
-}*/
+}

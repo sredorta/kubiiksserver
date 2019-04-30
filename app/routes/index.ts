@@ -75,7 +75,7 @@ export class Routes {
 
     //Signup
     app.route('/api/auth/signup')
-      .post(AuthController.signup);
+      .post(AuthController.signupChecks(),AuthController.signup);
 
     //Login
     app.route('/api/auth/login')

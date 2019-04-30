@@ -58,6 +58,7 @@ export class Helper {
         if (value.length<5) return false;
         if (value.length>50) return false;
         var re = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{5,}';
+
         //return false;
         if (!value.match(re))
             return false

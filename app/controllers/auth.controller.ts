@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import {AppConfig} from '../utils/Config';
 import {messages} from '../middleware/common';
 
-import {DTOFirstName, DTOLastName,DTOEmail,DTOPassword,DTOPhone,DTOMobile, DTOId, DTOAccess, DTOKeepConnected} from '../routes/dto';
+import {DTOFirstNameRequired,DTOFirstNameOptional, DTOLastNameRequired,DTOLastNameOptional,DTOEmail,DTOPassword,DTOPhoneOptional,DTOPhoneRequired,DTOMobileRequired,DTOMobileOptional, DTOId, DTOAccess, DTOKeepConnected} from '../routes/dto';
 import { Helper } from '../classes/Helper';
 
 import jwt from "jsonwebtoken";
@@ -26,8 +26,6 @@ interface IJwtPayload {
 export class AuthController {
 
     constructor() {}
-
-
 
     ///////////////////////////////////////////////////////////////////////////
     //User signup
@@ -98,15 +96,29 @@ export class AuthController {
         let handlers : RequestHandler[] = [];
         handlers.push(Middleware.validation(DTOPassword)); //Allways include password
         if (Helper.isSharedSettingMatch("signup_firstName", "include"))
-            handlers.push(Middleware.validation(DTOFirstName));
+            handlers.push(Middleware.validation(DTOFirstNameRequired));
+        if (Helper.isSharedSettingMatch("signup_firstName", "optional"))
+            handlers.push(Middleware.validation(DTOFirstNameOptional));
+
         if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
-            handlers.push(Middleware.validation(DTOLastName));
+            handlers.push(Middleware.validation(DTOLastNameRequired));
+        if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
+            handlers.push(Middleware.validation(DTOLastNameOptional));
+
         if (Helper.isSharedSettingMatch("signup_email", "include")) 
             handlers.push(Middleware.validation(DTOEmail));
+
         if (Helper.isSharedSettingMatch("signup_phone", "include")) 
-            handlers.push(Middleware.validation(DTOPhone));
+            handlers.push(Middleware.validation(DTOPhoneRequired));            
+        if (Helper.isSharedSettingMatch("signup_phone", "optional")) 
+            handlers.push(Middleware.validation(DTOPhoneOptional));
+
         if (Helper.isSharedSettingMatch("signup_mobile", "include")) 
-            handlers.push(Middleware.validation(DTOMobile));
+            handlers.push(Middleware.validation(DTOMobileRequired));            
+        if (Helper.isSharedSettingMatch("signup_mobile", "optional")) 
+            handlers.push(Middleware.validation(DTOMobileOptional));
+
+
         return handlers;
     }
 
@@ -275,7 +287,7 @@ export class AuthController {
     public static resetPasswordByMobileChecks() {
         let handlers : RequestHandler[] = [];
         handlers.push(Middleware.validation(DTOAccess));
-        handlers.push(Middleware.validation(DTOMobile));
+        handlers.push(Middleware.validation(DTOMobileRequired));
         return handlers;
     }    
 }
