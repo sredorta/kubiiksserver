@@ -50,6 +50,10 @@ import * as dotenv from "dotenv";
             "facebook": {
                 "clientId": <string>process.env.AUTH_FACEBOOK_CLIENT_ID,
                 "clientSecret": <string>process.env.AUTH_FACEBOOK_CLIENT_SECRET
+            },
+            "googleplus": {
+                "clientId": <string>process.env.AUTH_GOOGLEPLUS_CLIENT_ID,
+                "clientSecret": <string>process.env.AUTH_GOOGLEPLUS_CLIENT_SECRET
             }
         },
         "sharedSettings" : [

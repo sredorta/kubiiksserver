@@ -2,6 +2,7 @@ import passport from 'passport';
 import passportLocal from 'passport-local';
 import passportJWT from "passport-jwt";
 import passportFacebook from "passport-facebook";
+import passsportGoogle from "passport-google-oauth";
 import {ExtractJwt} from "passport-jwt";
 import {messages} from '../middleware/common';
 import { Helper } from './Helper';
@@ -147,5 +148,92 @@ export class Passport {
         _work();
       }
     ));
+  }
+
+  //GooglePlus Profile example
+  /*
+  { id: '118285710646673394875',
+  displayName: 'Sergi Redorta',
+  name: { familyName: 'Redorta', givenName: 'Sergi' },
+  photos:
+   [ { value: 'https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rda_vAH3Psp41NUnGzmbrxk0xqMww/mo/photo.jpg' } ],
+  provider: 'google',
+  _raw: '{\n  "sub": "118285710646673394875",\n  "name": "Sergi Redorta",\n  "given_name": "Sergi",\n  "family_name": "Redorta",\n  "profile": "https://plus.google.com/118285710646673394875",\n  "picture": "https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rda_vAH3Psp41NUnGzmbrxk0xqMww/mo/photo.jpg",\n  "locale": "fr"\n}',
+  _json:
+   { sub: '118285710646673394875',
+     name: 'Sergi Redorta',
+     given_name: 'Sergi',
+     family_name: 'Redorta',
+     profile: 'https://plus.google.com/118285710646673394875',
+     picture: 'https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rda_vAH3Psp41NUnGzmbrxk0xqMww/mo/photo.jpg',
+     locale: 'fr' } }*/
+
+  public static googleplus() {
+    passport.use('googleplus', new passsportGoogle.OAuth2Strategy({
+      clientID: AppConfig.auth.googleplus.clientId,
+      clientSecret: AppConfig.auth.googleplus.clientSecret,
+      callbackURL: "https://localhost:3000/api/auth/googleplus/callback",
+      passReqToCallback:true,
+    },
+    function(req, accessToken, refreshToken, profile, cb) {
+      console.log("We are in googleplus passport !!!!!!!!!!!!!!!!!");
+      //Now we need to see if user already exists in database and if not then add it
+      async function _work() {
+          console.log("GOT PROFILE:");
+          console.log(profile);
+          return cb(null, {
+            profile: profile,
+            token: accessToken
+        });
+          //Check that we got all the required minimum fields
+ /*         if (!profile)
+            return cb(null,null);
+
+          if (!profile.emails)
+            return cb(null,null);
+          if (!profile.emails[0].value)
+            return cb(null,null);
+
+
+          let myUser = await User.findOne({where: {email:profile.emails[0].value}});
+          if (myUser) {
+            console.log("Overriding user data with facebook data !!!");
+            //We already have an user so just update fields if required
+            if (profile._json.first_name)
+              myUser.firstName = profile._json.first_name;
+            if (profile._json.last_name)
+              myUser.lastName = profile._json.last_name;
+              myUser.isSocial = true;
+              myUser.facebookId = profile.id;
+              myUser.facebookToken = accessToken;
+              myUser = await myUser.save();
+              return cb(null, myUser);
+          }
+          //LIKE SIGNUP
+          console.log("Creating user data with facebook data !!!");
+          //We got a new user so we register him
+          myUser = await User.create({
+            firstName: profile._json.first_name,
+            lastName: profile._json.last_name,
+            email: profile._json.email,
+            emailValidationKey: Helper.generateRandomString(30),
+            mobileValidationKey: Helper.generateRandomNumber(4),
+            isSocial:true,
+            facebookId : profile.id,
+            facebookToken: accessToken            
+          });
+          //Attach admin role if required
+          if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
+            await myUser.attachRole("admin"); 
+          }           
+          //return cb(new HttpException(100, "SEND THE TOKEN PLEASE", null), false);
+
+          console.log("Sending user to callback");
+          //return cb(new HttpException(400, "HERE WE SHOULD PROVIDE TOKEN !", null), false);
+          return cb(null,myUser);*/
+      }
+      _work();
+    }
+  ));
   }
 }

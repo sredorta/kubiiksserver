@@ -87,6 +87,13 @@ export class Routes {
     app.route('/api/auth/facebook/callback')
     .get(passport.authenticate('facebook', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
 
+    app.route('/api/auth/googleplus')
+      .get(passport.authenticate('googleplus', {scope: ['https://www.googleapis.com/auth/userinfo.profile'], session:false}));
+
+    app.route('/api/auth/googleplus/callback')
+    .get(passport.authenticate('googleplus', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
+
+
     //Fail callback to any oauth2
     //We just redirect to the login page
     app.route('/api/auth/oauth2/callback/fail')
