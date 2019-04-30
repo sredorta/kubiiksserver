@@ -1,5 +1,6 @@
 import app from "./app";
 import {Sequelize} from 'sequelize-typescript';
+//import {Sequelize as SequelizeOrig} from 'sequelize';
 import fs from 'fs';
 import https from 'https';
 import {Setting} from './models/setting';
@@ -26,6 +27,13 @@ const sequelize = new Sequelize({
       return filename.substring(0, filename.indexOf('.ts')) === member.toLowerCase();
     },*/
   });
+ /*const sequelizeOrig = new SequelizeOrig(AppConfig.db.database, AppConfig.db.username,AppConfig.db.password, {
+      dialect: 'mariadb',
+      host: '127.0.0.1'
+ });*/
+
+
+
  sequelize.addModels([User,Setting,Role,UserRole]);
 
 async function startServer() {    
