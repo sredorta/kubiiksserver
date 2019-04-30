@@ -25,6 +25,8 @@ export const messages = {
     authEmailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
     oauth2MissingField : (name = 'field') => `Error de autentificacion, impossible de recuperar el campo ${name} `,
 
+    apiRouteNotFound: 'El servidor no encontró la petición',
+
 
     title: 'Implementation simple de i18n avec TypeScript',
     greeting: (name = 'John Doe') => `Bonjour, ${name}.`,

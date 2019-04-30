@@ -82,7 +82,7 @@ export class AuthController {
                      console.log(html);
 
                      transporter.sendMail(myEmail).then(result => {
-                        res.send({message: messages.authEmailValidate(myUser.email)});  
+                        res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
                      }).catch(error => {
                         next(new HttpException(500, messages.authEmailSentError,null));
                      })
@@ -155,7 +155,7 @@ export class AuthController {
       
             //We just need to create a token and provide it
             const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });
-            res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login/success?token="+token);      
+            res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login/success/"+token);      
     }
 
     //When any of the oauth2 gets a fail then redirect to /login/fail
@@ -169,14 +169,16 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     static getAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //TODO SWITCH TO PASSPORT !!!!
-        console.log(res.locals.jwtPayload);
+        //Sending back user
+        res.json(req.user);
+        /*console.log(res.locals.jwtPayload);
         User.findOne({where: {id: res.locals.jwtPayload.userId}}).then(myUser => {
             if (!myUser)
                 next( new HttpException(400, messages.authTokenInvalid,null));
             else {
                 res.json(myUser);
             }
-        });
+        });*/
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -250,7 +252,7 @@ export class AuthController {
                 console.log(html);
 
                 transporter.sendMail(myEmail).then(result => {
-                        res.send({message: messages.authEmailResetPassword(myUser.email)});  
+                        res.send({message: {show:true,text:messages.authEmailResetPassword(myUser.email)}});  
                 }).catch(error => {
                         next(new HttpException(500, messages.authEmailSentError,null));
                 });          

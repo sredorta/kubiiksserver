@@ -51,12 +51,12 @@ export class Passport {
                 }).then((user:User|null)=> {
                     //Check user existance
                     if (!user) {
-                        return cb(new HttpException(400, messages.authInvalidCredentials ,null), false);
+                        return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                     }
                     //Check password valid
                     if (!user.checkPassword(password)){
                         console.log("Passwords not matching !!!!");
-                        return cb(new HttpException(400, messages.authInvalidCredentials ,null), false);
+                        return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                     }
                     //Success 
                     return cb(null, user);
@@ -74,9 +74,12 @@ export class Passport {
             secretOrKey : AppConfig.auth.jwtSecret
         },
         async function (jwtPayload, cb) {
+            console.log("We are here !!!!");
+            console.log(jwtPayload);
             try {
-                const user = await User.findByPk(jwtPayload.userId);
+                const user = await User.findByPk(jwtPayload.id);
                 if (!user) {
+                    console.log(user);
                     return cb(new HttpException(401, messages.authTokenInvalid, null), false);
                 }
                 return cb(null, user);

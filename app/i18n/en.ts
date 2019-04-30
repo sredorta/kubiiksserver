@@ -26,7 +26,7 @@ export const messages = {
     authEmailSentError: 'An error happened when sending the email, please contact the administrator',
     oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
 
-
+    apiRouteNotFound: 'The server could not found the requested action',
 
 
     title: 'Simple i18n implementation with TypeScript',

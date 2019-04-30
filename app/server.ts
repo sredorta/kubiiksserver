@@ -15,6 +15,7 @@ import {Response,Request,NextFunction} from 'express';
 const privateKey = fs.readFileSync('server.key');
 const certificate = fs.readFileSync('server.crt');
 
+
 const sequelize = new Sequelize({
     database: AppConfig.db.database,
     dialect: 'mariadb',
@@ -25,7 +26,7 @@ const sequelize = new Sequelize({
       return filename.substring(0, filename.indexOf('.ts')) === member.toLowerCase();
     },*/
   });
- sequelize.addModels([User,Setting,Role, UserRole]);
+ sequelize.addModels([User,Setting,Role,UserRole]);
 
 async function startServer() {    
     await sequelize.sync({force:true});
@@ -41,10 +42,11 @@ async function startServer() {
     //Serve with SSL or not
     if (!AppConfig.api.ssl)
         app.listen(AppConfig.api.port, () => {});
-    else
+    else {
         https.createServer({
             key: privateKey,
             cert: certificate
         }, app).listen(AppConfig.api.port);
+    }
 }
 startServer();

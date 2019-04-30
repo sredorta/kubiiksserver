@@ -6,6 +6,8 @@ import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
 import { messages } from "../middleware/common";
 import {Middleware} from '../middleware/common';
+import {HttpException} from  '../classes/HttpException';
+import https from 'https';
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import {AppConfig} from '../utils/Config';
@@ -20,13 +22,23 @@ import {Helper} from '../classes/Helper';
 export class Routes {    
   //Call all controllers required here  
 
+  /*
+  agentOptions = {
+    host: '127.0.0.1'
+    , port: '3000'
+    , path: '/'
+    , rejectUnauthorized: false
+  };
+  agent = https()*/
 
-  public routes(app:Router): void {          
+  
+
+  public routes(app:Router): void {
 
 
     app.route('/')
         .get((req: Request, res: Response, next: NextFunction) => {            
-            res.status(200).send({
+          res.status(200).send({
                 message: messages.description
             });
     });
@@ -63,26 +75,11 @@ export class Routes {
 
     //Signup
     app.route('/api/auth/signup')
-      .post(AuthController.signupChecks(),AuthController.signup);
+      .post(AuthController.signup);
 
-
-
-
-      
     //Login
     app.route('/api/auth/login')
       .post([passport.authenticate('local',{session: false}),AuthController.loginChecks()], AuthController.login);
-    //app.route('/api/auth/login')
-      //.post(AuthController.loginChecks(),AuthController.login);      
-      //.get(passportConfig.isAuthenticated,AuthController.login);
-
-   // app.post('/api/auth/login', passport.authenticate('local',{session: false}), AuthController.login);  
-/*    app.route('/api/auth/login')
-      .post( AuthController.login);*/
-/*      passport.authenticate('local', {session:false}, (err, user,info) => {
-        console.log("We are here in authenticate !!!!");
-        console.log("User is: " + user.email);
-    }),*/
 
     app.route('/api/auth/facebook')
       .get(passport.authenticate('facebook', {scope:['email'], session:false}));
@@ -95,12 +92,10 @@ export class Routes {
     app.route('/api/auth/oauth2/callback/fail')
       .get(AuthController.oauth2Fail);
 
-
-    
-
     //getAuthUser
     app.route('/api/auth/get')
-      .get(Middleware.registered(),AuthController.getAuthUser);
+      .get(passport.authenticate('jwt',{session: false}),AuthController.getAuthUser);
+
 
     //Email validation endpoint
     app.route('/api/auth/validate-email')
@@ -125,8 +120,6 @@ export class Routes {
     app.route("/api/users/test")
     .get(UserController.testRoles);
 
-        const router = Router();
-
         //Get all users
         //TODO remove the checkJwt
         app.route("/api/users/all")
@@ -141,15 +134,17 @@ export class Routes {
         app.route('/api/usercreate')
         .get(UserController.create);
 
-
-
-
-
-
-
-        
-
-
+    /////////////////////////////////////////////////////////////////
+    // HANDLE NON EXISTING ROUTES
+    ////////////////////////////////////////////////////////////////
+    app.route('*')
+      .get(function(req, res, next){
+        next(new HttpException(404, messages.apiRouteNotFound, null));
+        });
+    app.route('*')
+      .post(function(req, res, next){
+          next(new HttpException(404, messages.apiRouteNotFound, null));
+      });        
 
     }
 }

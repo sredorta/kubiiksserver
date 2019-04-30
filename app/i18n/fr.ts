@@ -25,6 +25,9 @@ export const messages = {
     authEmailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
     oauth2MissingField : (name = 'field') => `Erreur penant l'authentifition, impossible de recuperer le champ ${name} `,
 
+    apiRouteNotFound: "Le serveur n'a pas trouvé la requete demandé",
+
+
     title: 'Implementation simple de i18n avec TypeScript',
     greeting: (name = 'John Doe') => `Bonjour, ${name}.`,
     unreadNotification: (unread: number) => `You have ${unread === 0 ? 'no' : unread} unread message${unread === 1 ? '' : 's'}.`
