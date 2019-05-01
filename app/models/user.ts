@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 
 import {Role} from './role';
 import {UserRole} from './user_role';
+import { IJwtPayload } from '../controllers/auth.controller';
 
 
 
@@ -82,9 +83,8 @@ export class User extends Model<User> {
   password!:string;
 
   @AllowNull(false)
-  @Default(false)
-  @Column(DataTypes.BOOLEAN)
-  isSocial!:boolean;
+  @Column(DataTypes.STRING(100))
+  passport!:string;
 
   @AllowNull(true)
   @Column(DataTypes.STRING(50))
@@ -94,6 +94,13 @@ export class User extends Model<User> {
   @Column(DataTypes.STRING(255))
   facebookToken!:string;
 
+  @AllowNull(true)
+  @Column(DataTypes.STRING(50))
+  googleId!:string;
+
+  @AllowNull(true)
+  @Column(DataTypes.STRING(255))
+  googleToken!:string;  
 
   //Relations
   @BelongsToMany(() => Role, () => UserRole)
@@ -116,8 +123,10 @@ export class User extends Model<User> {
     if (time == "short") {
       expires = AppConfig.auth.accessShort;
     }
-    return jwt.sign(
-      { id: this.id }, //Payload !
+    const payload : IJwtPayload = {
+      id: this.id 
+    }
+    return jwt.sign(payload, //Payload !
       AppConfig.auth.jwtSecret,
       { expiresIn: expires }
     );

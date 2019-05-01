@@ -17,10 +17,10 @@ import {Validator} from "class-validator";
 //Data models
 import {User} from '../models/user';
 
-
-interface IJwtPayload {
-    userId:string
-
+/**Payload interface */
+export interface IJwtPayload {
+    /**Contains user ID */
+    id:number
 }
 
 export class AuthController {
@@ -30,6 +30,7 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     //User signup
     ///////////////////////////////////////////////////////////////////////////
+    /**Sign up user using local passport */
     static signup = async (req: Request, res: Response, next:NextFunction) => {
         let myUser : User;
         let method = Helper.getSharedSetting("signup_validation_method")
@@ -40,6 +41,7 @@ export class AuthController {
                 email: req.body.email,
                 phone:req.body.phone,
                 mobile:req.body.mobile,
+                passport: "local",
                 emailValidationKey: Helper.generateRandomString(30),
                 mobileValidationKey: Helper.generateRandomNumber(4),
                 password: User.hashPassword(req.body.password)
@@ -125,12 +127,12 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     // login
     ///////////////////////////////////////////////////////////////////////////
-    //Debug with passports
+    /**Login using local passport */
     static login =  (req:Request, res:Response,next:NextFunction) => {
         //Thanks to passports we have the user in req.user if we get here credentials are valid
             console.log("LOGIN ROUTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             //console.log(req.user);
-            const payload : IJwtPayload = {userId: req.user.id};
+            const payload : IJwtPayload = {id: req.user.id};
             let accessTime : string;    
             if (!req.body.keepconnected)
                 accessTime = AppConfig.auth.accessShort;
@@ -147,7 +149,6 @@ export class AuthController {
         handlers.push(Middleware.validation(DTOPassword)); //Allways include password
         handlers.push(Middleware.validation(DTOKeepConnected));
         //TODO validate username here !!!!!
-
 /*        if (Helper.isSharedSettingMatch("login_email", "include")) 
             handlers.push(Middleware.validation(DTOEmail));
 
@@ -163,7 +164,7 @@ export class AuthController {
     //When any of the oauth2 gets a success then redirect to /login/success and provide the token we have generated
     //Angular should recover the token from the page and redirect to home afterwards
     static oauth2Success =  (req:Request, res:Response,next:NextFunction) => {
-            const payload = {userId: req.user.id};
+            const payload : IJwtPayload = {id: req.user.id};
       
             //We just need to create a token and provide it
             const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });

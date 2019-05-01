@@ -13,6 +13,7 @@ import { Request, Response, NextFunction } from "express";
 import {HttpException} from '../classes/HttpException';
 import {User} from '../models/user';
 import { isNamedExports } from 'typescript';
+import { IJwtPayload } from '../controllers/auth.controller';
 
 
 
@@ -30,7 +31,7 @@ export class Passport {
         });
     }
 
-    //Passport that validates login from local system
+    /**Local login passport */   
     public static local() {
         console.log("Enabling local passport");
         passport.use('local',new passportLocal.Strategy({
@@ -40,41 +41,41 @@ export class Passport {
         function (username, password, cb)  {
             //Find that we have an user matching username and passport
             console.log("USING LOCAL STRATEGY !!!" + Helper.getSharedSetting("login_username"));
-            let field = Helper.getSharedSetting("login_username"); 
-            if (!field ){
-                return cb(new HttpException(500, "Invalid 'login_username' config field : " + field  ,null), false);
-            }
-            let query :any =  {};
-            query[field] = username;
-            console.log(query);
-            User.scope("full").findOne({
-                    where: query
-                }).then((user:User|null)=> {
-                    //Check user existance
-                    if (!user) {
-                        return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
-                    }
+            async function _work() {
+                let field = Helper.getSharedSetting("login_username"); 
+                if (!field ){
+                    return cb(new HttpException(500, "Invalid 'login_username' config field : " + field  ,null), false);
+                }
+                let query :any =  {};
+                query[field] = username;
+                console.log(query);
+                let myUser = await User.scope("full").findOne({where: query});
+                if (!myUser) {
+                    return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
+                } else {
                     //Check password valid
-                    if (!user.checkPassword(password)){
+                    console.log("Before checking password !!!! : " + password);
+                    if (!myUser.checkPassword(password)){
                         console.log("Passwords not matching !!!!");
                         return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                     }
-                    //Success 
-                    return cb(null, user);
-                }).catch((error: Error) => {
-                    return cb(error);
-                });
+                }
+                myUser.passport = "local";
+                myUser = await myUser.save();
+                return cb(null, myUser);
+            }
+            _work();
         }));
     }
 
-    //Passport to decode JWT and pass user to next middleware
+    /**Passport that decodes jwt and provides user to next middleware */   
     public static jwt() {
         console.log("Enabling jwt passport");
         passport.use('jwt',new passportJWT.Strategy({
             jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey : AppConfig.auth.jwtSecret
         },
-        async function (jwtPayload, cb) {
+        async function (jwtPayload: IJwtPayload, cb) {
             console.log("We are here !!!!");
             console.log(jwtPayload);
             try {
@@ -92,6 +93,26 @@ export class Passport {
             }
         ));
     }
+/*Facebook profile example
+    { id: '10219621054623304',
+    username: undefined,
+    displayName: undefined,
+    name:
+     { familyName: 'Redorta',
+       givenName: 'Sergi',
+       middleName: undefined },
+    gender: undefined,
+    profileUrl: undefined,
+    emails: [ { value: 'sergi.redorta@hotmail.com' } ],
+    provider: 'facebook',
+    _raw: '{"id":"10219621054623304","email":"sergi.redorta\\u0040hotmail.com","last_name":"Redorta","first_name":"Sergi"}',
+    _json:
+     { id: '10219621054623304',
+       email: 'sergi.redorta@hotmail.com',
+       last_name: 'Redorta',
+       first_name: 'Sergi' } }*/
+
+    /**Facebook passport for login or signup */   
     public static facebook() {
       passport.use('facebook', new passportFacebook.Strategy({
         clientID: AppConfig.auth.facebook.clientId,
@@ -101,48 +122,50 @@ export class Passport {
         profileFields: ['id', 'emails', 'name', "link","locale","timezone"]
       },
       function(req, accessToken, refreshToken, profile, cb) {
-        console.log("We are in facebook passport !!!!!!!!!!!!!!!!!");
         //Now we need to see if user already exists in database and if not then add it
         async function _work() {
             //Check that we got all the required minimum fields
             if (!profile._json.email)
               return cb(null,null,null);
 
-            let myUser = await User.findOne({where: {email:profile._json.email}});
+            //Find user by email or by facebookId and update fields from provider profile
+            let myUser = await User.findOne({where: {email:profile._json.email}});      //Find user by email
             if (myUser) {
-              console.log("Overriding user data with facebook data !!!");
-              //We already have an user so just update fields if required
-              if (profile._json.first_name)
-                myUser.firstName = profile._json.first_name;
-              if (profile._json.last_name)
-                myUser.lastName = profile._json.last_name;
-                myUser.isSocial = true;
-                myUser.facebookId = profile.id;
+                if (profile._json.id)  myUser.facebookId = profile._json.id;   
+            } else {
+                myUser = await User.findOne({where: {facebookId:profile._json.id}});    //Find user by provider id
+                if (myUser) {
+                    if (profile._json.email) myUser.email = profile._json.email;
+                }
+            }
+            //EQUIVALENT TO LOGIN
+            if (myUser) {
+                console.log("FACEBOOK LOGIN DETECTED !!!!");
+                if (profile._json.first_name) myUser.firstName = profile._json.first_name;
+                if (profile._json.last_name) myUser.lastName = profile._json.last_name;
                 myUser.facebookToken = accessToken;
+                myUser.passport = "facebook";
                 myUser = await myUser.save();
                 return cb(null, myUser);
             }
-            //LIKE SIGNUP
-            console.log("Creating user data with facebook data !!!");
+            //EQUIVALENT TO SIGNUP
+            console.log("FACEBOOK SIGNUP DETECTED !!!!");
             //We got a new user so we register him
             myUser = await User.create({
               firstName: profile._json.first_name,
               lastName: profile._json.last_name,
               email: profile._json.email,
+              password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
               emailValidationKey: Helper.generateRandomString(30),
               mobileValidationKey: Helper.generateRandomNumber(4),
-              isSocial:true,
-              facebookId : profile.id,
+              passport: "facebook",
+              facebookId : profile._json.id,
               facebookToken: accessToken            
             });
             //Attach admin role if required
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
               await myUser.attachRole("admin"); 
             }           
-            //return cb(new HttpException(100, "SEND THE TOKEN PLEASE", null), false);
-
-            console.log("Sending user to callback");
-            //return cb(new HttpException(400, "HERE WE SHOULD PROVIDE TOKEN !", null), false);
             return cb(null,myUser);
         }
         _work();
@@ -150,89 +173,86 @@ export class Passport {
     ));
   }
 
-  //GooglePlus Profile example
+  //Google Profile example
   /*
   { id: '118285710646673394875',
   displayName: 'Sergi Redorta',
   name: { familyName: 'Redorta', givenName: 'Sergi' },
+  emails: [ { value: 'sergi.redorta@gmail.com', verified: true } ],
   photos:
-   [ { value: 'https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rda_vAH3Psp41NUnGzmbrxk0xqMww/mo/photo.jpg' } ],
+   [ { value: 'https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAjVI/p3QqxgzwXgI/photo.jpg' } ],
   provider: 'google',
-  _raw: '{\n  "sub": "118285710646673394875",\n  "name": "Sergi Redorta",\n  "given_name": "Sergi",\n  "family_name": "Redorta",\n  "profile": "https://plus.google.com/118285710646673394875",\n  "picture": "https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rda_vAH3Psp41NUnGzmbrxk0xqMww/mo/photo.jpg",\n  "locale": "fr"\n}',
+  _raw: '{\n  "sub": "118285710646673394875",\n  "name": "Sergi Redorta",\n  "given_name": "Sergi",\n  "family_name": "Redorta",\n  "profile": "https://plus.google.com/118285710646673394875",\n  "picture": "https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAjVI/p3QqxgzwXgI/photo.jpg",\n  "email": "sergi.redorta@gmail.com",\n  "email_verified": true,\n  "locale": "fr"\n}',
   _json:
    { sub: '118285710646673394875',
      name: 'Sergi Redorta',
      given_name: 'Sergi',
      family_name: 'Redorta',
      profile: 'https://plus.google.com/118285710646673394875',
-     picture: 'https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rda_vAH3Psp41NUnGzmbrxk0xqMww/mo/photo.jpg',
-     locale: 'fr' } }*/
+     picture: 'https://lh3.googleusercontent.com/-OuYh3FZFEtE/AAAAAAAAAAI/AAAAAAAAjVI/p3QqxgzwXgI/photo.jpg',
+     email: 'sergi.redorta@gmail.com',
+     email_verified: true,
+     locale: 'fr' } }
+ */
 
-  public static googleplus() {
-    passport.use('googleplus', new passsportGoogle.OAuth2Strategy({
-      clientID: AppConfig.auth.googleplus.clientId,
-      clientSecret: AppConfig.auth.googleplus.clientSecret,
-      callbackURL: "https://localhost:3000/api/auth/googleplus/callback",
+  /**Google passport for login or signup */   
+  public static google() {
+    passport.use('google', new passsportGoogle.OAuth2Strategy({
+      clientID: AppConfig.auth.google.clientId,
+      clientSecret: AppConfig.auth.google.clientSecret,
+      callbackURL: "https://localhost:3000/api/auth/google/callback",
       passReqToCallback:true,
     },
     function(req, accessToken, refreshToken, profile, cb) {
-      console.log("We are in googleplus passport !!!!!!!!!!!!!!!!!");
-      //Now we need to see if user already exists in database and if not then add it
-      async function _work() {
-          console.log("GOT PROFILE:");
-          console.log(profile);
-          return cb(null, {
-            profile: profile,
-            token: accessToken
-        });
-          //Check that we got all the required minimum fields
- /*         if (!profile)
-            return cb(null,null);
+      console.log("We are in google passport !!!!!!!!!!!!!!!!!");
+        //Now we need to see if user already exists in database and if not then add it
+        async function _work() {
+            //Check that we got all the required minimum fields
+            if (!profile._json.email)
+              return cb(null,null);
 
-          if (!profile.emails)
-            return cb(null,null);
-          if (!profile.emails[0].value)
-            return cb(null,null);
-
-
-          let myUser = await User.findOne({where: {email:profile.emails[0].value}});
-          if (myUser) {
-            console.log("Overriding user data with facebook data !!!");
-            //We already have an user so just update fields if required
-            if (profile._json.first_name)
-              myUser.firstName = profile._json.first_name;
-            if (profile._json.last_name)
-              myUser.lastName = profile._json.last_name;
-              myUser.isSocial = true;
-              myUser.facebookId = profile.id;
-              myUser.facebookToken = accessToken;
-              myUser = await myUser.save();
-              return cb(null, myUser);
-          }
-          //LIKE SIGNUP
-          console.log("Creating user data with facebook data !!!");
-          //We got a new user so we register him
-          myUser = await User.create({
-            firstName: profile._json.first_name,
-            lastName: profile._json.last_name,
-            email: profile._json.email,
-            emailValidationKey: Helper.generateRandomString(30),
-            mobileValidationKey: Helper.generateRandomNumber(4),
-            isSocial:true,
-            facebookId : profile.id,
-            facebookToken: accessToken            
-          });
-          //Attach admin role if required
-          if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
-            await myUser.attachRole("admin"); 
-          }           
-          //return cb(new HttpException(100, "SEND THE TOKEN PLEASE", null), false);
-
-          console.log("Sending user to callback");
-          //return cb(new HttpException(400, "HERE WE SHOULD PROVIDE TOKEN !", null), false);
-          return cb(null,myUser);*/
-      }
-      _work();
+            //Find user by email or by facebookId and update fields from provider profile
+            let myUser = await User.findOne({where: {email:profile._json.email}});      //Find user by email
+            if (myUser) {
+                if (profile._json.sub)  myUser.googleId = profile._json.sub;   
+            } else {
+                myUser = await User.findOne({where: {googleId:profile._json.sub}});    //Find user by provider id
+                if (myUser) {
+                    if (profile._json.email) myUser.email = profile._json.email;
+                }
+            }
+            //EQUIVALENT TO LOGIN
+            if (myUser) {
+                console.log("GOOGLE LOGIN DETECTED !!!!");
+                if (profile._json.given_name) myUser.firstName = profile._json.given_name;
+                if (profile._json.family_name) myUser.lastName = profile._json.family_name;
+                //TODO save also language that is in _json.locale
+                myUser.googleToken = accessToken;
+                myUser.passport = "google";
+                myUser = await myUser.save();
+                return cb(null, myUser);
+            }
+            //EQUIVALENT TO SIGNUP
+            console.log("GOOGLE SIGNUP DETECTED !!!!");
+            //We got a new user so we register him
+            myUser = await User.create({
+              firstName: profile._json.given_name,
+              lastName: profile._json.family_name,
+              email: profile._json.email,
+              emailValidationKey: Helper.generateRandomString(30),
+              mobileValidationKey: Helper.generateRandomNumber(4),
+              password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
+              passport:"google",
+              googleId : profile._json.sub,
+              googleToken: accessToken            
+            });
+            //Attach admin role if required
+            if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
+              await myUser.attachRole("admin"); 
+            }           
+            return cb(null,myUser);
+        }
+        _work();
     }
   ));
   }

@@ -87,11 +87,11 @@ export class Routes {
     app.route('/api/auth/facebook/callback')
     .get(passport.authenticate('facebook', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
 
-    app.route('/api/auth/googleplus')
-      .get(passport.authenticate('googleplus', {scope: ['https://www.googleapis.com/auth/userinfo.profile'], session:false}));
+    app.route('/api/auth/google')
+      .get(passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email'], session:false}));
 
-    app.route('/api/auth/googleplus/callback')
-    .get(passport.authenticate('googleplus', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
+    app.route('/api/auth/google/callback')
+    .get(passport.authenticate('google', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
 
 
     //Fail callback to any oauth2

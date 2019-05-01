@@ -174,31 +174,6 @@ export class Middleware {
       }
 
 
-    //Checks if header contains JWT and needs to be called at each route that requires auth
-/*    public static registered() {
-        return function (req:express.Request, res:express.Response, next:express.NextFunction) {
-            const token = <string>req.headers["authorization"];
-            console.log("Found token in Header : " + token);
-
-            if (!token) {
-                next(new HttpException(401, messages.authTokenMissing, null));
-                return;
-            }
-            //Now check if token is valid
-            //Try to validate the token and get data
-            try {
-                const jwtPayload = <any>jwt.verify(token, AppConfig.auth.jwtSecret);
-                res.locals.jwtPayload = jwtPayload;
-                console.log("Stored in locals for next request:");
-                console.log(jwtPayload);
-            } catch (error) {
-                //If token is not valid, respond with 401 (unauthorized)
-                next(new HttpException(401, messages.authTokenInvalid, null));
-                return;
-            }      
-            next();
-        }
-    }*/
     //Checks that the registered user is an administrator if not errors      
     public static admin() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {

@@ -43,7 +43,7 @@ class App {
         Passport.local();
         Passport.jwt();
         Passport.facebook();
-        Passport.googleplus();
+        Passport.google();
 
     }
 
