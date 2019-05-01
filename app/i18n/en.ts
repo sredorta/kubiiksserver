@@ -10,6 +10,7 @@ export const messages = {
     validationUnique: (name = 'field') => `${name} already exists in the database`,
     validation: (name = 'field') => `Wrong value for for field '${name}'`,
     validationNotFound: (name = 'field') => `${name} not found in the database with the given requirements`,
+    validationTerms: "Terms and conditions must be accepted",
 
     //Other system messages
     featureNotAvailable: (name = 'field') => `Feature '${name}' not yet supported`,

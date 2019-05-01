@@ -15,12 +15,13 @@ import { Helper } from '../classes/Helper';
 export const UserN = 'Not a model';
 export const NUser = 'Not a model';
 
+//Default scope only contains the public data
 @DefaultScope({
-  attributes: {exclude : ['password','isEmailValidated','emailValidationKey','isMobileValidated', 'mobileValidationKey']}
+  attributes:  ['id','firstName','lastName','email', 'phone', 'mobile']
 })
 @Scopes({
   withRoles: {
-    attributes: {exclude : ['password','isEmailValidated','emailValidationKey','isMobileValidated', 'mobileValidationKey','UserRole']},
+    attributes:  ['id','firstName','lastName','email', 'phone', 'mobile'],
     include: [() => Role]
   },
   full: {
@@ -60,6 +61,11 @@ export class User extends Model<User> {
   @AllowNull(true)
   @Column(DataTypes.STRING(50))
   mobile!:string;
+
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataTypes.BOOLEAN)
+  terms!:boolean;
 
   @AllowNull(false)
   @Default(false)
@@ -109,7 +115,7 @@ export class User extends Model<User> {
 
 
   /**Returns array with all required missing fields for signup. This can happen when creating account with oauth2 */
-  public getMissingSignupFields() {
+  /*public getMissingSignupFields() {
     let result = [];
     if (Helper.isSharedSettingMatch("signup_firstName","include"))
       if (this.firstName == null || this.firstName == undefined) result.push("firstName");
@@ -122,13 +128,13 @@ export class User extends Model<User> {
     if (Helper.isSharedSettingMatch("signup_phone","include"))
       if (this.phone == null || this.phone == undefined) result.push("phone");       
     return result;
-  }
+  }*/
 
   /**Validate that user contains all signup required fields. It could be that this is not the case in case of oauth2 account creation */
-  public hasAllSignupFields() {
+  /*public hasAllSignupFields() {
     if (this.getMissingSignupFields().length>0) return false;
     return true;
-  }
+  }*/
 
 
   /**Hashes a password to store in db */

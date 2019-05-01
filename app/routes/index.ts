@@ -99,10 +99,13 @@ export class Routes {
     app.route('/api/auth/oauth2/callback/fail')
       .get(AuthController.oauth2Fail);
 
-    /**Route called after using social passports to check if missing any required field and ask user to fill any required */  
+    /**Route called after using social passports to check if missing any required field and ask user to fill any required and accept conditions */  
     app.route('/api/auth/oauth2/validate')
       .get(passport.authenticate('jwt',{session: false}),AuthController.oauth2ValidateFields);
 
+    /**Route called after using social passports to save updates */  
+    app.route('/api/auth/oauth2/update')
+    .post(passport.authenticate('jwt',{session: false}),AuthController.oauth2UpdateFields);
 
 
     //getAuthUser

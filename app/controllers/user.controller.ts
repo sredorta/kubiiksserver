@@ -11,6 +11,7 @@ import { Helper } from '../classes/Helper';
 import { IsNumber, IsEmail } from 'class-validator';
 import { Role } from '../models/role';
 import { User } from '../models/user';
+import { isUserWhitespacable } from 'babel-types';
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
 class GetUserByIdDTO {
     @IsNumber()
@@ -85,13 +86,15 @@ export class UserController {
         console.log("Get all users");
         console.log("Logged in user:");
         console.log(req.user);
+        res.json(await User.scope("withRoles").findAll());
+/*
         User.findAll()
         .then((result)=> {
             res.json(result);
         }).catch( (error) => {
             console.log("We got error !!!");
             next(new HttpException(500, error.message, error.errors));
-        });
+        });*/
     }
 
     ///////////////////////////////////////////////////////////////////////////

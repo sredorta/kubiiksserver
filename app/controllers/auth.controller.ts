@@ -6,7 +6,7 @@ import nodemailer from 'nodemailer';
 import {AppConfig} from '../utils/Config';
 import {messages} from '../middleware/common';
 
-import {DTOFirstNameRequired,DTOFirstNameOptional, DTOLastNameRequired,DTOLastNameOptional,DTOEmail,DTOPassword,DTOPhoneOptional,DTOPhoneRequired,DTOMobileRequired,DTOMobileOptional, DTOId, DTOAccess, DTOKeepConnected} from '../routes/dto';
+import {DTOFirstNameRequired,DTOFirstNameOptional, DTOLastNameRequired,DTOLastNameOptional,DTOEmail,DTOPassword,DTOPhoneOptional,DTOPhoneRequired,DTOMobileRequired,DTOMobileOptional, DTOId, DTOKeepConnected, DTOTerms} from '../routes/dto';
 import { Helper } from '../classes/Helper';
 
 import jwt from "jsonwebtoken";
@@ -32,6 +32,12 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     /**Sign up user using local passport */
     static signup = async (req: Request, res: Response, next:NextFunction) => {
+        //Check that we got the terms accepted
+//        if (!req.body.terms) 
+//            return next( new HttpException(500, messages.featureNotAvailable("signup_validation_method : mobile"),null))
+        if (req.body.terms!= true)
+            return next( new HttpException(500, messages.validationTerms,null))
+
         let myUser : User;
         let method = Helper.getSharedSetting("signup_validation_method")
         try {
@@ -120,6 +126,7 @@ export class AuthController {
         if (Helper.isSharedSettingMatch("signup_mobile", "optional")) 
             handlers.push(Middleware.validation(DTOMobileOptional));
 
+        handlers.push(Middleware.validation(DTOTerms));
 
         return handlers;
     }
@@ -168,7 +175,7 @@ export class AuthController {
       
             //We just need to create a token and provide it
             const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });
-            res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login/success/"+token);      
+            res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login/validate/"+token);      
     }
 
     //When any of the oauth2 gets a fail then redirect to /login/fail
@@ -177,14 +184,23 @@ export class AuthController {
         res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login");
     };
 
+    /**Gets current user stored fields in the system */
     static oauth2ValidateFields =  (req:Request, res:Response,next:NextFunction) => {
-        //We have req.user from the passport
-        //let myUser = req.user;
-        //let missingFields = req.user
         let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
-        res.json(myUser.getMissingSignupFields());
+        res.json(myUser);
     }
-
+    /**Updates the current user with the given parameters */
+    static oauth2UpdateFields = async (req:Request, res:Response,next:NextFunction) => {
+        console.log("oauth2UpdateFields !!!!");
+        console.log(req.body);
+        let myUser = await User.findByPk(req.user.id);
+        if (!myUser) {
+            next( new HttpException(400, messages.validationNotFound(messages.User), null))
+        } else {
+            myUser.update(req.body);
+            res.json(myUser);
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // getAuthUser
@@ -296,7 +312,6 @@ export class AuthController {
     //ADD CHECKS
     public static resetPasswordByMobileChecks() {
         let handlers : RequestHandler[] = [];
-        handlers.push(Middleware.validation(DTOAccess));
         handlers.push(Middleware.validation(DTOMobileRequired));
         return handlers;
     }    

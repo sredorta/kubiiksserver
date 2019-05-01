@@ -183,25 +183,18 @@ export class DTOMobileOptional {
     public mobile!: string;
 }
 
-export class DTOAccess {
-    @IsOptional()
-    @IsString()
+export class DTOTerms {
     @IsNotEmpty({
         message:function() {
-            return messages.validationEmpty("lastName");
+            return messages.validationEmpty("terms");
         }
     })
-    @MinLength(2, {
-        message: function (){
-            return messages.validationMinLength("lastName","2")
+    @IsBoolean({
+        message:function() {
+            return messages.validation("terms");
         }
     })
-    @MaxLength(50, {
-        message: function() {
-            return messages.validationMaxLength("lastName","50")
-        }
-    })
-    public access!:number;
+    public terms!: boolean;
 }
 export class DTOKeepConnected {
     @IsBoolean({

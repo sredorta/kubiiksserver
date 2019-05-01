@@ -17,7 +17,7 @@ export const NRole = 'Not a model';
       include: [() => User]
     },
     reduced: {
-      attributes: {exclude : []}
+      attributes:  ['role']
     }
 
   })

@@ -9,6 +9,7 @@ export const messages = {
     validationUnique: (name = 'field') => `${name} déjà existent dans la base de donnees`,
     validation: (name = 'field') => `Le champ '${name}' est incorrect`,
     validationNotFound: (name = 'field') => `Pas de '${name}' enregistrée dans nos bases de donnees avec les paramètres donnés`,
+    validationTerms: "Les conditions d'utilization des données personnelles doivent être accetés",
 
     //Other system messages
     featureNotAvailable: (name = 'field') => `Functionalité '${name}' pas encore disponible`,
