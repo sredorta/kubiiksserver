@@ -103,9 +103,9 @@ export class Routes {
     app.route('/api/auth/oauth2/validate')
       .get(passport.authenticate('jwt',{session: false}),AuthController.oauth2ValidateFields);
 
-    /**Route called after using social passports to save updates */  
+    /**Route called after using social passports to save updates, it has exactly same checks as signup except for password*/  
     app.route('/api/auth/oauth2/update')
-    .post(passport.authenticate('jwt',{session: false}),AuthController.oauth2UpdateFields);
+    .post(AuthController.oauth2UpdateFieldsChecks(),passport.authenticate('jwt',{session: false}),AuthController.oauth2UpdateFields);
 
 
     //getAuthUser

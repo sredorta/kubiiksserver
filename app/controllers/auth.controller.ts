@@ -33,8 +33,6 @@ export class AuthController {
     /**Sign up user using local passport */
     static signup = async (req: Request, res: Response, next:NextFunction) => {
         //Check that we got the terms accepted
-//        if (!req.body.terms) 
-//            return next( new HttpException(500, messages.featureNotAvailable("signup_validation_method : mobile"),null))
         if (req.body.terms!= true)
             return next( new HttpException(500, messages.validationTerms,null))
 
@@ -48,6 +46,7 @@ export class AuthController {
                 phone:req.body.phone,
                 mobile:req.body.mobile,
                 passport: "local",
+                terms:req.body.terms,
                 emailValidationKey: Helper.generateRandomString(30),
                 mobileValidationKey: Helper.generateRandomNumber(4),
                 password: User.hashPassword(req.body.password)
@@ -187,20 +186,64 @@ export class AuthController {
     /**Gets current user stored fields in the system */
     static oauth2ValidateFields =  (req:Request, res:Response,next:NextFunction) => {
         let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
-        res.json(myUser);
+        //If terms are not validated we need to show signup completion form, if not we can move directly to loggedIn area
+        if (myUser.terms == false) {
+            res.json({complete:false, user:myUser});
+        } else {
+            //Return user with roles as token is already available (equivalent to getAuthUser)
+            console.log(myUser);
+            res.json({complete:true, user:myUser});
+        }
     }
+
+
     /**Updates the current user with the given parameters */
     static oauth2UpdateFields = async (req:Request, res:Response,next:NextFunction) => {
         console.log("oauth2UpdateFields !!!!");
         console.log(req.body);
+        //Check that we got the terms accepted
+        if (req.body.terms!= true)
+            return next( new HttpException(400, messages.validationTerms,null))
         let myUser = await User.findByPk(req.user.id);
         if (!myUser) {
             next( new HttpException(400, messages.validationNotFound(messages.User), null))
         } else {
-            myUser.update(req.body);
+            await myUser.update(req.body);
+
             res.json(myUser);
         }
     }
+    //Problem is that some fields are unique and we already have the user created so all IsUnique validations will fail !!!
+    //I think that we need somehow to create one DTO per post request and not per argument, but not sure
+
+    /**Must contain same checks as signup but not password neither email */
+    public static oauth2UpdateFieldsChecks() {
+        let handlers : RequestHandler[] = [];
+        if (Helper.isSharedSettingMatch("signup_firstName", "include"))
+            handlers.push(Middleware.validation(DTOFirstNameRequired));
+        if (Helper.isSharedSettingMatch("signup_firstName", "optional"))
+            handlers.push(Middleware.validation(DTOFirstNameOptional));
+
+        if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
+            handlers.push(Middleware.validation(DTOLastNameRequired));
+        if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
+            handlers.push(Middleware.validation(DTOLastNameOptional));
+
+        if (Helper.isSharedSettingMatch("signup_phone", "include")) 
+            handlers.push(Middleware.validation(DTOPhoneRequired));            
+        if (Helper.isSharedSettingMatch("signup_phone", "optional")) 
+            handlers.push(Middleware.validation(DTOPhoneOptional));
+
+        if (Helper.isSharedSettingMatch("signup_mobile", "include")) 
+            handlers.push(Middleware.validation(DTOMobileRequired));            
+        if (Helper.isSharedSettingMatch("signup_mobile", "optional")) 
+            handlers.push(Middleware.validation(DTOMobileOptional));
+
+        handlers.push(Middleware.validation(DTOTerms));
+
+        return handlers;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // getAuthUser

@@ -6,6 +6,7 @@ import {messages} from '../middleware/common';
 
 import { Helper } from "./Helper";
 import {HttpException} from './HttpException';
+import { resolve } from "bluebird";
 
 const validator = new Validator();
 
@@ -163,20 +164,25 @@ class UniqueValidator implements ValidatorConstraintInterface {
         console.log("Using class : " + MyClass.name);
         console.log("Using fields: " + field);
         console.log(MyClass);
-
+ 
         let query :any =  {};
-        query[field] =value;
+        query[field]=value;
         const myPromise =  new Promise<boolean>((resolve,reject) => {
-            MyClass.findOne({
-                where: query
-                }).then((result:any)=> {
-                    console.log(result);
-                    if(result) resolve(false);
-                    return resolve(true);
-                }).catch((error: Error) => {
-                    return resolve(true);
-                });
+            if (value!= null) {
+                MyClass.findOne({
+                    where: query
+                    }).then((result:any)=> {
+                        console.log(result);
+                        if(result) resolve(false);
+                        return resolve(true);
+                    }).catch((error: Error) => {
+                        return resolve(true);
+                    });
+            } else {
+                    return resolve(true); //We consider unique even if others are null
+            }        
         });
+
         return myPromise;
     }
  
