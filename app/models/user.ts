@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import {Role} from './role';
 import {UserRole} from './user_role';
 import { IJwtPayload } from '../controllers/auth.controller';
+import { Helper } from '../classes/Helper';
 
 
 
@@ -107,7 +108,30 @@ export class User extends Model<User> {
   roles!: Role[];
 
 
-  //Hashes a password to store in db
+  /**Returns array with all required missing fields for signup. This can happen when creating account with oauth2 */
+  public getMissingSignupFields() {
+    let result = [];
+    if (Helper.isSharedSettingMatch("signup_firstName","include"))
+      if (this.firstName == null || this.firstName == undefined) result.push("firstName");
+    if (Helper.isSharedSettingMatch("signup_lastName","include"))
+      if (this.lastName == null || this.lastName == undefined) result.push("lastName");
+    if (Helper.isSharedSettingMatch("signup_email","include"))
+      if (this.email == null || this.email == undefined) result.push("email");
+    if (Helper.isSharedSettingMatch("signup_mobile","include"))
+      if (this.mobile == null || this.mobile == undefined) result.push("mobile");
+    if (Helper.isSharedSettingMatch("signup_phone","include"))
+      if (this.phone == null || this.phone == undefined) result.push("phone");       
+    return result;
+  }
+
+  /**Validate that user contains all signup required fields. It could be that this is not the case in case of oauth2 account creation */
+  public hasAllSignupFields() {
+    if (this.getMissingSignupFields().length>0) return false;
+    return true;
+  }
+
+
+  /**Hashes a password to store in db */
   public static hashPassword(unencrypted:string) : string {
         return bcrypt.hashSync(unencrypted,8);
   }
@@ -117,7 +141,7 @@ export class User extends Model<User> {
       return bcrypt.compareSync(unencryptedPassword, this.password);
   }
 
-  //Generates a token
+  /**Generates a token */
   public createToken(time: "short" | "long") {
     let expires = AppConfig.auth.accessLong;
     if (time == "short") {
@@ -132,6 +156,7 @@ export class User extends Model<User> {
     );
   }
 
+  /**Attaches a specif role to the user */
   public attachRole(role: string) : Promise<boolean> {
     let myPromise : Promise<boolean>;
     let obj = this;
@@ -151,18 +176,5 @@ export class User extends Model<User> {
     });
     return myPromise;
   }
-/*
-  let adminRole = await Role.findOne({where:{role:"admin"}});
-
-  console.log(adminRole);   
-  if (!adminRole) {
-      return next( new HttpException(500, "Admin role not found !!!",null));
-  }
-  //If we are the first user, then we need to add the admin role
-  //If we are in demo mode each new user has an admin role
-  if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
-      await myUser.$add('Role',[adminRole]); 
-  }
-*/
 
 }

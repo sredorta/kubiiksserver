@@ -159,10 +159,10 @@ export class AuthController {
     }    
 
     ///////////////////////////////////////////////////////////////////////////
-    // FACEBOOK OAUTH2
+    // OAUTH2
     ///////////////////////////////////////////////////////////////////////////
     //When any of the oauth2 gets a success then redirect to /login/success and provide the token we have generated
-    //Angular should recover the token from the page and redirect to home afterwards
+    //Angular should recover the token from the page and redirect to home afterwards if all fields are ok, if not ask user to enter fields
     static oauth2Success =  (req:Request, res:Response,next:NextFunction) => {
             const payload : IJwtPayload = {id: req.user.id};
       
@@ -176,6 +176,15 @@ export class AuthController {
     static oauth2Fail =  (req:Request, res:Response,next:NextFunction) => {
         res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login");
     };
+
+    static oauth2ValidateFields =  (req:Request, res:Response,next:NextFunction) => {
+        //We have req.user from the passport
+        //let myUser = req.user;
+        //let missingFields = req.user
+        let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
+        res.json(myUser.getMissingSignupFields());
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////
     // getAuthUser

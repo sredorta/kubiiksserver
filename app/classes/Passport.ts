@@ -79,12 +79,13 @@ export class Passport {
             console.log("We are here !!!!");
             console.log(jwtPayload);
             try {
-                const user = await User.findByPk(jwtPayload.id);
-                if (!user) {
-                    console.log(user);
+                const myUser = await User.findByPk(jwtPayload.id);
+                if (!myUser) {
+                    console.log(myUser);
                     return cb(new HttpException(401, messages.authTokenInvalid, null), false);
                 }
-                return cb(null, user);
+                //TODO: Validate that all required fields are present if not, return error
+                return cb(null, myUser);
             }
             catch (error) {
                 return cb(error);

@@ -61,7 +61,7 @@ import * as dotenv from "dotenv";
             {"key": "signup_lastName", "value":"include"},
             {"key": "signup_email", "value":"include"},
             {"key": "signup_phone", "value":"optional"},
-            {"key": "signup_mobile", "value":"optional"},
+            {"key": "signup_mobile", "value":"include"},
             {"key": "signup_validation_method", "value":"no_validation"},
             {"key": "login_username", "value":"email"},
             {"key": "mode", "value":"demo"}
