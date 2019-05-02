@@ -223,7 +223,8 @@ export class AuthController {
     static getAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //TODO SWITCH TO PASSPORT !!!!
         //Sending back user
-        res.json(req.user);
+        let myUser = await User.scope("withRoles").findByPk(req.user.id);
+        res.json(myUser);
         /*console.log(res.locals.jwtPayload);
         User.findOne({where: {id: res.locals.jwtPayload.userId}}).then(myUser => {
             if (!myUser)

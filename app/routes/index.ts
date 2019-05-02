@@ -123,8 +123,7 @@ export class Routes {
     .get(passport.authenticate('google', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
 
 
-    //Fail callback to any oauth2
-    //We just redirect to the login page
+    //Fail callback to any oauth2 : We just redirect to the login page
     app.route('/api/auth/oauth2/callback/fail')
       .get(AuthController.oauth2Fail);
 
@@ -132,7 +131,7 @@ export class Routes {
     app.route('/api/auth/oauth2/validate')
       .get(passport.authenticate('jwt',{session: false}),AuthController.oauth2ValidateFields);
 
-    /**Route called after using social passports to save updates, it has exactly same checks as signup except for password*/  
+    /**Route called after using social passports to save updates. At least terms needs to be checked*/  
     app.route('/api/auth/oauth2/update')
     .post([passport.authenticate('jwt',{session: false}),AuthController.oauth2UpdateFieldsChecks()],AuthController.oauth2UpdateFields); //Validation needs to be performed after auth in order to get access to req.user.id
 

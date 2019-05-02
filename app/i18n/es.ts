@@ -21,7 +21,7 @@ export const messages = {
 
     //Auth
     authTokenMissing: 'Autentification necessaria para acceder',
-    authTokenInvalid: 'El token enviado es invalido',
+    authTokenInvalid: 'Su session no es valida, connectese de nuevo',
     authTokenInvalidAdmin: 'Tienes que ser administrador para acceder aqui',
     authInvalidCredentials: 'Credenciales incorrectas',
     authEmailResetPassword: (name = 'field') => `Un correo electronico con el nuevo password ha sido enviado a : ${name}`,

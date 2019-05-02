@@ -170,7 +170,7 @@ export class User extends Model<User> {
       async function _addRole() {
         let message :string ="";
 
-          let myRole = await Role.findOne({where:{"role":role}});
+          let myRole = await Role.findOne({where:{"name":role}});
           if (!myRole) {
             reject("Role could not be found");
           } else {

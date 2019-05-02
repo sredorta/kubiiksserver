@@ -33,7 +33,7 @@ export class Role extends Model<Role> {
     @AllowNull(false)
     @Unique(true)
     @Column(DataTypes.STRING(50))
-    role!: string;
+    name!: string;
 
     //Relations
     @BelongsToMany(() => User, () => UserRole)
@@ -45,8 +45,8 @@ export class Role extends Model<Role> {
         console.log("ROLE:: Seeding table !");
         async function _seed() {
             try {
-            await Role.create({role:"chat"});
-            await Role.create({role:"admin"});
+            await Role.create({name:"chat"});
+            await Role.create({name:"admin"});
             } catch(err) {
                 console.log("ERROR: Could not seed ROLES !!!")
             }

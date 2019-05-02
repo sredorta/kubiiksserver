@@ -22,7 +22,7 @@ export const messages = {
 
     //auth
     authTokenMissing: 'Authentification is required and not provided',
-    authTokenInvalid: 'The token provided is invalid',
+    authTokenInvalid: 'Your session is not valid anymore, log in again',
     authTokenInvalidAdmin: 'Administrator rights are required',
     authInvalidCredentials: 'Invalid credentials',
     authEmailResetPassword: (name = 'field') => `An email with your new password has been sent to : ${name}`,

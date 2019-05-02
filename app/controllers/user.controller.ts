@@ -43,7 +43,7 @@ export class UserController {
                 console.log(myRoles);    
                 res.json(myUser);
                 }
-                //result.roles.create({role:"admin"}).then({
+                //result.roles.create({name:"admin"}).then({
             } catch(error) {
                 console.log("We got error !!!");
                 next(new HttpException(400, error.message, error.errors));

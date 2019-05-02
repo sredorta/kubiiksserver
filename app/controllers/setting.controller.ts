@@ -13,9 +13,7 @@ import { User } from '../models/user';
 
 export class SettingController {
 
-    ///////////////////////////////////////////////////////////////////////////
-    //Get all settings from the table 
-    ///////////////////////////////////////////////////////////////////////////
+    /**Get all shared settings */
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
         Setting.findAll().then((result)=> {
             res.json(result);
@@ -24,9 +22,7 @@ export class SettingController {
         });
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //Get user by key
-    ///////////////////////////////////////////////////////////////////////////
+    /**Get shared setting by key */
     static getByKey = async (req: Request, res: Response, next:NextFunction) => {
         const key = req.body.key;
         Setting.findOne({
@@ -40,7 +36,7 @@ export class SettingController {
         });
     }   
 
-    //Get user by ID CHECKS
+    /**getByKey parameter checking */
     public static getByKeyChecks() {
         return [
             body('key').exists().withMessage('exists').isString(),
@@ -48,9 +44,7 @@ export class SettingController {
         ]
     }
 
-    ///////////////////////////////////////////////////////////////////////////
-    //Get email settings and make a transporter check
-    ///////////////////////////////////////////////////////////////////////////
+    /**Email transporter check */
     public static emailCheck = async (req: Request, res: Response, next:NextFunction) => {
         const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
         let myResult = {
