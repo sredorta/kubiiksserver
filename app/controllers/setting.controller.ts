@@ -2,26 +2,13 @@ import {Request, Response, NextFunction} from 'express';
 import {Setting} from '../models/setting';
 import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
-import {messages} from '../middleware/common';
 import nodemailer from 'nodemailer';
 import {AppConfig} from '../utils/Config';
+import {body} from 'express-validator/check';
+import { CustomValidators } from '../classes/CustomValidators';
+import { User } from '../models/user';
 
 
-import { IsString, IsNotEmpty } from 'class-validator';
-//DEFINE HERE ALL LOCAL DTO CLASSES FOR PARAMETER CHECKING
-class DTOKey {
-    @IsNotEmpty({
-        message:function() {
-            return messages.validationEmpty("key");
-        }
-    })
-    @IsString({
-        message: function() {
-            return messages.validation("key");
-        }
-    })
-    public key!: string;
-}
 
 
 export class SettingController {
@@ -55,7 +42,10 @@ export class SettingController {
 
     //Get user by ID CHECKS
     public static getByKeyChecks() {
-        return Middleware.validation(DTOKey);
+        return [
+            body('key').exists().withMessage('exists').isString(),
+            Middleware.validate()
+        ]
     }
 
     ///////////////////////////////////////////////////////////////////////////

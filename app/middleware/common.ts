@@ -134,7 +134,7 @@ export class Middleware {
       }
 
     /** Middleware that handles parameter input validation using class-validator and DTOs*/
-    public static validation<T>(type: any): express.RequestHandler {
+/*    public static validation<T>(type: any): express.RequestHandler {
         console.log("Validation middleWare enabled !");
         return function validationMiddleware(req:Request, res:Response, next: NextFunction) {
           console.log("VALIDATING PARAMETERS !!!!");  
@@ -161,23 +161,8 @@ export class Middleware {
             });
         };
       }
+*/
 
-
-          //Handle all errors !
-    public static errorHandler2() {
-        console.log("errorHandler2 enabled !!!");
-        return function errorMiddleware(error:HttpException, req:express.Request, res:express.Response, next:express.NextFunction) {
-            console.log("Running errorHandler2 !");
-            console.log("//////////////////////////////////////////////");
-            console.log(error);
-            console.log("//////////////////////////////////////////////");
-            if (error)
-                res.status(200).send({
-                    status:status,
-                    message: "There was an error"
-                });                  
-        }
-    }         
 
     //Checks that the registered user is an administrator if not errors      
     public static admin() {

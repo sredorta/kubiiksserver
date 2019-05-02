@@ -5,6 +5,11 @@ import { messages } from '../middleware/common';
 import { Model } from 'sequelize';
 import { IValidationMessage } from './ValidationException';
 import { Helper } from './Helper';
+import { resolve } from 'bluebird';
+import { User } from '../models/user';
+import {Op} from "sequelize";
+
+
 export class CustomValidators extends Error {
 
     //When we reject the promise we send a msg that will be then intercepted by the ValidationException
@@ -21,11 +26,26 @@ export class CustomValidators extends Error {
             return Promise.resolve();
         }
     }
+    
+    /**Does firstName and lastName validation based on shared data validation*/
+    static nameValidator(field:string) {
+        return (value:any) => {
+            console.log("Value is: "  + value);
+            //firstName checking
+            if (value!=undefined) {
+                   if (!validator.isLength(value,{min:2})) return Promise.reject(<IValidationMessage>{type:'minlength',value:'2'});
+                   if (!validator.isLength(value,{max:50})) return Promise.reject(<IValidationMessage>{type:'maxlength',value:'50'});                
+            } else {   
+                if (Helper.isSharedSettingMatch(field, "include")) 
+                    return Promise.reject(<IValidationMessage>{type:'exists'});
+            }
+            return Promise.resolve(); //End of validation success
+        }
+    }
 
     /**checks correct phone format and if is optional or not depending on shared*/
     static phone(field:string) {
         return (value:any, {req} : {req:Request}) => {
-            console.log("Validating phone !!!!");
             if (!value) {
                 if (Helper.isSharedSettingMatch(field, "include")) 
                     return Promise.reject({type:'exists'});
@@ -37,16 +57,14 @@ export class CustomValidators extends Error {
                 re =/^0[1-5].*$/;
                 if (!value.match(re)) return Promise.reject({type:'phone'});
             }
-                //Correct phone
-                return Promise.resolve();
+            //Correct
+            return Promise.resolve();
          }
     }
 
     /**checks correct mobile format and if is optional or not depending on shared*/
     static mobile(field:string) {
         return (value:any, {req} : {req:Request}) => {
-            console.log("Validating mobile !!!!");
-            console.log(value);
             if (!value) {
                 if (Helper.isSharedSettingMatch(field, "include")) 
                     return Promise.reject({type:'exists'});
@@ -58,8 +76,8 @@ export class CustomValidators extends Error {
                 re =/^0[1-5].*$/;
                 if (value.match(re)) return Promise.reject({type:'mobile'});
             }
-                //Correct phone
-                return Promise.resolve();
+            //Correct
+            return Promise.resolve();
          }
     }
 
@@ -67,8 +85,6 @@ export class CustomValidators extends Error {
     /**Boolean that is true */
     static checked() {
         return (value:any) => {
-            console.log("Validating checked !!!!");
-            console.log(value);
             if (!validator.isBoolean(String(value))) return Promise.reject();
             if (value !== true) {
                 return Promise.reject({type:'checked'});
@@ -108,38 +124,53 @@ export class CustomValidators extends Error {
             });
         }
     }
-    /**Does all signup validation*/
-    static signup(MyClass: any, field:string) {
+
+    /**Does all database verifications to see if user is not already in the db*/
+    static dBuserNotPresent(MyClass:any) {
         return (value:any, {req} : {req:Request}) => {
-            console.log("firstName : "  + req.body.firstName);
-            console.log("lastName : "  + req.body.lastName);
+            console.log("email : "  + req.body.email);
+            console.log("phone : "  + req.body.phone);
+            console.log("mobile: "  + req.body.mobile);
 
-            //firstName checking
-            if (req.body.firstName!=undefined) {
-                   if (!validator.isLength(req.body.firstName,{min:2})) return Promise.reject(<IValidationMessage>{type:'minlength',value:'2',field:"firstName"});
-                   if (!validator.isLength(req.body.firstName,{max:50})) return Promise.reject(<IValidationMessage>{type:'maxlength',value:'50',field:"firstName"});                
-            } else {   
-                if (Helper.isSharedSettingMatch("firstName", "include")) 
-                    return Promise.reject(<IValidationMessage>{type:'exists',field:"firstName"});
-            }
-            return Promise.resolve(); //End of validation success
+            let query : any[] = [];
+            query.push({email:req.body.email});
+            if (Helper.isSharedSettingMatch("phone", "include") || Helper.isSharedSettingMatch("phone", "optional") ) 
+                if (req.body.phone != undefined)
+                    query.push({phone:req.body.phone});
+            if (Helper.isSharedSettingMatch("mobile", "include") || Helper.isSharedSettingMatch("mobile", "optional") ) 
+                if (req.body.phone != undefined)
+                    query.push({phone:req.body.phone});
+            console.log(query);
+            return MyClass.findOne({
+                where: {[Op.or]: query}
+                }).then((user:any) => {
+                if (user) {
+                    return Promise.reject(<IValidationMessage>{type:'dbmissing',class:MyClass.name});
+                }
+            });
+        }
+    }
+    /**Does all database verifications to see if user is not already in the db*/
+    static dBuserNotPresentExceptMe(MyClass:any) {
+        return (value:any, {req} : {req:Request}) => {
+            let query : any[] = [];
+            query.push({email:req.body.email});
+            if (Helper.isSharedSettingMatch("phone", "include") || Helper.isSharedSettingMatch("phone", "optional") ) 
+                if (req.body.phone != undefined)
+                    query.push({phone:req.body.phone});
+            if (Helper.isSharedSettingMatch("mobile", "include") || Helper.isSharedSettingMatch("mobile", "optional") ) 
+                if (req.body.phone != undefined)
+                    query.push({phone:req.body.phone});
+            console.log(query);
+            return MyClass.findOne({
+                where: [{id:{[Op.not]:req.user.id}},{[Op.or]: query}]
+                }).then((user:any) => {
+                if (user) {
+                    return Promise.reject(<IValidationMessage>{type:'dbmissing',class:MyClass.name});
+                }
+            });
         }
     }
 
-    /**Does firstName and lastName validation based on shared data validation*/
-    static nameValidator(field:string) {
-        return (value:any) => {
-            console.log("Value is: "  + value);
-            //firstName checking
-            if (value!=undefined) {
-                   if (!validator.isLength(value,{min:2})) return Promise.reject(<IValidationMessage>{type:'minlength',value:'2'});
-                   if (!validator.isLength(value,{max:50})) return Promise.reject(<IValidationMessage>{type:'maxlength',value:'50'});                
-            } else {   
-                if (Helper.isSharedSettingMatch(field, "include")) 
-                    return Promise.reject(<IValidationMessage>{type:'exists'});
-            }
-            return Promise.resolve(); //End of validation success
-        }
-    }
 
 }

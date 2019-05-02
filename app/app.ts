@@ -53,7 +53,6 @@ class App {
     private initializeErrorHandling() {
         //Error handling controller must be after all routes
         this.app.use(Middleware.errorHandler());
-        this.app.use(Middleware.errorHandler2());
 
     }
 }

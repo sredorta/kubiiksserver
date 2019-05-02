@@ -1,27 +1,12 @@
-import {Request, Response, NextFunction, RequestHandler} from 'express'; //= require('express');
-
+import {Request, Response, NextFunction} from 'express'; //= require('express');
 import {HttpException} from '../classes/HttpException';
-import {ValidationException} from '../classes/ValidationException';
-
-import bodyParser = require('body-parser');
-import { checkServerIdentity } from 'tls';
-import { Middleware, messages } from '../middleware/common';
+import { Middleware } from '../middleware/common';
 import { Helper } from '../classes/Helper';
-
-import { IsNumber, IsEmail } from 'class-validator';
 import { Role } from '../models/role';
 import { User } from '../models/user';
-import { isUserWhitespacable } from 'babel-types';
 
-import {check, validationResult,body} from 'express-validator/check';
+import {body} from 'express-validator/check';
 import { CustomValidators } from '../classes/CustomValidators';
-
-
-//DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
-class GetUserByIdDTO {
-    @IsNumber()
-    public id!: number;
-}
 
 
 
@@ -119,7 +104,11 @@ export class UserController {
     }   
     //Get user by ID CHECKS
     public static getUserByIdChecks() {
-        return Middleware.validation(GetUserByIdDTO);
+        return [
+            body('id').exists().isUUID("all"),
+            Middleware.validate()
+        ]        
+        //return Middleware.validation(GetUserByIdDTO);
     }
 
     static tmp = async (req: Request, res: Response, next: NextFunction) => {
@@ -163,9 +152,6 @@ export class UserController {
     /**Parameter validation */
     static testchecks() {
         return [
-            //body('param1','exists').exists(),
-            //body('param1').custom(CustomValidators.password()),
-            //body('param1').custom(CustomValidators.dBMissing(User,"email")),
             body('firstName').custom(CustomValidators.nameValidator('firstName')),
             body('lastName').custom(CustomValidators.nameValidator('lastName')),
             body('email').exists().withMessage('exists').isEmail(),
@@ -173,10 +159,7 @@ export class UserController {
             body('mobile').custom(CustomValidators.mobile('mobile')),
             body('password').exists().withMessage('exists').custom(CustomValidators.password()),
             body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
-
-           // body('param1').custom((value:any, {req} : {req:Request}) => {CustomValidators.inUse(User,{"email":req.body.param1})}),
-            //body('param2','exists').exists(),
-            //body('param4','exists').exists(),
+            body('terms').custom(CustomValidators.dBuserNotPresent(User)),
             Middleware.validate()
         ]
     }    

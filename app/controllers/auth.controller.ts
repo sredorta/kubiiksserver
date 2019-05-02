@@ -2,18 +2,17 @@ import {Request, Response, NextFunction, RequestHandler} from 'express';
 import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
 import nodemailer from 'nodemailer';
+import {body} from 'express-validator/check';
+import { CustomValidators } from '../classes/CustomValidators';
 
 import {AppConfig} from '../utils/Config';
 import {messages} from '../middleware/common';
-
-import {DTOFirstNameRequired,DTOFirstNameOptional, DTOLastNameRequired,DTOLastNameOptional,DTOEmail,DTOPassword,DTOPhoneOptional,DTOPhoneRequired,DTOMobileRequired,DTOMobileOptional, DTOId, DTOKeepConnected, DTOTerms} from '../routes/dto';
 import { Helper } from '../classes/Helper';
 
 import jwt from "jsonwebtoken";
 import pug from 'pug';
 import path from 'path';
 import {Validator} from "class-validator";
-
 //Data models
 import {User} from '../models/user';
 
@@ -98,37 +97,21 @@ export class AuthController {
         }
     }
 
-    //ADD CHECKS
-    public static signupChecks() {
-        let handlers : RequestHandler[] = [];
-        handlers.push(Middleware.validation(DTOPassword)); //Allways include password
-        if (Helper.isSharedSettingMatch("firstName", "include"))
-            handlers.push(Middleware.validation(DTOFirstNameRequired));
-        if (Helper.isSharedSettingMatch("firstName", "optional"))
-            handlers.push(Middleware.validation(DTOFirstNameOptional));
+    /**Parameter validation */
+    static signupChecks() {
+            return [
+                body('firstName').custom(CustomValidators.nameValidator('firstName')),
+                body('lastName').custom(CustomValidators.nameValidator('lastName')),
+                body('email').exists().withMessage('exists').isEmail(),
+                body('phone').custom(CustomValidators.phone('phone')),
+                body('mobile').custom(CustomValidators.mobile('mobile')),
+                body('password').exists().withMessage('exists').custom(CustomValidators.password()),
+                body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
+                body('dummy').custom(CustomValidators.dBuserNotPresent(User)),
+                Middleware.validate()
+            ]
+    }    
 
-        if (Helper.isSharedSettingMatch("lastName", "include")) 
-            handlers.push(Middleware.validation(DTOLastNameRequired));
-        if (Helper.isSharedSettingMatch("lastName", "include")) 
-            handlers.push(Middleware.validation(DTOLastNameOptional));
-
-        if (Helper.isSharedSettingMatch("email", "include")) 
-            handlers.push(Middleware.validation(DTOEmail));
-
-        if (Helper.isSharedSettingMatch("phone", "include")) 
-            handlers.push(Middleware.validation(DTOPhoneRequired));            
-        if (Helper.isSharedSettingMatch("phone", "optional")) 
-            handlers.push(Middleware.validation(DTOPhoneOptional));
-
-        if (Helper.isSharedSettingMatch("mobile", "include")) 
-            handlers.push(Middleware.validation(DTOMobileRequired));            
-        if (Helper.isSharedSettingMatch("mobile", "optional")) 
-            handlers.push(Middleware.validation(DTOMobileOptional));
-
-        handlers.push(Middleware.validation(DTOTerms));
-
-        return handlers;
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     // login
@@ -149,20 +132,24 @@ export class AuthController {
             console.log("GENERATED TOKEN : " + token);  
             res.json({token: token});              
     }
-    //ADD CHECKS
-    public static loginChecks() {
-        let handlers : RequestHandler[] = [];
-        handlers.push(Middleware.validation(DTOPassword)); //Allways include password
-        handlers.push(Middleware.validation(DTOKeepConnected));
-        //TODO validate username here !!!!!
-/*        if (Helper.isSharedSettingMatch("login_email", "include")) 
-            handlers.push(Middleware.validation(DTOEmail));
-
+    /**Parameter validation */
+    static loginChecks() {
         if (Helper.isSharedSettingMatch("login_mobile", "include")) 
-            handlers.push(Middleware.validation(DTOMobile));*/
+            return [
+                body('username').custom(CustomValidators.mobile('mobile')),
+                body('password').exists().withMessage('exists').custom(CustomValidators.password()),
+                body('keepconnected').exists().withMessage('exists').isBoolean(),
+                Middleware.validate()
+            ]
+        else
+            return [
+                body('username').exists().withMessage({type:'exists',field:'email'}).isEmail(),
+                body('password').exists().withMessage('exists').custom(CustomValidators.password()),
+                body('keepconnected').exists().withMessage('exists').isBoolean(),
+                Middleware.validate()
+            ]            
+    }        
 
-        return handlers;
-    }    
 
     ///////////////////////////////////////////////////////////////////////////
     // OAUTH2
@@ -214,35 +201,20 @@ export class AuthController {
         }
     }
     //Problem is that some fields are unique and we already have the user created so all IsUnique validations will fail !!!
-    //I think that we need somehow to create one DTO per post request and not per argument, but not sure
-
-    /**Must contain same checks as signup but not password neither email */
-    public static oauth2UpdateFieldsChecks() {
-        let handlers : RequestHandler[] = [];
-        if (Helper.isSharedSettingMatch("firstName", "include"))
-            handlers.push(Middleware.validation(DTOFirstNameRequired));
-        if (Helper.isSharedSettingMatch("firstName", "optional"))
-            handlers.push(Middleware.validation(DTOFirstNameOptional));
-
-        if (Helper.isSharedSettingMatch("lastName", "include")) 
-            handlers.push(Middleware.validation(DTOLastNameRequired));
-        if (Helper.isSharedSettingMatch("lastName", "include")) 
-            handlers.push(Middleware.validation(DTOLastNameOptional));
-
-        if (Helper.isSharedSettingMatch("phone", "include")) 
-            handlers.push(Middleware.validation(DTOPhoneRequired));            
-        if (Helper.isSharedSettingMatch("phone", "optional")) 
-            handlers.push(Middleware.validation(DTOPhoneOptional));
-
-        if (Helper.isSharedSettingMatch("mobile", "include")) 
-            handlers.push(Middleware.validation(DTOMobileRequired));            
-        if (Helper.isSharedSettingMatch("mobile", "optional")) 
-            handlers.push(Middleware.validation(DTOMobileOptional));
-
-        handlers.push(Middleware.validation(DTOTerms));
-
-        return handlers;
-    }
+    /**Parameter validation */
+    static oauth2UpdateFieldsChecks() {
+        return [
+            body('firstName').custom(CustomValidators.nameValidator('firstName')),
+            body('lastName').custom(CustomValidators.nameValidator('lastName')),
+            body('email').exists().withMessage('exists').isEmail(),
+            body('phone').custom(CustomValidators.phone('phone')),
+            body('mobile').custom(CustomValidators.mobile('mobile')),
+            body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
+            body('dummy').custom(CustomValidators.dBuserNotPresentExceptMe(User)),
+            Middleware.validate()
+        ]
+    }    
+ 
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -340,22 +312,24 @@ export class AuthController {
             }
         });
     }
-    //ADD CHECKS
-    public static resetPasswordByEmailChecks() {
-        let handlers : RequestHandler[] = [];
-        handlers.push(Middleware.validation(DTOEmail));
-        return handlers;
+    /**Parameter validation */
+    static resetPasswordByEmailChecks() {
+            return [
+                body('email').exists().withMessage('exists').isEmail(),
+                Middleware.validate()
+            ]
     }    
     ///////////////////////////////////////////////////////////////////////////
     // resetPasswordEmail:  Resets the password by sending new one by email
     ///////////////////////////////////////////////////////////////////////////
     static resetPasswordByMobile = async (req: Request, res: Response, next:NextFunction) => {
         next( new HttpException(400, messages.featureNotAvailable('password reset mobile'), null))
-    }
-    //ADD CHECKS
-    public static resetPasswordByMobileChecks() {
-        let handlers : RequestHandler[] = [];
-        handlers.push(Middleware.validation(DTOMobileRequired));
-        return handlers;
-    }    
+    }  
+    /**Parameter validation */
+    static resetPasswordByMobileChecks() {
+        return [
+            body('mobile').exists().withMessage('exists').custom(CustomValidators.mobile('mobile')),
+            Middleware.validate()
+        ]
+    }       
 }

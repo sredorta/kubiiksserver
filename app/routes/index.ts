@@ -108,7 +108,7 @@ export class Routes {
 
     //Login
     app.route('/api/auth/login')
-      .post([passport.authenticate('local',{session: false}),AuthController.loginChecks()], AuthController.login);
+      .post([AuthController.loginChecks(),passport.authenticate('local',{session: false}),AuthController.loginChecks()], AuthController.login);
 
     app.route('/api/auth/facebook')
       .get(passport.authenticate('facebook', {scope:['email'], session:false}));
@@ -134,7 +134,7 @@ export class Routes {
 
     /**Route called after using social passports to save updates, it has exactly same checks as signup except for password*/  
     app.route('/api/auth/oauth2/update')
-    .post(AuthController.oauth2UpdateFieldsChecks(),passport.authenticate('jwt',{session: false}),AuthController.oauth2UpdateFields);
+    .post([passport.authenticate('jwt',{session: false}),AuthController.oauth2UpdateFieldsChecks()],AuthController.oauth2UpdateFields); //Validation needs to be performed after auth in order to get access to req.user.id
 
 
     //getAuthUser
