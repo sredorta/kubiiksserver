@@ -14,6 +14,7 @@ import * as ts from "typescript";
 import jwt from "jsonwebtoken";
 import {check, validationResult,body} from 'express-validator/check';
 import {ValidationException} from '../classes/ValidationException';
+import { TokenException } from '../classes/TokenException';
 
 export let messages = en; //Set default language and export messages
 
@@ -67,57 +68,67 @@ export class Middleware {
     //Handle all errors !
     public static errorHandler() {
         console.log("errorHandler enabled !!!");
-        return function errorMiddleware(error: HttpException, request: Request, response: Response, next: NextFunction) {
+        return function errorMiddleware(error: HttpException | TokenException, request: Request, response: Response, next: NextFunction) {
             console.log("Running errorHandler !");
             console.log("//////////////////////////////////////////////");
-            console.log(error);
+            console.log(error.stack);
             console.log("//////////////////////////////////////////////");
-
+            console.log("ERROR TYPE: " + typeof error);
 
             console.log("Message: " + error.message);
-            console.log(typeof error);
-            const status : number = error.status || 500;
-            let message = error.message || 'Something went wrong';;
-            let send = false;
-            if (error.errors) {
-                if (error.errors[0])
-                    if (error.errors[0].type == "Validation error") {
-                        message = messages.validation(error.errors[0].path);
-                        response.status(status).send({
-                                status:status,
-                                message: message
-                                });
-                    } else if (error.errors[0].type =="unique violation") {
-                        async function _generateError() {
-                            const elem = error.errors[0].instance._modelOptions.name.singular;
-                            console.log("Found unique violation !!!!!");
-                            console.log(elem);
-                            //TODO fix this in case it doesn't exist and remove error
-                            let code: string = `({
-                                Run: (messages: any, elem:string): string => {
-                                    return Promise.resolve(messages.validationUnique(messages[elem])); }
-                                })`;
-                            let result = ts.transpile(code);
-                            let runnalbe :any = eval(result);
-                            message = await runnalbe.Run(messages,elem);
+
+
+            if (error instanceof TokenException) {
+                response.status(error.status).send({
+                    status:error.status,
+                    message: error.message,
+                    type: error.type,
+                    reason: error.reason
+                });    
+            } else {
+                const status : number = error.status || 500;
+                let message = error.message || 'Something went wrong';;
+                let send = false;
+                if (error.errors) {
+                    if (error.errors[0])
+                        if (error.errors[0].type == "Validation error") {
+                            message = messages.validation(error.errors[0].path);
+                            response.status(status).send({
+                                    status:status,
+                                    message: message
+                                    });
+                        } else if (error.errors[0].type =="unique violation") {
+                            async function _generateError() {
+                                const elem = error.errors[0].instance._modelOptions.name.singular;
+                                console.log("Found unique violation !!!!!");
+                                console.log(elem);
+                                //TODO fix this in case it doesn't exist and remove error
+                                let code: string = `({
+                                    Run: (messages: any, elem:string): string => {
+                                        return Promise.resolve(messages.validationUnique(messages[elem])); }
+                                    })`;
+                                let result = ts.transpile(code);
+                                let runnalbe :any = eval(result);
+                                message = await runnalbe.Run(messages,elem);
+                                response.status(status).send({
+                                    status:status,
+                                    message: message
+                                    });
+                            }
+                            _generateError();
+                        } else {
                             response.status(status).send({
                                 status:status,
                                 message: message
-                                });
-                        }
-                        _generateError();
-                    } else {
-                        response.status(status).send({
-                            status:status,
-                            message: message
-                        });             
-                    } 
-            } else {
-                response.status(status).send({
-                    status:status,
-                    message: message
-                });                  
-            }         
+                            });             
+                        } 
+                } else {
+                    response.status(status).send({
+                        status:status,
+                        message: message
+                    });                  
+                }        
+            } 
         }
     }
     /** Middleware that handles parameter input validation using express-validation*/

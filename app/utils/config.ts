@@ -59,8 +59,8 @@ import * as dotenv from "dotenv";
         "sharedSettings" : [
             {"key": "firstName", "value":"include"},
             {"key": "lastName", "value":"include"},
-            {"key": "phone", "value":"optional"},
-            {"key": "mobile", "value":"include"},
+            {"key": "phone", "value":"exclude"},
+            {"key": "mobile", "value":"optional"},
             {"key": "validation_method", "value":"no_validation"},
             {"key": "login_username", "value":"email"},
             {"key": "mode", "value":"demo"}

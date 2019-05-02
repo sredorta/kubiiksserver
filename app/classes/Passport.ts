@@ -14,6 +14,7 @@ import {HttpException} from '../classes/HttpException';
 import {User} from '../models/user';
 import { isNamedExports } from 'typescript';
 import { IJwtPayload } from '../controllers/auth.controller';
+import { TokenException } from './TokenException';
 
 
 
@@ -82,7 +83,7 @@ export class Passport {
                 const myUser = await User.findByPk(jwtPayload.id);
                 if (!myUser) {
                     console.log(myUser);
-                    return cb(new HttpException(401, messages.authTokenInvalid, null), false);
+                    return cb(new TokenException(401, messages.authTokenInvalid, "user_not_found"), false);
                 }
                 //TODO: Validate that all required fields are present if not, return error
                 return cb(null, myUser);

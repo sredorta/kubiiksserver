@@ -189,15 +189,14 @@ export class AuthController {
         console.log("oauth2UpdateFields !!!!");
         console.log(req.body);
         //Check that we got the terms accepted
-        if (req.body.terms!= true)
-            return next( new HttpException(400, messages.validationTerms,null))
+ 
         let myUser = await User.findByPk(req.user.id);
         if (!myUser) {
             next( new HttpException(400, messages.validationNotFound(messages.User), null))
         } else {
             await myUser.update(req.body);
-
-            res.json(myUser);
+            let result = await User.scope("withRoles").findByPk(req.user.id);
+            res.json(result);
         }
     }
     //Problem is that some fields are unique and we already have the user created so all IsUnique validations will fail !!!
