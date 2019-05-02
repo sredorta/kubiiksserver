@@ -18,6 +18,10 @@ import passportJWT from "passport-facebook";
 import {ExtractJwt} from "passport-jwt";
 import {User} from '../models/user';
 import {Helper} from '../classes/Helper';
+import { Product } from '../models/product';
+import {check, validationResult,body} from 'express-validator/check';
+
+
 
 export class Routes {    
   //Call all controllers required here  
@@ -34,6 +38,31 @@ export class Routes {
   
 
   public routes(app:Router): void {
+
+
+    app.route('/api/test')
+    .post(UserController.testchecks(), UserController.test
+    );
+  
+
+/*      try {
+        console.log (validationResult(req));
+        let errors = await req.getValidationResult();//req).throw();
+        console.log(errors);
+        //const errors = req.getValidationResult();
+        //await Product.create({field1:"test1", field2:"kk"});
+        //await Product.create({field1:"test2", field2:"kk"});
+
+        res.status(200).send({
+          message: "COMPLETED !"
+        });
+      } catch(error) {
+        console.log(JSON.stringify(error.array));
+        next(new HttpException(500, error.message, error.errors));
+      }*/
+
+
+  
 
 
     app.route('/')

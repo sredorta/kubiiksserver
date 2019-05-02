@@ -1,10 +1,15 @@
 export const messages = {
     description: "Esto es una api",
     User: 'Usuario',
+    validationExists: (name = 'field') => `Falta el parametro '${name}'`,
+    validationDBExists: (name = 'field') => `'${name}' no encontrado en la base de datos`,
+    validationDBMissing: (name = 'field') => `'${name}' ya existe en la base de datos`,
 
     validationMinLength:(name = 'field', value='value') => `El campo '${name}' debe tener como minimo ${value} caracteres`,
     validationMaxLength: (name = 'field', value='value') => `El campo '${name}' debe tener menos de ${value} caracteres`,
     validationPassword: (name = 'field') => `El campo '${name}' debe tener como minimo una mayuscula, una minuscula, un numero y mas de 5 caracteres`,
+    validationChecked:  (name = 'field') => `El campo '${name}' debe estar seleccionado`,
+
     validationEmpty: (name = 'field') => `El campo '${name}' no puede estar vacio`,
     validationUnique: (name = 'field') => `${name} ya existente en la base de datos`,
     validation: (name = 'field') => `El campo '${name}' est incorrecto`,

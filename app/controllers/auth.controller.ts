@@ -37,7 +37,7 @@ export class AuthController {
             return next( new HttpException(500, messages.validationTerms,null))
 
         let myUser : User;
-        let method = Helper.getSharedSetting("signup_validation_method")
+        let method = Helper.getSharedSetting("validation_method")
         try {
             myUser = await User.scope("full").create({
                 firstName: req.body.firstName,
@@ -57,7 +57,7 @@ export class AuthController {
                 await myUser.attachRole("admin"); 
             }
 
-            //Depending on the signup_validation method we need to authenticate or not
+            //Depending on the validation method we need to authenticate or not
             switch (method) {
                 //Login to the admin account if exists or to the standard if admin does not exist
                 case "no_validation": {
@@ -68,7 +68,7 @@ export class AuthController {
                 }
                 //Requires mobile phone validation
                 case "mobile": {
-                    next( new HttpException(500, messages.featureNotAvailable("signup_validation_method : mobile"),null))
+                    next( new HttpException(500, messages.featureNotAvailable("validation_method : mobile"),null))
                     break;
                 }
                 //Validation with email is the default
@@ -102,27 +102,27 @@ export class AuthController {
     public static signupChecks() {
         let handlers : RequestHandler[] = [];
         handlers.push(Middleware.validation(DTOPassword)); //Allways include password
-        if (Helper.isSharedSettingMatch("signup_firstName", "include"))
+        if (Helper.isSharedSettingMatch("firstName", "include"))
             handlers.push(Middleware.validation(DTOFirstNameRequired));
-        if (Helper.isSharedSettingMatch("signup_firstName", "optional"))
+        if (Helper.isSharedSettingMatch("firstName", "optional"))
             handlers.push(Middleware.validation(DTOFirstNameOptional));
 
-        if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
+        if (Helper.isSharedSettingMatch("lastName", "include")) 
             handlers.push(Middleware.validation(DTOLastNameRequired));
-        if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
+        if (Helper.isSharedSettingMatch("lastName", "include")) 
             handlers.push(Middleware.validation(DTOLastNameOptional));
 
-        if (Helper.isSharedSettingMatch("signup_email", "include")) 
+        if (Helper.isSharedSettingMatch("email", "include")) 
             handlers.push(Middleware.validation(DTOEmail));
 
-        if (Helper.isSharedSettingMatch("signup_phone", "include")) 
+        if (Helper.isSharedSettingMatch("phone", "include")) 
             handlers.push(Middleware.validation(DTOPhoneRequired));            
-        if (Helper.isSharedSettingMatch("signup_phone", "optional")) 
+        if (Helper.isSharedSettingMatch("phone", "optional")) 
             handlers.push(Middleware.validation(DTOPhoneOptional));
 
-        if (Helper.isSharedSettingMatch("signup_mobile", "include")) 
+        if (Helper.isSharedSettingMatch("mobile", "include")) 
             handlers.push(Middleware.validation(DTOMobileRequired));            
-        if (Helper.isSharedSettingMatch("signup_mobile", "optional")) 
+        if (Helper.isSharedSettingMatch("mobile", "optional")) 
             handlers.push(Middleware.validation(DTOMobileOptional));
 
         handlers.push(Middleware.validation(DTOTerms));
@@ -219,24 +219,24 @@ export class AuthController {
     /**Must contain same checks as signup but not password neither email */
     public static oauth2UpdateFieldsChecks() {
         let handlers : RequestHandler[] = [];
-        if (Helper.isSharedSettingMatch("signup_firstName", "include"))
+        if (Helper.isSharedSettingMatch("firstName", "include"))
             handlers.push(Middleware.validation(DTOFirstNameRequired));
-        if (Helper.isSharedSettingMatch("signup_firstName", "optional"))
+        if (Helper.isSharedSettingMatch("firstName", "optional"))
             handlers.push(Middleware.validation(DTOFirstNameOptional));
 
-        if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
+        if (Helper.isSharedSettingMatch("lastName", "include")) 
             handlers.push(Middleware.validation(DTOLastNameRequired));
-        if (Helper.isSharedSettingMatch("signup_lastName", "include")) 
+        if (Helper.isSharedSettingMatch("lastName", "include")) 
             handlers.push(Middleware.validation(DTOLastNameOptional));
 
-        if (Helper.isSharedSettingMatch("signup_phone", "include")) 
+        if (Helper.isSharedSettingMatch("phone", "include")) 
             handlers.push(Middleware.validation(DTOPhoneRequired));            
-        if (Helper.isSharedSettingMatch("signup_phone", "optional")) 
+        if (Helper.isSharedSettingMatch("phone", "optional")) 
             handlers.push(Middleware.validation(DTOPhoneOptional));
 
-        if (Helper.isSharedSettingMatch("signup_mobile", "include")) 
+        if (Helper.isSharedSettingMatch("mobile", "include")) 
             handlers.push(Middleware.validation(DTOMobileRequired));            
-        if (Helper.isSharedSettingMatch("signup_mobile", "optional")) 
+        if (Helper.isSharedSettingMatch("mobile", "optional")) 
             handlers.push(Middleware.validation(DTOMobileOptional));
 
         handlers.push(Middleware.validation(DTOTerms));

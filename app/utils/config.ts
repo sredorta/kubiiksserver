@@ -57,12 +57,11 @@ import * as dotenv from "dotenv";
             }
         },
         "sharedSettings" : [
-            {"key": "signup_firstName", "value":"include"},
-            {"key": "signup_lastName", "value":"include"},
-            {"key": "signup_email", "value":"include"},
-            {"key": "signup_phone", "value":"optional"},
-            {"key": "signup_mobile", "value":"include"},
-            {"key": "signup_validation_method", "value":"no_validation"},
+            {"key": "firstName", "value":"include"},
+            {"key": "lastName", "value":"include"},
+            {"key": "phone", "value":"optional"},
+            {"key": "mobile", "value":"include"},
+            {"key": "validation_method", "value":"no_validation"},
             {"key": "login_username", "value":"email"},
             {"key": "mode", "value":"demo"}
         ],

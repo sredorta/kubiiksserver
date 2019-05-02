@@ -117,15 +117,15 @@ export class User extends Model<User> {
   /**Returns array with all required missing fields for signup. This can happen when creating account with oauth2 */
   /*public getMissingSignupFields() {
     let result = [];
-    if (Helper.isSharedSettingMatch("signup_firstName","include"))
+    if (Helper.isSharedSettingMatch("firstName","include"))
       if (this.firstName == null || this.firstName == undefined) result.push("firstName");
-    if (Helper.isSharedSettingMatch("signup_lastName","include"))
+    if (Helper.isSharedSettingMatch("lastName","include"))
       if (this.lastName == null || this.lastName == undefined) result.push("lastName");
-    if (Helper.isSharedSettingMatch("signup_email","include"))
+    if (Helper.isSharedSettingMatch("email","include"))
       if (this.email == null || this.email == undefined) result.push("email");
-    if (Helper.isSharedSettingMatch("signup_mobile","include"))
+    if (Helper.isSharedSettingMatch("mobile","include"))
       if (this.mobile == null || this.mobile == undefined) result.push("mobile");
-    if (Helper.isSharedSettingMatch("signup_phone","include"))
+    if (Helper.isSharedSettingMatch("phone","include"))
       if (this.phone == null || this.phone == undefined) result.push("phone");       
     return result;
   }*/

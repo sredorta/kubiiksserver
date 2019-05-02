@@ -10,6 +10,7 @@ import {UserRole} from './models/user_role';
 
 import {AppConfig} from './utils/config';
 import {Response,Request,NextFunction} from 'express';
+import { Product } from "./models/product";
 
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
@@ -34,7 +35,7 @@ const sequelize = new Sequelize({
 
 
 
- sequelize.addModels([User,Setting,Role,UserRole]);
+ sequelize.addModels([User,Setting,Role,UserRole, Product]);
 
 async function startServer() {    
     await sequelize.sync({force:true});

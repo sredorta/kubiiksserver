@@ -1,17 +1,22 @@
 import {Request, Response, NextFunction, RequestHandler} from 'express'; //= require('express');
 
-import check from 'express-validator';
 import {HttpException} from '../classes/HttpException';
+import {ValidationException} from '../classes/ValidationException';
+
 import bodyParser = require('body-parser');
 import { checkServerIdentity } from 'tls';
-import { body } from 'express-validator/check';
-import { Middleware } from '../middleware/common';
+import { Middleware, messages } from '../middleware/common';
 import { Helper } from '../classes/Helper';
 
 import { IsNumber, IsEmail } from 'class-validator';
 import { Role } from '../models/role';
 import { User } from '../models/user';
 import { isUserWhitespacable } from 'babel-types';
+
+import {check, validationResult,body} from 'express-validator/check';
+import { CustomValidators } from '../classes/CustomValidators';
+
+
 //DEFINE HERE ALL DTO CLASSES FOR PARAMETER VALIDATION
 class GetUserByIdDTO {
     @IsNumber()
@@ -145,5 +150,38 @@ export class UserController {
         };
     }
 
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    //TESTING PARAMS
+
+    static test = async (req: Request, res: Response, next: NextFunction) => {
+        console.log(JSON.parse(JSON.stringify("Hello")));
+        console.log(JSON.parse(JSON.stringify({"test":"test","hello":"world"})));
+
+        res.json("SUCCESS !!!");
+    }
+    /**Parameter validation */
+    static testchecks() {
+        return [
+            //body('param1','exists').exists(),
+            //body('param1').custom(CustomValidators.password()),
+            //body('param1').custom(CustomValidators.dBMissing(User,"email")),
+            body('firstName').custom(CustomValidators.nameValidator('firstName')),
+            body('lastName').custom(CustomValidators.nameValidator('lastName')),
+            body('email').exists().withMessage('exists').isEmail(),
+            body('phone').custom(CustomValidators.phone('phone')),
+            body('mobile').custom(CustomValidators.mobile('mobile')),
+            body('password').exists().withMessage('exists').custom(CustomValidators.password()),
+            body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
+
+           // body('param1').custom((value:any, {req} : {req:Request}) => {CustomValidators.inUse(User,{"email":req.body.param1})}),
+            //body('param2','exists').exists(),
+            //body('param4','exists').exists(),
+            Middleware.validate()
+        ]
+    }    
+    static conditional() {
+
+    }
 
 }

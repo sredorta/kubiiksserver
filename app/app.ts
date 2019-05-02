@@ -5,6 +5,7 @@ import passport from "passport";
 import { Routes } from "./routes/index";
 import {Middleware} from "./middleware/common";
 import {Passport} from "./classes/Passport";
+import ExpressValidator from "express-validator";
 
 class App {
 
@@ -36,6 +37,7 @@ class App {
         //this.app.use(express.json());        //Use JSON post parameters format 
         this.app.use(Middleware.cors());     //Enable cors
         this.app.use(Middleware.language()); //Parses headers and determines language
+        this.app.use(ExpressValidator());
 
         //Declare all available passports   
         this.app.use(passport.initialize()); 
@@ -51,6 +53,8 @@ class App {
     private initializeErrorHandling() {
         //Error handling controller must be after all routes
         this.app.use(Middleware.errorHandler());
+        this.app.use(Middleware.errorHandler2());
+
     }
 }
 

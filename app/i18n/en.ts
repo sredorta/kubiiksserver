@@ -3,12 +3,17 @@ export const messages = {
 
     //Validation messages
     User: 'User',
+    validationExists: (name = 'field') => `Missing parameter '${name}'`,
+    validationDBExists: (name = 'field') => `'${name}' not found in the database`,
+    validationDBMissing: (name = 'field') => `'${name}' already in the database`,
+
     validationMinLength: (name = 'field', value='value') => `Field '${name}' must have at least ${value} characters`,
     validationMaxLength: (name = 'field', value='value') => `Field '${name}' must have less than ${value} characters`,
     validationPassword: (name = 'field') => `Field '${name}' must have lowercases, uppercases, numbers and be more than 5 characters long`,
+    validationChecked:  (name = 'field') => `Field '${name}' must be checked`,
     validationEmpty: (name = 'field') => `Field '${name}' cannot be empty`,
     validationUnique: (name = 'field') => `${name} already exists in the database`,
-    validation: (name = 'field') => `Wrong value for for field '${name}'`,
+    validation: (name = 'field') => `Wrong value for field '${name}'`,
     validationNotFound: (name = 'field') => `${name} not found in the database with the given requirements`,
     validationTerms: "Terms and conditions must be accepted",
 

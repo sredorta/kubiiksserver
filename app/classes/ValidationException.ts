@@ -1,0 +1,78 @@
+import { messages } from '../middleware/common';
+
+export interface IValidationMessage {
+    type:string;
+    class?:string;
+    value?:string;
+    field?:string;
+}
+
+export class ValidationException extends Error {
+    status: number = 400;   //Allways return 400 error message for invalid params
+    message: string;
+    errors : any = null;
+    constructor(error:any) {
+        super();
+        try {
+            let msg : IValidationMessage = {type:"unknown"};
+            let field : string;
+            const myError = error.array()[0];
+            const msgJson = JSON.parse(JSON.stringify(myError.msg));
+            if (typeof msgJson == "string") {
+                console.log("Detected string !");
+                msg.type = msgJson;
+                field = myError.param;
+            } else {
+                console.log("Detected object !");
+                msg = <IValidationMessage>msgJson;
+                if (msg.field)
+                    field = msg.field;
+                else field = myError.param;
+            }
+            console.log(msg.type);
+            console.log(myError);
+            this.message = messages.validationExists(msg.class)
+
+            switch(<string>msg.type) {
+                case "exists": {
+                    this.message= messages.validationExists(field);
+                    break;
+                }
+                case "minlength": {
+                    this.message= messages.validationMinLength(field,msg.value);
+                    break;
+                }
+                case "maxlength": {
+                    this.message= messages.validationMaxLength(field,msg.value);
+                    break;
+                }                
+                case "password": {
+                    this.message = messages.validationPassword(field);
+                    break;
+                }
+                case "checked": {
+                    this.message = messages.validationChecked(field);
+                    break;
+                }
+                case "dbmissing": { //Expects not found in db
+                    this.message = messages.validationDBMissing(msg.class);
+                    break;
+                }
+                case "dbexists": {
+                    console.log("In dbExists !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    this.message = messages.validationDBExists(msg.class);
+                    break;
+                }
+                default: {
+                    this.message = messages.validation(field);
+                }
+            }
+        } catch(error) {
+            console.log("Catched error");
+            console.log(error);
+            this.message = messages.validation("Unknown"); //Default message
+        }
+
+    }
+}
+   
