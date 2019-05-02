@@ -14,7 +14,6 @@ import * as ts from "typescript";
 import jwt from "jsonwebtoken";
 import {check, validationResult,body} from 'express-validator/check';
 import {ValidationException} from '../classes/ValidationException';
-import { TokenException } from '../classes/TokenException';
 
 export let messages = en; //Set default language and export messages
 
@@ -49,6 +48,9 @@ export class Middleware {
             let language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
             
             res.locals.language = language;  //Store language in the locals
+            if (!req.user)
+                req.user = {};
+            req.user.language = language;   //This is used afterwards !!!!
 
             //Override messages so that it uses correct language
             let acc : any = [];
@@ -68,7 +70,7 @@ export class Middleware {
     //Handle all errors !
     public static errorHandler() {
         console.log("errorHandler enabled !!!");
-        return function errorMiddleware(error: HttpException | TokenException, request: Request, response: Response, next: NextFunction) {
+        return function errorMiddleware(error: HttpException, request: Request, response: Response, next: NextFunction) {
             console.log("Running errorHandler !");
             console.log("//////////////////////////////////////////////");
             console.log(error.stack);
@@ -78,14 +80,7 @@ export class Middleware {
             console.log("Message: " + error.message);
 
 
-            if (error instanceof TokenException) {
-                response.status(error.status).send({
-                    status:error.status,
-                    message: error.message,
-                    type: error.type,
-                    reason: error.reason
-                });    
-            } else {
+
                 const status : number = error.status || 500;
                 let message = error.message || 'Something went wrong';;
                 let send = false;
@@ -128,7 +123,7 @@ export class Middleware {
                         message: message
                     });                  
                 }        
-            } 
+
         }
     }
     /** Middleware that handles parameter input validation using express-validation*/

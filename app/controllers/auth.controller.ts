@@ -36,7 +36,9 @@ export class AuthController {
             return next( new HttpException(500, messages.validationTerms,null))
 
         let myUser : User;
-        let method = Helper.getSharedSetting("validation_method")
+        let method = Helper.getSharedSetting("validation_method");
+        console.log("REQ USER:");
+        console.log(req.user.language);
         try {
             myUser = await User.scope("full").create({
                 firstName: req.body.firstName,
@@ -44,6 +46,7 @@ export class AuthController {
                 email: req.body.email,
                 phone:req.body.phone,
                 mobile:req.body.mobile,
+                language: req.user.language,
                 passport: "local",
                 terms:req.body.terms,
                 emailValidationKey: Helper.generateRandomString(30),

@@ -14,7 +14,6 @@ import {HttpException} from '../classes/HttpException';
 import {User} from '../models/user';
 import { isNamedExports } from 'typescript';
 import { IJwtPayload } from '../controllers/auth.controller';
-import { TokenException } from './TokenException';
 
 
 
@@ -83,7 +82,7 @@ export class Passport {
                 const myUser = await User.findByPk(jwtPayload.id);
                 if (!myUser) {
                     console.log(myUser);
-                    return cb(new TokenException(401, messages.authTokenInvalid, "user_not_found"), false);
+                    return cb(new HttpException(401, messages.authTokenInvalid, null), false);
                 }
                 //TODO: Validate that all required fields are present if not, return error
                 return cb(null, myUser);
@@ -157,6 +156,7 @@ export class Passport {
               firstName: profile._json.first_name,
               lastName: profile._json.last_name,
               email: profile._json.email,
+              language: req.user.language,
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
               emailValidationKey: Helper.generateRandomString(30),
               mobileValidationKey: Helper.generateRandomNumber(4),
@@ -241,6 +241,7 @@ export class Passport {
               firstName: profile._json.given_name,
               lastName: profile._json.family_name,
               email: profile._json.email,
+              language: req.user.language,
               emailValidationKey: Helper.generateRandomString(30),
               mobileValidationKey: Helper.generateRandomNumber(4),
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case

@@ -26,6 +26,7 @@ export class UserController {
                     email: "sergi.redorta@hotmail.com",
                     phone: "0423133212",
                     mobile: "0623133212",
+                    language:req.user.language,
                     password: "Hello1234",
                     emailValidationKey: Helper.generateRandomString(30),
                     mobileValidationKey: Helper.generateRandomNumber(4)});
@@ -121,6 +122,7 @@ export class UserController {
                 email: "sergi.redorta@hotmail.com",
                 phone: "0423133212",
                 mobile: "0623133212",
+                language: req.user.language,
                 password: "Hello1234",
                 emailValidationKey: Helper.generateRandomString(30),
                 mobileValidationKey: Helper.generateRandomNumber(4)
