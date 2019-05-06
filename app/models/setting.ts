@@ -1,9 +1,13 @@
-import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default} from 'sequelize-typescript';
+import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/Config';
 
 export const SettingN = 'Not a model';
 export const NSetting = 'Not a model';
+
+@DefaultScope({
+    attributes: ["id","key","type","value"]
+  })
 
 @Table
 export class Setting extends Model<Setting> {
@@ -20,6 +24,10 @@ export class Setting extends Model<Setting> {
 
   @AllowNull(false)
   @Column(DataTypes.STRING(50))
+  type!: string;
+
+  @AllowNull(false)
+  @Column(DataTypes.STRING(1000))
   value!: string;
 
 
@@ -30,10 +38,57 @@ export class Setting extends Model<Setting> {
         for(let item of AppConfig.sharedSettings) {
             await Setting.create({
                 key: item.key,
+                type: "shared",
                 value: item.value
             });                
         }
-        console.log("SEED END");
+        /*i18n*/
+        await Setting.create({
+            type: "i18n",
+            key: "fallbackLanguage",
+            value: "en"
+        });
+        await Setting.create({
+            type: "i18n",
+            key: "languages",
+            value: "fr,en,es"
+        });        
+        /*social*/
+        await Setting.create({
+            type: "social",
+            key: "linkFacebook",
+            value: "https://www.facebook.com/kubiiks/"
+        });          
+        await Setting.create({
+            type: "social",
+            key: "linkGooglePlus",
+            value: "https://plus.google.com/u/0/118285710646673394875"
+        });   
+        await Setting.create({
+            type: "social",
+            key: "linkInstagram",
+            value: "https://www.instagram.com/sergiredorta/"
+        });   
+        await Setting.create({
+            type: "social",
+            key: "linkLinkedin",
+            value: "https://www.linkedin.com/company/kubiiks/"
+        });                           
+        await Setting.create({
+            type: "social",
+            key: "linkTwitter",
+            value: ""
+        });   
+        await Setting.create({
+            type: "social",
+            key: "linkYoutube",
+            value: "https://www.youtube.com/user/sergiredorta"
+        });                   
+/*
+    matInputAppearance: "fill",   //Mat input appearance "outline", "default", "fill"...
+    matInputHasLabel: true,
+    matInputHasHint: true,*/ 
+    console.log("SEED END"); 
     }
     return _seed();
   }
@@ -41,70 +96,6 @@ export class Setting extends Model<Setting> {
 
 
 
-
-/*
-
-
-import app from "../app";
-import { Sequelize, Model, DataTypes } from 'sequelize';
-import {AppConfig} from '../utils/Config';
-
-export class Setting extends Model {
-    public id!: number; // Note that the `null assertion` `!` is required in strict mode.
-
-    public key!: string;
-    public value!:string;
-  
-    // timestamps!
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
-
-
-    public static data : any[] = [];
-
-    //Does the model definition for SQL
-    public static definition(sequelize : Sequelize) {
-        return { params :{
-               id: {
-                type: new DataTypes.INTEGER().UNSIGNED,
-                autoIncrement: true,
-                primaryKey: true,
-                },
-               key: {
-                type: new DataTypes.STRING(50),
-                allowNull: false,
-                unique: true
-                },
-               value: {
-                    type: new DataTypes.STRING(50),
-                    allowNull: false,
-                    defaultValue: ""
-                }
-            }, table: {
-                tableName: 'settings',
-                modelName: 'setting',
-                sequelize: sequelize
-            }};
-        }
-
-    //Seeds the table with all the defaults copies the data from the config.json to the settings table for the front-end
-    //import {AppConfig} from '../utils/Config';
-
-    public static seed() {
-        async function _seed() {
-            for(let item of AppConfig.sharedSettings) {
-                await Setting.create({
-                    key: item.key,
-                    value: item.value
-                });                
-            }
-            console.log("SEED END");
-        }
-        return _seed();
-    }
-
-}
-*/
 
 
 

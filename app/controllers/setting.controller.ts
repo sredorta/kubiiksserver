@@ -22,7 +22,7 @@ export class SettingController {
         });
     }
 
-    /**Get shared setting by key */
+    /**Get setting by key */
     static getByKey = async (req: Request, res: Response, next:NextFunction) => {
         const key = req.body.key;
         Setting.findOne({
