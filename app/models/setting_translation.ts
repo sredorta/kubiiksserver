@@ -33,54 +33,6 @@ export class SettingTranslation extends Model<SettingTranslation> {
   @BelongsTo(() => Setting)
   setting!: Setting;
 
-  /**Gets the setting value of the specified key */
-/*  public static getByKey(key:string) : Promise<Setting> {
-    let myPromise : Promise<Setting>;
-    myPromise =  new Promise<Setting>((resolve,reject) => {
-      async function _work() {
-        let message :string ="";
-          let result = await Setting.findOne({where:{"key":key}});
-          if (!result) {
-            reject(null);
-          } else {
-            resolve(result);
-          }
-      }
-      _work();
-    });
-    return myPromise;
-  }*/
-
-  /**Gets all the settings of the specified type */
-/*  public static getByType(type:SettingType) : Promise<Setting[]> {
-    let myPromise : Promise<Setting[]>;
-    myPromise =  new Promise<Setting[]>((resolve,reject) => {
-      async function _work() {
-        let message :string ="";
-          let result = await Setting.findAll({where:{"type":type}});
-          if (!result) {
-            reject(null);
-          } else {
-            resolve(result);
-          }
-      }
-      _work();
-    });
-    return myPromise;      
-  }*/
-
-  /**From array of settings we get the value of the one that matches they given key*/
-/*  public static getValueFromArray(array:Setting[], key:string) : string | null {
-    let result = array.find(obj=> obj.key==key);
-    if (result) return result.value;
-    return null;
-  }*/
-
-
-
-  /**Seeds the table initially */
-  public static seed() {
-  }
 }
 
 

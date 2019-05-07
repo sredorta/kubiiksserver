@@ -93,18 +93,7 @@ export class Setting extends Model<Setting> {
                 type: "shared",
                 value: item.value
             });                
-        }
-        /*i18n*/
-        await Setting.create({
-            type: "i18n",
-            key: "fallbackLanguage",
-            value: "fr"
-        });
-        await Setting.create({
-            type: "i18n",
-            key: "languages",
-            value: "fr,en"
-        });        
+        }     
         /*social*/
         await Setting.create({
             type: "social",
@@ -139,12 +128,31 @@ export class Setting extends Model<Setting> {
         let mySetting = await Setting.create({
             type: "seo",
             key: "title",
-            value: 'empty for now'
+            value: 'Fallback text'
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"valeur en francais"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"value in english"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"valor en español"});             
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"titre en francais"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"titre in english"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"titre en español"});             
          
+        mySetting = await Setting.create({
+            type: "seo",
+            key: "description",
+            value: 'Fallback text'
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description en francais"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description in english"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español"});             
+         
+        mySetting = await Setting.create({
+            type: "seo",
+            key: "keywords",
+            value: 'Fallback text'
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"keyword en francais"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"keyword in english"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"keyword en español"});             
+                 
+
         //let res = await Setting.findByPk(16);
         //console.log(res);
            
