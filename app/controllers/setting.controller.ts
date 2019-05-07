@@ -7,15 +7,32 @@ import {AppConfig} from '../utils/Config';
 import {body} from 'express-validator/check';
 import { CustomValidators } from '../classes/CustomValidators';
 import { User } from '../models/user';
+import { SettingTranslation } from '../models/setting_translation';
 
 
 
 
 export class SettingController {
 
-    /**Get all shared settings */
+    /**Get all shared settings with the current language translation*/
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
-        Setting.findAll().then((result)=> {
+        console.log("Language currently being asked is: " + res.locals.language);
+        Setting.findAll().then((settings)=> {
+            let result : any[] = [];
+            let myValue : string = "";
+            let mySettingTranslation : SettingTranslation | undefined;
+            //Here we translate if required and always provide translated version
+            for (let setting of settings) {
+               myValue = setting.value; 
+               if (setting.translations.length>0) {
+                   mySettingTranslation = setting.translations.find(obj => obj.iso == res.locals.language);
+                   if (mySettingTranslation) {
+                        myValue = mySettingTranslation.value;
+                   } else
+                        myValue = setting.value;
+               }
+               result.push({id:setting.id,key:setting.key,type:setting.type,value:myValue})
+            }            
             res.json(result);
         }).catch( (error) => {
             next(new HttpException(500, error.message, error.errors));

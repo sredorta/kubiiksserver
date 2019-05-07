@@ -23,19 +23,14 @@ const sequelize = new Sequelize({
     dialect: 'mariadb',
     username: AppConfig.db.username,
     password: AppConfig.db.password,
-    modelPaths: [__dirname + './models/*.ts'],
-    /*modelMatch: (filename, member) => {
-      return filename.substring(0, filename.indexOf('.ts')) === member.toLowerCase();
-    },*/
+    modelPaths: [__dirname + './models/*'],
+    modelMatch: (filename, member) => {
+      filename = filename.replace("_", "");
+      return filename === member.toLowerCase();
+    },
   });
- /*const sequelizeOrig = new SequelizeOrig(AppConfig.db.database, AppConfig.db.username,AppConfig.db.password, {
-      dialect: 'mariadb',
-      host: '127.0.0.1'
- });*/
-
-
-
- sequelize.addModels([User,Setting,Role,UserRole, Product]);
+  //Create all models
+  sequelize.addModels([__dirname + '/models']);
 
 async function startServer() {    
     await sequelize.sync({force:true});

@@ -1,21 +1,21 @@
-import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope} from 'sequelize-typescript';
+import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,HasMany} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/Config';
+import { SettingTranslation } from './setting_translation';
+import { settings } from 'cluster';
 
 export const SettingN = 'Not a model';
 export const NSetting = 'Not a model';
 
+export enum SettingType {"shared", "i18n", "social"};
+
 @DefaultScope({
-    attributes: ["id","key","type","value"]
+    attributes: ["id","key","type","value"],
+    include: [() => SettingTranslation]
   })
 
 @Table
 export class Setting extends Model<Setting> {
-
-  @PrimaryKey
-  @AutoIncrement
-  @Column(DataTypes.INTEGER().UNSIGNED)
-  id!:number;
 
   @AllowNull(false)
   @Unique(true)
@@ -30,9 +30,61 @@ export class Setting extends Model<Setting> {
   @Column(DataTypes.STRING(1000))
   value!: string;
 
+  @HasMany(() => SettingTranslation)
+  translations!: SettingTranslation[];  
 
-  public static data : any[] = [];
+  /**Translate with the current language */
+  public static translate(settings:Setting[]) {
 
+
+  }
+
+
+  /**Gets the setting value of the specified key */
+  public static getByKey(key:string) : Promise<Setting> {
+    let myPromise : Promise<Setting>;
+    myPromise =  new Promise<Setting>((resolve,reject) => {
+      async function _work() {
+        let message :string ="";
+          let result = await Setting.findOne({where:{"key":key}});
+          if (!result) {
+            reject(null);
+          } else {
+            resolve(result);
+          }
+      }
+      _work();
+    });
+    return myPromise;
+  }
+
+  /**Gets all the settings of the specified type */
+  public static getByType(type:SettingType) : Promise<Setting[]> {
+    let myPromise : Promise<Setting[]>;
+    myPromise =  new Promise<Setting[]>((resolve,reject) => {
+      async function _work() {
+        let message :string ="";
+          let result = await Setting.findAll({where:{"type":type}});
+          if (!result) {
+            reject(null);
+          } else {
+            resolve(result);
+          }
+      }
+      _work();
+    });
+    return myPromise;      
+  }
+
+  /**From array of settings we get the value of the one that matches they given key*/
+  public static getValueFromArray(array:Setting[], key:string) : string | null {
+    let result = array.find(obj=> obj.key==key);
+    if (result) return result.value;
+    return null;
+  }
+
+
+  /**Seeds the table initially */
   public static seed() {
     async function _seed() {
         for(let item of AppConfig.sharedSettings) {
@@ -46,12 +98,12 @@ export class Setting extends Model<Setting> {
         await Setting.create({
             type: "i18n",
             key: "fallbackLanguage",
-            value: "en"
+            value: "fr"
         });
         await Setting.create({
             type: "i18n",
             key: "languages",
-            value: "fr,en,es"
+            value: "fr,en"
         });        
         /*social*/
         await Setting.create({
@@ -61,7 +113,7 @@ export class Setting extends Model<Setting> {
         });          
         await Setting.create({
             type: "social",
-            key: "linkGooglePlus",
+            key: "linkGoogleplus",
             value: "https://plus.google.com/u/0/118285710646673394875"
         });   
         await Setting.create({
@@ -83,7 +135,23 @@ export class Setting extends Model<Setting> {
             type: "social",
             key: "linkYoutube",
             value: "https://www.youtube.com/user/sergiredorta"
-        });                   
+        });      
+        let mySetting = await Setting.create({
+            type: "seo",
+            key: "title",
+            value: 'empty for now'
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"valeur en francais"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"value in english"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"valor en español"});             
+         
+        //let res = await Setting.findByPk(16);
+        //console.log(res);
+           
+        //let mySettingTranslation = SettingTranslation.build({iso:"fr",value:"valeur en fracais"});  
+        //mySetting.$create('translations',mySettingTranslation);
+
+
 /*
     matInputAppearance: "fill",   //Mat input appearance "outline", "default", "fill"...
     matInputHasLabel: true,
