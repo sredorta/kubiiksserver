@@ -152,7 +152,23 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"keyword in english"});    
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"keyword en español"});             
                  
+        mySetting = await Setting.create({
+            type: "seo",
+            key: "url",
+            value: 'https://www.kubiiks.com'
+        });
 
+        mySetting = await Setting.create({
+            type: "seo",
+            key: "url_image",
+            value: 'https://www.kubiiks.com/api/my-image.jpg'
+        });
+
+        mySetting = await Setting.create({
+            type: "seo",
+            key: "sitename",
+            value: 'kubiiks'
+        });
         //let res = await Setting.findByPk(16);
         //console.log(res);
            

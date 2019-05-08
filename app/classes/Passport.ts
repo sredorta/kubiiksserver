@@ -53,14 +53,31 @@ export class Passport {
                 if (!myUser) {
                     return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                 } else {
+                    //Handle throttling
+                    if (myUser.failCount>5) {
+                        console.log("TOO MANY TRIALS !!!");
+                        //Check if delta time is ok
+                        let deltaT = Math.abs(new Date().getTime() - new Date(myUser.failTimer).getTime());
+                        let deltaMinutes = Math.round(deltaT/60000);
+                        if (deltaMinutes<2) {
+                            //myUser.failCount = myUser.failCount+1;
+                            //myUser.failTimer = new Date();
+                            return cb(new HttpException(401, messages.authTooManyTrials ,null), false);
+                        }
+
+                    }
                     //Check password valid
                     console.log("Before checking password !!!! : " + password);
                     if (!myUser.checkPassword(password)){
                         console.log("Passwords not matching !!!!");
+                        myUser.failCount = myUser.failCount+1;
+                        myUser.failTimer = new Date();
+                        await myUser.save();
                         return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                     }
                 }
                 myUser.passport = "local";
+                myUser.failCount=0;
                 myUser = await myUser.save();
                 return cb(null, myUser);
             }

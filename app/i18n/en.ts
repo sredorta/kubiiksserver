@@ -25,6 +25,7 @@ export const messages = {
     authTokenInvalid: 'Your session is not valid anymore, log in again',
     authTokenInvalidAdmin: 'Administrator rights are required',
     authInvalidCredentials: 'Invalid credentials',
+    authTooManyTrials:  'Too many failed trials, please try again in few minutes',
     authEmailResetPassword: (name = 'field') => `An email with your new password has been sent to : ${name}`,
     authEmailValidate: (name = 'field') => `A validation email has been sent to : ${name}`,
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,

@@ -24,6 +24,7 @@ export const messages = {
     authTokenInvalid: "Votre session n'est pas valide, connectez-vous a nouveau",
     authTokenInvalidAdmin: "Droit d'administrateur requis pour cette operation",
     authInvalidCredentials: 'Credentiels invalides',
+    authTooManyTrials:  'Trop d\'essais invalides, essaye a nouveau dans quelques minutes',
     authEmailResetPassword: (name = 'field') => `Un courriel avec le nouvea mot de passe à été envoyé à : ${name}`,
     authEmailValidate: (name = 'field') => `Un courriel de validation de compte à été envoyé à : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,

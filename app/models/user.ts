@@ -94,6 +94,17 @@ export class User extends Model<User> {
   password!:string;
 
   @AllowNull(false)
+  @Default(0)
+  @Column(DataTypes.SMALLINT)
+  failCount!:number;
+  
+  @AllowNull(true)
+  @Default(new Date())
+  @Column(DataTypes.DATE)
+  failTimer!:Date;  
+
+
+  @AllowNull(false)
   @Column(DataTypes.STRING(100))
   passport!:string;
 
