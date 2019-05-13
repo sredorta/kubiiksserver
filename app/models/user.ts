@@ -17,11 +17,11 @@ export const NUser = 'Not a model';
 
 //Default scope only contains the public data
 @DefaultScope({
-  attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language', 'terms']
+  attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language', 'terms','createdAt','updatedAt']
 })
 @Scopes({
   withRoles: {
-    attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language'],
+    attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','createdAt','updatedAt'],
     include: [() => Role]
   },
   full: {
@@ -197,5 +197,158 @@ export class User extends Model<User> {
     });
     return myPromise;
   }
+  /**Seeds the table initially */
+  public static seed() {
+    async function _seed() {
+        /*first user*/
+        let myUser : User = new User();
+        myUser = await User.scope("full").create({
+          firstName: "Sergi",
+          lastName: "Redorta",
+          email: "sergi.redorta@hotmail.com",
+          phone: null,
+          mobile: "0623133212",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });
+        await myUser.attachRole("admin");
+        /*Debug users*/
+        myUser = await User.scope("full").create({
+          firstName: "Christine",
+          lastName: "Besson",
+          email: "christine.besson@hotmail2.com",
+          phone: null,
+          mobile: "0623133222",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });
+        myUser = await User.scope("full").create({
+          firstName: "Laia",
+          lastName: "Redorta",
+          email: "laia.redorta@hotmail2.com",
+          phone: null,
+          mobile: "0623133233",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });
+        myUser = await User.scope("full").create({
+          firstName: "Jana",
+          lastName: "Redorta",
+          email: "jana.redorta@hotmail2.com",
+          phone: null,
+          mobile: "0623133244",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });
+        myUser = await User.scope("full").create({
+          firstName: "Anna",
+          lastName: "Soldevila",
+          email: "anna.soldevila@hotmail2.com",
+          phone: null,
+          mobile: "0623133255",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });      
+        myUser = await User.scope("full").create({
+          firstName: "Julien",
+          lastName: "Vert",
+          email: "julien.vert@hotmail2.com",
+          phone: null,
+          mobile: "0623133266",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        }); 
+        myUser = await User.scope("full").create({
+          firstName: "Sophie",
+          lastName: "Larribeau",
+          email: "sophie.larribeau@hotmail2.com",
+          phone: null,
+          mobile: "0623133266",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        }); 
+        myUser = await User.scope("full").create({
+          firstName: "Marc",
+          lastName: "Redorta",
+          email: "marc.redorta@hotmail2.com",
+          phone: null,
+          mobile: "0623133277",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });                         
+        myUser = await User.scope("full").create({
+          firstName: "Eva",
+          lastName: "Corvera",
+          email: "eva.corvera@hotmail2.com",
+          phone: null,
+          mobile: "0623133288",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });         
+        myUser = await User.scope("full").create({
+          firstName: "Cedric",
+          lastName: "Normand",
+          email: "cedric.normand@hotmail2.com",
+          phone: null,
+          mobile: "0623133299",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });  
+        myUser = await User.scope("full").create({
+          firstName: "Pascal",
+          lastName: "Gory",
+          email: "pascal.gory@hotmail2.com",
+          phone: null,
+          mobile: "0623133300",
+          language: "fr",
+          passport: "local",
+          terms: true,
+          emailValidationKey: Helper.generateRandomString(30),
+          mobileValidationKey: Helper.generateRandomNumber(4),
+          password: User.hashPassword("Secure0")
+        });                  
 
+    }
+    return _seed();
+  }
 }

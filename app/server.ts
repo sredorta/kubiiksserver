@@ -37,6 +37,7 @@ async function startServer() {
     //Seeding part
     await Setting.seed(); //Seed settings from the config.json for FE sharing
     await Role.seed();
+    await User.seed();
 
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");

@@ -4,6 +4,7 @@ import {Request, Response, NextFunction, Router} from "express";
 import {UserController} from '../controllers/user.controller';
 import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
+import {RoleController} from '../controllers/role.controller';
 import { messages } from "../middleware/common";
 import {Middleware} from '../middleware/common';
 import {HttpException} from  '../classes/HttpException';
@@ -161,22 +162,25 @@ export class Routes {
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
-    app.route("/api/users/test")
-    .get(UserController.testRoles);
+    //Get all users
+    //TODO remove the checkJwt
+    app.route("/api/users/all")
+      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
+        .get(UserController.getAll);
 
-        //Get all users
-        //TODO remove the checkJwt
-        app.route("/api/users/all")
-          //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
-          .get(UserController.getAll);
-
-        //Get user by ID
-        app.route('/api/users/get/id')
+    //Get user by ID
+    app.route('/api/users/get/id')
         .post(UserController.getUserByIdChecks(),UserController.getOneById);
 
-        //Create new user
-        app.route('/api/usercreate')
+    //Create new user
+      app.route('/api/usercreate')
         .get(UserController.create);
+
+
+    //Get all available roles
+    app.route("/api/roles/all")
+      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
+        .get(RoleController.getAll);        
 
     /////////////////////////////////////////////////////////////////
     // HANDLE NON EXISTING ROUTES
