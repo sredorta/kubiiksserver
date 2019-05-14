@@ -33,14 +33,12 @@ export class Passport {
 
     /**Local login passport */   
     public static local() {
-        console.log("Enabling local passport");
         passport.use('local',new passportLocal.Strategy({
             usernameField: 'username',
             passwordField: 'password',
         }, 
         function (username, password, cb)  {
             //Find that we have an user matching username and passport
-            console.log("USING LOCAL STRATEGY !!!" + Helper.getSharedSetting("login_username"));
             async function _work() {
                 let field = Helper.getSharedSetting("login_username"); 
                 if (!field ){
@@ -48,14 +46,12 @@ export class Passport {
                 }
                 let query :any =  {};
                 query[field] = username;
-                console.log(query);
                 let myUser = await User.scope("full").findOne({where: query});
                 if (!myUser) {
                     return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                 } else {
                     //Handle throttling
                     if (myUser.failCount>5) {
-                        console.log("TOO MANY TRIALS !!!");
                         //Check if delta time is ok
                         let deltaT = Math.abs(new Date().getTime() - new Date(myUser.failTimer).getTime());
                         let deltaMinutes = Math.round(deltaT/60000);
@@ -67,9 +63,7 @@ export class Passport {
 
                     }
                     //Check password valid
-                    console.log("Before checking password !!!! : " + password);
                     if (!myUser.checkPassword(password)){
-                        console.log("Passwords not matching !!!!");
                         myUser.failCount = myUser.failCount+1;
                         myUser.failTimer = new Date();
                         await myUser.save();
@@ -87,18 +81,14 @@ export class Passport {
 
     /**Passport that decodes jwt and provides user to next middleware */   
     public static jwt() {
-        console.log("Enabling jwt passport");
         passport.use('jwt',new passportJWT.Strategy({
             jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey : AppConfig.auth.jwtSecret
         },
         async function (jwtPayload: IJwtPayload, cb) {
-            console.log("We are here !!!!");
-            console.log(jwtPayload);
             try {
                 const myUser = await User.findByPk(jwtPayload.id);
                 if (!myUser) {
-                    console.log(myUser);
                     return cb(new HttpException(401, messages.authTokenInvalid, null), false);
                 }
                 //TODO: Validate that all required fields are present if not, return error
@@ -158,7 +148,6 @@ export class Passport {
             }
             //EQUIVALENT TO LOGIN
             if (myUser) {
-                console.log("FACEBOOK LOGIN DETECTED !!!!");
                 if (profile._json.first_name) myUser.firstName = profile._json.first_name;
                 if (profile._json.last_name) myUser.lastName = profile._json.last_name;
                 myUser.facebookToken = accessToken;
@@ -167,7 +156,6 @@ export class Passport {
                 return cb(null, myUser);
             }
             //EQUIVALENT TO SIGNUP
-            console.log("FACEBOOK SIGNUP DETECTED !!!!");
             //We got a new user so we register him
             myUser = await User.create({
               firstName: profile._json.first_name,
@@ -223,7 +211,6 @@ export class Passport {
       passReqToCallback:true,
     },
     function(req, accessToken, refreshToken, profile, cb) {
-      console.log("We are in google passport !!!!!!!!!!!!!!!!!");
         //Now we need to see if user already exists in database and if not then add it
         async function _work() {
             //Check that we got all the required minimum fields
@@ -242,7 +229,6 @@ export class Passport {
             }
             //EQUIVALENT TO LOGIN
             if (myUser) {
-                console.log("GOOGLE LOGIN DETECTED !!!!");
                 if (profile._json.given_name) myUser.firstName = profile._json.given_name;
                 if (profile._json.family_name) myUser.lastName = profile._json.family_name;
                 //TODO save also language that is in _json.locale
@@ -252,7 +238,6 @@ export class Passport {
                 return cb(null, myUser);
             }
             //EQUIVALENT TO SIGNUP
-            console.log("GOOGLE SIGNUP DETECTED !!!!");
             //We got a new user so we register him
             myUser = await User.create({
               firstName: profile._json.given_name,

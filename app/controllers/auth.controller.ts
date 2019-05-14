@@ -37,8 +37,6 @@ export class AuthController {
 
         let myUser : User;
         let method = Helper.getSharedSetting("validation_method");
-        console.log("REQ USER:");
-        console.log(req.user.language);
         try {
             myUser = await User.scope("full").create({
                 firstName: req.body.firstName,
@@ -64,7 +62,6 @@ export class AuthController {
                 //Login to the admin account if exists or to the standard if admin does not exist
                 case "no_validation": {
                     const token = myUser.createToken("short");  
-                    console.log("GENERATED TOKEN : " + token);  
                     res.send({token: token});  
                     break;
                 }
@@ -86,7 +83,6 @@ export class AuthController {
                         text: 'Voila un bon email',
                         html: html
                      }
-                     console.log(html);
 
                      transporter.sendMail(myEmail).then(result => {
                         res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
@@ -122,8 +118,6 @@ export class AuthController {
     /**Login using local passport */
     static login =  (req:Request, res:Response,next:NextFunction) => {
         //Thanks to passports we have the user in req.user if we get here credentials are valid
-            console.log("LOGIN ROUTE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            //console.log(req.user);
             const payload : IJwtPayload = {id: req.user.id};
             let accessTime : string;    
             if (!req.body.keepconnected)
@@ -132,7 +126,6 @@ export class AuthController {
                 accessTime = AppConfig.auth.accessLong;
             //We just need to create a token and provide it
             const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: accessTime });
-            console.log("GENERATED TOKEN : " + token);  
             res.json({token: token});              
     }
     /**Parameter validation */
@@ -181,7 +174,6 @@ export class AuthController {
             res.json({complete:false, user:myUser});
         } else {
             //Return user with roles as token is already available (equivalent to getAuthUser)
-            console.log(myUser);
             res.json({complete:true, user:myUser});
         }
     }
@@ -189,10 +181,7 @@ export class AuthController {
 
     /**Updates the current user with the given parameters */
     static oauth2UpdateFields = async (req:Request, res:Response,next:NextFunction) => {
-        console.log("oauth2UpdateFields !!!!");
-        console.log(req.body);
         //Check that we got the terms accepted
- 
         let myUser = await User.findByPk(req.user.id);
         if (!myUser) {
             next( new HttpException(400, messages.validationNotFound(messages.User), null))
@@ -241,8 +230,6 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     static emailValidation = async (req: Request, res: Response, next:NextFunction) => {
         const validator = new Validator();
-        console.log("emailValidation !!!");
-        console.log(req.query);
         //We do parameters checking here as we got parameters from the query
         let result : boolean = true;
         let myUser : User | null;
@@ -293,7 +280,6 @@ export class AuthController {
                 const password = Helper.generatePassword();
                 myUser.password = User.hashPassword(password);
                 myUser.save();
-                console.log("New password : " + password);
                 //Send email with new password
                 const html = pug.renderFile(path.join(__dirname, "../emails/resetpassword."+ res.locals.language + ".pug"), {password: password});
                 const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
@@ -304,7 +290,6 @@ export class AuthController {
                         text: 'Voila un bon email',
                         html: html
                     }
-                console.log(html);
 
                 transporter.sendMail(myEmail).then(result => {
                         res.send({message: {show:true,text:messages.authEmailResetPassword(myUser.email)}});  

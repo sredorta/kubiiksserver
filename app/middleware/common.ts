@@ -47,15 +47,11 @@ export class Middleware {
                     .map((file:any) => path.basename(file, '.ts'))
                     .filter((language:string) => language !== 'index');
             let language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
-            console.log("LANGUAGE IN HEADERS: " + req.acceptsLanguages());
-            console.log(req.headers);
-
 
             res.locals.language = language;  //Store language in the locals
             if (!req.user)
                 req.user = {};
             req.user.language = language;   //This is used afterwards !!!!
-            console.log("LANGUAGE IN HEADERS: " + language);
             //Override messages so that it uses correct language
             let acc : any = [];
             acc[language] = require(`../i18n/${language}`).messages;
