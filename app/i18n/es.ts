@@ -26,6 +26,8 @@ export const messages = {
     authTokenInvalidAdmin: 'Tienes que ser administrador para acceder aqui',
     authInvalidCredentials: 'Credenciales incorrectas',
     authTooManyTrials:  'Demasiados intentos fallados, intentalo de nuevo en unos minutos',
+    authAlreadyLoggedIn:  'Usted ya esta connectado',
+
     authEmailResetPassword: (name = 'field') => `Un correo electronico con el nuevo password ha sido enviado a : ${name}`,
     authEmailValidate: (name = 'field') => `Un correo electronico de confirmacion a sido enviado a : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Verificacion de la cuenta de correo`,

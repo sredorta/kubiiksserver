@@ -85,20 +85,20 @@ export class Routes {
 
     //Signup
     app.route('/api/auth/signup')
-      .post(AuthController.signupChecks(),AuthController.signup);
+      .post(Middleware.unregistered(),AuthController.signupChecks(),AuthController.signup);
 
     //Login
     app.route('/api/auth/login')
-      .post([AuthController.loginChecks(),passport.authenticate('local',{session: false}),AuthController.loginChecks()], AuthController.login);
+      .post(Middleware.unregistered(),AuthController.loginChecks(),passport.authenticate('local',{session: false}),AuthController.loginChecks(), AuthController.login);
 
     app.route('/api/auth/facebook')
-      .get(passport.authenticate('facebook', {scope:['email'], session:false}));
+      .get(Middleware.unregistered(),passport.authenticate('facebook', {scope:['email'], session:false}));
 
     app.route('/api/auth/facebook/callback')
     .get(passport.authenticate('facebook', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
 
     app.route('/api/auth/google')
-      .get(passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email'], session:false}));
+      .get(Middleware.unregistered(),passport.authenticate('google', {scope: ['https://www.googleapis.com/auth/userinfo.profile','https://www.googleapis.com/auth/userinfo.email'], session:false}));
 
     app.route('/api/auth/google/callback')
     .get(passport.authenticate('google', {failureRedirect: '/api/auth/oauth2/callback/fail' }), AuthController.oauth2Success);
@@ -117,22 +117,22 @@ export class Routes {
     .post([passport.authenticate('jwt',{session: false}),AuthController.oauth2UpdateFieldsChecks()],AuthController.oauth2UpdateFields); //Validation needs to be performed after auth in order to get access to req.user.id
 
 
-    //getAuthUser
+    /** getAuthUser or get current logged in user data */
     app.route('/api/auth/get')
       .get(passport.authenticate('jwt',{session: false}),AuthController.getAuthUser);
 
 
-    //Email validation endpoint
+    /**Email validation endpoint */
     app.route('/api/auth/validate-email')
       .get(AuthController.emailValidation);
 
-    //Reset password and send new one by email
+    /** Reset password and send new one by email*/
     app.route('/api/auth/reset-password/email')
-       .post(AuthController.resetPasswordByEmailChecks(), AuthController.resetPasswordByEmail);  
+       .post(Middleware.unregistered(),AuthController.resetPasswordByEmailChecks(), AuthController.resetPasswordByEmail);  
 
-    //Reset password and send new one by mobile
+    /** Reset password and send new one by mobile*/
     app.route('/api/auth/reset-password/mobile')
-       .post(AuthController.resetPasswordByMobileChecks(), AuthController.resetPasswordByMobile);  
+       .post(Middleware.unregistered(),AuthController.resetPasswordByMobileChecks(), AuthController.resetPasswordByMobile);  
 
 
     //Debug only to be removed

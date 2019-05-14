@@ -207,22 +207,11 @@ export class AuthController {
  
 
 
-    ///////////////////////////////////////////////////////////////////////////
-    // getAuthUser
-    ///////////////////////////////////////////////////////////////////////////
+    /**Get current loggedIn user */
     static getAuthUser = async (req: Request, res: Response, next:NextFunction) => {
-        //TODO SWITCH TO PASSPORT !!!!
         //Sending back user
         let myUser = await User.scope("withRoles").findByPk(req.user.id);
         res.json(myUser);
-        /*console.log(res.locals.jwtPayload);
-        User.findOne({where: {id: res.locals.jwtPayload.userId}}).then(myUser => {
-            if (!myUser)
-                next( new HttpException(400, messages.authTokenInvalid,null));
-            else {
-                res.json(myUser);
-            }
-        });*/
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -263,6 +252,8 @@ export class AuthController {
             next(new HttpException(500, error.message, error.errors));
         }
     }
+    //TODO: Use validation here !!!
+    
 
     ///////////////////////////////////////////////////////////////////////////
     // resetPasswordEmail:  Resets the password by sending new one by email
@@ -271,7 +262,6 @@ export class AuthController {
         let query :any =  {};
         query["email"] = req.body.email;
         
-
         User.scope("withRoles").findOne({where: query}).then(myUser => {
             if (!myUser)
                 next( new HttpException(400, messages.validationNotFound(messages.User),null));

@@ -15,6 +15,7 @@ import jwt from "jsonwebtoken";
 import {check, validationResult,body} from 'express-validator/check';
 import {ValidationException} from '../classes/ValidationException';
 import { User } from '../models/user';
+import passportJWT from "passport-jwt";
 
 export let messages = en; //Set default language and export messages
 
@@ -139,7 +140,32 @@ export class Middleware {
         };
       }
 
-    //Checks that the registered user is an administrator if not errors      
+    /**Checks that user has not been already logged in */
+    public static unregistered() {
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            console.log("UNREGISTERED CHECK !!!!!!!!!!!!!!!!");
+            try {
+                let token  =  req.headers['authorization'];
+                console.log("Token is : " + token);
+                if (token == undefined) {
+                    next();
+                } else {
+                    //Verify if token is valid
+                    token = token.slice(7, token.length); //Remove Bearer from token
+                    jwt.verify(token, AppConfig.auth.jwtSecret, (err, decoded) => {
+                        if (err) next();
+                        else throw new HttpException(400, messages.authAlreadyLoggedIn, null);
+                        })
+                }
+
+            } catch(error) {
+                next(error);
+            }
+        }
+    } 
+
+
+    /** Checks that the registered user is an administrator if not errors */     
     public static admin() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
