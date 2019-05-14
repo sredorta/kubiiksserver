@@ -16,9 +16,6 @@ export class SettingController {
 
     /**Get all shared settings with the current language translation*/
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
-        console.log("Language currently being asked is: " + res.locals.language);
-        console.log("Language currently being asked is: " + req.user.language);
-
         Setting.findAll().then((settings)=> {
             let result : any[] = [];
             let myValue : string = "";

@@ -30,7 +30,6 @@ export class CustomValidators extends Error {
     /**Does firstName and lastName validation based on shared data validation*/
     static nameValidator(field:string) {
         return (value:any) => {
-            console.log("Value is: "  + value);
             //firstName checking
             if (value!=undefined) {
                    if (!validator.isLength(value,{min:2})) return Promise.reject(<IValidationMessage>{type:'minlength',value:'2'});
@@ -99,9 +98,6 @@ export class CustomValidators extends Error {
     /**Expects that there is no element in the db with the specified field and class*/
     static dBMissing(MyClass: any, field:string) {
         return (value:any, {req} : {req:Request}) => {
-            /*if (Helper.isSharedSettingMatch("email", "include")) {
-                console.log("IS EMAIL :" + validator.isEmail("sergi.redorta@hotmail.com"));
-            }*/
             let query : any = {};
             query[field]=value;
             return MyClass.findOne({where:query}).then((user:any) => {
@@ -128,10 +124,6 @@ export class CustomValidators extends Error {
     /**Does all database verifications to see if user is not already in the db*/
     static dBuserNotPresent(MyClass:any) {
         return (value:any, {req} : {req:Request}) => {
-            console.log("email : "  + req.body.email);
-            console.log("phone : "  + req.body.phone);
-            console.log("mobile: "  + req.body.mobile);
-
             let query : any[] = [];
             query.push({email:req.body.email});
             if (Helper.isSharedSettingMatch("phone", "include") || Helper.isSharedSettingMatch("phone", "optional") ) 
@@ -140,7 +132,6 @@ export class CustomValidators extends Error {
             if (Helper.isSharedSettingMatch("mobile", "include") || Helper.isSharedSettingMatch("mobile", "optional") ) 
                 if (req.body.phone != undefined)
                     query.push({phone:req.body.phone});
-            console.log(query);
             return MyClass.findOne({
                 where: {[Op.or]: query}
                 }).then((user:any) => {

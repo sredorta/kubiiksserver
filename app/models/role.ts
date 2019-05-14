@@ -42,7 +42,6 @@ export class Role extends Model<Role> {
 
     //Seeds the table with plenty of users
     public static seed() {
-        console.log("ROLE:: Seeding table !");
         async function _seed() {
             try {
               await Role.create({name:"admin"});
@@ -50,7 +49,7 @@ export class Role extends Model<Role> {
               await Role.create({name:"blog"});
 
             } catch(err) {
-                console.log("ERROR: Could not seed ROLES !!!")
+                console.log("ERROR: Could not seed USERS !!!")
             }
         }
         return _seed();

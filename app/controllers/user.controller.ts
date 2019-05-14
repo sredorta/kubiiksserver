@@ -1,5 +1,6 @@
 import {Request, Response, NextFunction} from 'express'; //= require('express');
 import {HttpException} from '../classes/HttpException';
+import {messages} from '../middleware/common';
 import { Middleware } from '../middleware/common';
 import { Helper } from '../classes/Helper';
 import { Role } from '../models/role';
@@ -16,17 +17,29 @@ export class UserController {
 
     /**Gets all user with their roles */
     static getAll = async(req: Request, res: Response, next: NextFunction) => {
-        res.json(await User.scope("withRoles").findAll());
+        try {
+            res.json(await User.scope("withRoles").findAll());
+        } catch(error) {
+            next(error);
+        }        
     }
 
     /**Remove user by id */
     static delete = async(req: Request, res: Response, next: NextFunction) => {
-        let myUser =  await User.findByPk(req.body.id);
-        if (myUser) {
-            await myUser.destroy(); 
+        try {
+            if (req.user.id == req.body.id) {
+                throw new HttpException(400, messages.validationSelfUser ,null);
+            }
+            let myUser =  await User.findByPk(req.body.id);
+            if (myUser) {
+                await myUser.destroy(); 
+            }
+            res.status(204).json("deleted");
+        } catch(error) {
+            next(error);
         }
-        res.status(204).json("deleted");
     }
+
     /**removeChecks parameter validation */
     static deleteChecks() {
         return [
@@ -51,8 +64,6 @@ export class UserController {
         .then(result => {
             res.json(result);
         }).catch( (error) => {
-            console.log("We got error !!!");
-            console.log(error);
             next(new HttpException(500, error.message, error.errors));
         });
     }   

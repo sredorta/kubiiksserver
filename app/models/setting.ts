@@ -174,7 +174,7 @@ export class Setting extends Model<Setting> {
     matInputAppearance: "fill",   //Mat input appearance "outline", "default", "fill"...
     matInputHasLabel: true,
     matInputHasHint: true,*/ 
-    console.log("SEED END"); 
+
     }
     return _seed();
   }

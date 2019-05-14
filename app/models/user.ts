@@ -165,9 +165,7 @@ export class User extends Model<User> {
           let myUser = await User.scope("withRoles").findByPk(id);
           if (!myUser)
             reject("User could not be found");
-          else {
-            console.log("Finding if user has roles !!!");
-            console.log(myUser.roles.findIndex(obj => obj.name == role));            
+          else {           
             if (typeof role == "string")
               if (myUser.roles.findIndex(obj => obj.name == role) >= 0) resolve(true);
               else reject("Role not found");

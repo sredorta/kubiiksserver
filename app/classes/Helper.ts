@@ -70,7 +70,6 @@ export class Helper {
         let i = 0;
         while(!Helper.passwordPassQualityRequired(password)) {
             password = Helper.generateRandomString(10);
-            console.log("Password generation iteration : " + i);
             i++;
         }
         return password;

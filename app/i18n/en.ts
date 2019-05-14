@@ -15,6 +15,7 @@ export const messages = {
     validationUnique: (name = 'field') => `${name} already exists in the database`,
     validation: (name = 'field') => `Wrong value for field '${name}'`,
     validationNotFound: (name = 'field') => `${name} not found in the database with the given requirements`,
+    validationSelfUser: 'Cannot do this operation on the current logged in account',
     validationTerms: "Terms and conditions must be accepted",
 
     //Other system messages

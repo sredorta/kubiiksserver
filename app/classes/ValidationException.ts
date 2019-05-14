@@ -19,18 +19,14 @@ export class ValidationException extends Error {
             const myError = error.array()[0];
             const msgJson = JSON.parse(JSON.stringify(myError.msg));
             if (typeof msgJson == "string") {
-                console.log("Detected string !");
                 msg.type = msgJson;
                 field = myError.param;
             } else {
-                console.log("Detected object !");
                 msg = <IValidationMessage>msgJson;
                 if (msg.field)
                     field = msg.field;
                 else field = myError.param;
             }
-            console.log(msg.type);
-            console.log(myError);
             this.message = messages.validationExists(msg.class)
 
             switch(<string>msg.type) {
@@ -59,7 +55,6 @@ export class ValidationException extends Error {
                     break;
                 }
                 case "dbexists": {
-                    console.log("In dbExists !!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
                     this.message = messages.validationDBExists(msg.class);
                     break;
                 }
@@ -68,8 +63,6 @@ export class ValidationException extends Error {
                 }
             }
         } catch(error) {
-            console.log("Catched error");
-            console.log(error);
             this.message = messages.validation("Unknown"); //Default message
         }
 
