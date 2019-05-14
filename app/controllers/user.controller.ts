@@ -13,62 +13,6 @@ import { CustomValidators } from '../classes/CustomValidators';
 
 export class UserController {
 
-    static testRoles = async(req: Request, res: Response, next: NextFunction) => {    
-
-        //TODO switch to await/async
-        async function work() {
-            try {
-                let myUser = await User.findOne();
-                if (myUser)
-                    await myUser.destroy();
-                myUser = await User.create({firstName: "sergi",
-                    lastName: "redorta",
-                    email: "sergi.redorta@hotmail.com",
-                    phone: "0423133212",
-                    mobile: "0623133212",
-                    language:req.user.language,
-                    password: "Hello1234",
-                    emailValidationKey: Helper.generateRandomString(30),
-                    mobileValidationKey: Helper.generateRandomNumber(4)});
-                
-                let myRole1 = await Role.findByPk(1);
-                let myRole2 = await Role.findByPk(2);
-
-                console.log(myRole1);   
-                if (myRole1 && myRole2)  
-                    await myUser.$add('Role',[myRole1, myRole2]);   
-                //let myRoles : Role[] = []; 
-                if (myUser) {
-                let myRoles =  await myUser.$get('Roles');
-                myUser = await User.scope("withRoles").findOne();
-                console.log(myRoles);    
-                res.json(myUser);
-                }
-                //result.roles.create({name:"admin"}).then({
-            } catch(error) {
-                console.log("We got error !!!");
-                next(new HttpException(400, error.message, error.errors));
-            };
-        }
-        work();
-    }
-
-
-    static create = async(req: Request, res: Response, next: NextFunction) => {                 
-        //TODO switch to await/async
-        let params = User.build({id:"test"});
-
-        User.create({
-            firstName: "sergi",
-            email: "test@test.test",
-            preferredName: 'WithAccounts',
-        }).then((result)=> {
-            res.json(result);
-        }).catch( (error) => {
-            console.log("We got error !!!");
-            next(new HttpException(400, error.message, error.errors));
-        });
-    }
 
     ///////////////////////////////////////////////////////////////////////////
     //Get all users

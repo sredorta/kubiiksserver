@@ -29,7 +29,7 @@ export const NUser = 'Not a model';
   },
   fullWidthRoles: {
     attributes: {exclude : []},
-    include: [() => Role]
+    include: [() => Role],
   }
 })
 
@@ -129,28 +129,6 @@ export class User extends Model<User> {
   roles!: Role[];
 
 
-  /**Returns array with all required missing fields for signup. This can happen when creating account with oauth2 */
-  /*public getMissingSignupFields() {
-    let result = [];
-    if (Helper.isSharedSettingMatch("firstName","include"))
-      if (this.firstName == null || this.firstName == undefined) result.push("firstName");
-    if (Helper.isSharedSettingMatch("lastName","include"))
-      if (this.lastName == null || this.lastName == undefined) result.push("lastName");
-    if (Helper.isSharedSettingMatch("email","include"))
-      if (this.email == null || this.email == undefined) result.push("email");
-    if (Helper.isSharedSettingMatch("mobile","include"))
-      if (this.mobile == null || this.mobile == undefined) result.push("mobile");
-    if (Helper.isSharedSettingMatch("phone","include"))
-      if (this.phone == null || this.phone == undefined) result.push("phone");       
-    return result;
-  }*/
-
-  /**Validate that user contains all signup required fields. It could be that this is not the case in case of oauth2 account creation */
-  /*public hasAllSignupFields() {
-    if (this.getMissingSignupFields().length>0) return false;
-    return true;
-  }*/
-
 
   /**Hashes a password to store in db */
   public static hashPassword(unencrypted:string) : string {
@@ -178,14 +156,17 @@ export class User extends Model<User> {
   }
 
   /**Attaches a specif role to the user */
-  public attachRole(role: string) : Promise<boolean> {
+  public attachRole(role: string | number) : Promise<boolean> {
     let myPromise : Promise<boolean>;
     let obj = this;
     myPromise =  new Promise<boolean>((resolve,reject) => {
       async function _addRole() {
-        let message :string ="";
+          let myRole;
+          if (typeof role == "string")
+            myRole = await Role.findOne({where:{"name":role}});
+          else 
+            myRole = await Role.findByPk(role);
 
-          let myRole = await Role.findOne({where:{"name":role}});
           if (!myRole) {
             reject("Role could not be found");
           } else {
@@ -197,6 +178,33 @@ export class User extends Model<User> {
     });
     return myPromise;
   }
+
+  /**Detaches a specif role from the user */
+  public detachRole(role: string | number) : Promise<boolean> {
+    let myPromise : Promise<boolean>;
+    let obj = this;
+    myPromise =  new Promise<boolean>((resolve,reject) => {
+      async function _removeRole() {
+          let myRole;
+          if (typeof role == "string")
+            myRole = await Role.findOne({where:{"name":role}});
+          else 
+            myRole = await Role.findByPk(role);
+
+          if (!myRole) {
+            reject("Role could not be found");
+          } else {
+            await obj.$remove('Role',[myRole]); 
+            resolve(true);
+          }
+      }
+      _removeRole();
+    });
+    return myPromise;
+  }
+
+
+
   /**Seeds the table initially */
   public static seed() {
     async function _seed() {
@@ -216,6 +224,8 @@ export class User extends Model<User> {
           password: User.hashPassword("Secure0")
         });
         await myUser.attachRole("admin");
+        await myUser.attachRole("chat");
+
         /*Debug users*/
         myUser = await User.scope("full").create({
           firstName: "Christine",

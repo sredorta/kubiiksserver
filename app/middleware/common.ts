@@ -142,37 +142,6 @@ export class Middleware {
         };
       }
 
-    /** Middleware that handles parameter input validation using class-validator and DTOs*/
-/*    public static validation<T>(type: any): express.RequestHandler {
-        console.log("Validation middleWare enabled !");
-        return function validationMiddleware(req:Request, res:Response, next: NextFunction) {
-          console.log("VALIDATING PARAMETERS !!!!");  
-          validate(plainToClass(type, req.body))
-            .then((errors: ValidationError[]) => {
-              if (errors.length > 0) {
-                let message : string = "Unknown error";  
-                errors.map((error: ValidationError) => {
-                    //Get priority of isNotEmpty (missing parameter)
-                    if (error.constraints.isNotEmpty)
-                        message = error.constraints["isNotEmpty"];
-                    else {
-                        message = Object.values(error.constraints)[0];
-                    }
-                    console.log("THIS IS THE MESSAGE AFTER TAKING FIRST: " + message);
-                    console.log(error.constraints);
-                    console.log(Object.values(error.constraints)[0])
-                    //Object.values(error.constraints[0])
-                });
-                next(new HttpException(400, message, errors));
-              } else {
-                next();
-              }
-            });
-        };
-      }
-*/
-
-
     //Checks that the registered user is an administrator if not errors      
     public static admin() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {

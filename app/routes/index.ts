@@ -163,24 +163,31 @@ export class Routes {
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
     //Get all users
-    //TODO remove the checkJwt
+    /**Get all user details. Admin required */
     app.route("/api/users/all")
       //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
         .get(UserController.getAll);
 
-    //Get user by ID
+    /**Get user details by id. Admin required */
     app.route('/api/users/get/id')
+          //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
         .post(UserController.getUserByIdChecks(),UserController.getOneById);
 
-    //Create new user
-      app.route('/api/usercreate')
-        .get(UserController.create);
 
-
-    //Get all available roles
+    /**Get all available roles. Admin required */
     app.route("/api/roles/all")
       //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
         .get(RoleController.getAll);        
+
+    /** Attaches a role to a specific user. Admin required */   
+    app.route('/api/roles/attach')
+      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
+        .post(RoleController.attachChecks(),RoleController.attach)
+
+    /** Detaches a role from specific user. Admin required */    
+    app.route('/api/roles/detach')
+      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
+        .post(RoleController.detachChecks(),RoleController.detach)        
 
     /////////////////////////////////////////////////////////////////
     // HANDLE NON EXISTING ROUTES

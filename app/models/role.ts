@@ -9,7 +9,7 @@ export const RoleN = 'Not a model';
 export const NRole = 'Not a model';
 
 @DefaultScope({
-    attributes: {exclude : []}
+  attributes: {exclude : []}
   })
   @Scopes({
     withUsers: {
@@ -22,7 +22,7 @@ export const NRole = 'Not a model';
 
   })
   
-@Table
+@Table({timestamps:false})
 export class Role extends Model<Role> {
 
     @PrimaryKey

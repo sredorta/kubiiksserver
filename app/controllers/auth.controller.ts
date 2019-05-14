@@ -202,7 +202,6 @@ export class AuthController {
             res.json(result);
         }
     }
-    //Problem is that some fields are unique and we already have the user created so all IsUnique validations will fail !!!
     /**Parameter validation */
     static oauth2UpdateFieldsChecks() {
         return [

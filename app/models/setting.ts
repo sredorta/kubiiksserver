@@ -33,12 +33,6 @@ export class Setting extends Model<Setting> {
   @HasMany(() => SettingTranslation)
   translations!: SettingTranslation[];  
 
-  /**Translate with the current language */
-  public static translate(settings:Setting[]) {
-
-
-  }
-
 
   /**Gets the setting value of the specified key */
   public static getByKey(key:string) : Promise<Setting> {

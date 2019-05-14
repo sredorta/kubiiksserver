@@ -7,10 +7,9 @@ import {Role} from './role';
 export const SettingN = 'Not a model';
 export const NSetting = 'Not a model';
 
-@DefaultScope({
-    attributes: {exclude : ['UserRole']}
-  })
-@Table
+@DefaultScope({})
+
+@Table({timestamps:false})
 export class UserRole extends Model<UserRole> {
 
     @ForeignKey(() => User)
