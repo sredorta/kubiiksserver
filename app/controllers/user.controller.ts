@@ -14,23 +14,32 @@ import { CustomValidators } from '../classes/CustomValidators';
 export class UserController {
 
 
-    ///////////////////////////////////////////////////////////////////////////
-    //Get all users
-    ///////////////////////////////////////////////////////////////////////////
+    /**Gets all user with their roles */
     static getAll = async(req: Request, res: Response, next: NextFunction) => {
-        console.log("Get all users");
-        console.log("Logged in user:");
-        console.log(req.user);
         res.json(await User.scope("withRoles").findAll());
-/*
-        User.findAll()
-        .then((result)=> {
-            res.json(result);
-        }).catch( (error) => {
-            console.log("We got error !!!");
-            next(new HttpException(500, error.message, error.errors));
-        });*/
     }
+
+    /**Remove user by id */
+    static delete = async(req: Request, res: Response, next: NextFunction) => {
+        let myUser =  await User.findByPk(req.body.id);
+        if (myUser) {
+            await myUser.destroy(); 
+        }
+        res.status(204).json("deleted");
+    }
+    /**removeChecks parameter validation */
+    static deleteChecks() {
+        return [
+            body('id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(User,'id')),
+            Middleware.validate()
+        ]
+    }      
+
+
+
+
+
+
 
     ///////////////////////////////////////////////////////////////////////////
     //Get user by ID

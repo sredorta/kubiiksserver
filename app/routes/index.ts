@@ -162,32 +162,30 @@ export class Routes {
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
-    //Get all users
+
     /**Get all user details. Admin required */
     app.route("/api/users/all")
-      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
-        .get(UserController.getAll);
+        .get(passport.authenticate('jwt',{session: false}),Middleware.admin(),UserController.getAll);
 
     /**Get user details by id. Admin required */
     app.route('/api/users/get/id')
-          //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
-        .post(UserController.getUserByIdChecks(),UserController.getOneById);
-
+        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),UserController.getUserByIdChecks(),UserController.getOneById);
 
     /**Get all available roles. Admin required */
     app.route("/api/roles/all")
-      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
-        .get(RoleController.getAll);        
+        .get(passport.authenticate('jwt',{session: false}),Middleware.admin(),RoleController.getAll);        
 
     /** Attaches a role to a specific user. Admin required */   
     app.route('/api/roles/attach')
-      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
-        .post(RoleController.attachChecks(),RoleController.attach)
+        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),RoleController.attachChecks(),RoleController.attach)
 
     /** Detaches a role from specific user. Admin required */    
     app.route('/api/roles/detach')
-      //.get([passport.authenticate('jwt',{session: false})],UserController.getAll);
-        .post(RoleController.detachChecks(),RoleController.detach)        
+        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),RoleController.detachChecks(),RoleController.detach)   
+        
+    /** Detaches a role from specific user. Admin required */    
+    app.route('/api/users/delete')
+        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),UserController.deleteChecks(),UserController.delete)           
 
     /////////////////////////////////////////////////////////////////
     // HANDLE NON EXISTING ROUTES

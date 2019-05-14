@@ -155,6 +155,34 @@ export class User extends Model<User> {
     );
   }
 
+
+  /**Checks if user has specific role */
+  public hasRole(role:string | number) : Promise<boolean> {
+    let myPromise : Promise<boolean>;
+    let id = this.id;
+    myPromise =  new Promise<boolean>((resolve,reject) => {
+      async function _hasRole() {
+          let myUser = await User.scope("withRoles").findByPk(id);
+          if (!myUser)
+            reject("User could not be found");
+          else {
+            console.log("Finding if user has roles !!!");
+            console.log(myUser.roles.findIndex(obj => obj.name == role));            
+            if (typeof role == "string")
+              if (myUser.roles.findIndex(obj => obj.name == role) >= 0) resolve(true);
+              else reject("Role not found");
+            else
+              if (myUser.roles.findIndex(obj => obj.id == role) >= 0) resolve(true);
+              else reject("Role not found");              
+          }
+      }
+      _hasRole();
+    });
+    return myPromise;
+
+
+  }
+
   /**Attaches a specif role to the user */
   public attachRole(role: string | number) : Promise<boolean> {
     let myPromise : Promise<boolean>;

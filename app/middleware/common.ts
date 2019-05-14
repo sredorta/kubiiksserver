@@ -14,6 +14,7 @@ import * as ts from "typescript";
 import jwt from "jsonwebtoken";
 import {check, validationResult,body} from 'express-validator/check';
 import {ValidationException} from '../classes/ValidationException';
+import { User } from '../models/user';
 
 export let messages = en; //Set default language and export messages
 
@@ -144,9 +145,19 @@ export class Middleware {
 
     //Checks that the registered user is an administrator if not errors      
     public static admin() {
-        return function (req:express.Request, res:express.Response, next:express.NextFunction) {
-            if (res.locals.jwtPayload.access!= "admin")
-                next(new HttpException(401, messages.authTokenInvalidAdmin, null));
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            try {
+                let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
+                if (myUser) {
+                    if (await myUser.hasRole("admin"))
+                        next();
+                    else
+                        next(new HttpException(403, messages.authTokenInvalidAdmin, null));
+                } else
+                    next(new HttpException(403, messages.authTokenInvalidAdmin, null));
+            } catch(error) {
+                next(new HttpException(403, messages.authTokenInvalidAdmin, null));
+            }
         }
     }
 

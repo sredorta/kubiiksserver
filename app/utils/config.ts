@@ -63,6 +63,6 @@ import * as dotenv from "dotenv";
             {"key": "mobile", "value":"optional"},
             {"key": "validation_method", "value":"no_validation"},
             {"key": "login_username", "value":"email"},
-            {"key": "mode", "value":"demo"}
+            {"key": "mode", "value":"production"} //Put 'demo' for direct admin access
         ],
     }
