@@ -26,9 +26,21 @@ export class SettingTranslation extends Model<SettingTranslation> {
   @Column(DataTypes.STRING(10))
   iso!: string;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataTypes.STRING(1000))
   value!: string;
+
+  @AllowNull(true)
+  @Column(DataTypes.STRING(1000))
+  label!: string;  
+
+  @AllowNull(true)
+  @Column(DataTypes.STRING(1000))
+  placeholder!: string;  
+
+  @AllowNull(true)
+  @Column(DataTypes.STRING(1000))
+  hint!: string;  
 
   @BelongsTo(() => Setting)
   setting!: Setting;

@@ -71,8 +71,22 @@ export class Routes {
     //  This table is mapped from the config.json on the server start
     //  FE can only read this table to has access to the server config
     ////////////////////////////////////////////////////////////////
+
+    /**Gets all setting values with current language translated value*/
     app.route('/api/settings/all')
       .get(SettingController.getAll);
+
+    /**Gets all setting value with current language translated value,label,hint and placeholder */  
+    app.route('/api/settings/full')
+      .get(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.getAllFull);
+
+    /**Saves value for the setting with translations if required */  
+    app.route('/api/settings/update')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.updateChecks(),SettingController.update);
+
+
+
+
     app.route('/api/settings/get/key')
       .post(SettingController.getByKeyChecks(),SettingController.getByKey);
 
