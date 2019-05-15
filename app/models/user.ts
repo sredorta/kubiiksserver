@@ -33,7 +33,7 @@ export const NUser = 'Not a model';
   }
 })
 
-@Table
+@Table({})
 export class User extends Model<User> {
 
   @PrimaryKey

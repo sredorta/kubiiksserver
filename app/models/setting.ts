@@ -19,7 +19,7 @@ export enum SettingType {"shared", "i18n", "social"};
       include: [() => SettingTranslation]
     }
   })
-@Table
+@Table({timestamps:false})
 export class Setting extends Model<Setting> {
 
   @AllowNull(false)
@@ -227,19 +227,20 @@ export class Setting extends Model<Setting> {
             key: "title",
             value: 'Fallback text'
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"titre en francais",label:"Titre du site",placeholder:"placeholder",hint:"Titre du site web"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"titre in english",label:"Site title",placeholder:"placeholder",hint:"Page's title"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"titre en español",label:"Titulo de la pàgina web",placeholder:"placeholder",hint:"Titulo de la pagina principal"});             
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"titre en francais",label:"Titre",placeholder:"Titre du site",hint:"Titre du site web"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"titre in english",label:"Title",placeholder:"Sit'es title",hint:"Page's title"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"titre en español",label:"Titulo",placeholder:"Titulo de la pagina web",hint:"Titulo de la pagina principal"});             
          
         mySetting = await Setting.create({
             type: "seo",
             key: "description",
             value: 'Fallback text'
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description en francais",label:"description",placeholder:"placeholder",hint:"Description de la page"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description in english",label:"description",placeholder:"placeholder",hint:"Page's description"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español",label:"descripcion",placeholder:"placeholder",hint:"Descripcion de la pagina"});             
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description en francais",label:"description",placeholder:"Description",hint:"Description de la page"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description in english",label:"description",placeholder:"Description",hint:"Page's description"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español",label:"descripcion",placeholder:"Descripcion",hint:"Descripcion de la pagina"});             
          
+        //TODO: Maybe this tag is not required anymore, so remove if this is the case
         mySetting = await Setting.create({
             type: "seo",
             key: "keywords",
@@ -252,8 +253,12 @@ export class Setting extends Model<Setting> {
         mySetting = await Setting.create({
             type: "seo",
             key: "url",
-            value: 'https://www.kubiiks.com'
+            value: 'https://www.kubiiks.com',
+            placeholder: "https://www.mysite.com"
         });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Adresse internet",placeholder:null,hint:"Adresse principale du site"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Internet address",placeholder:null,hint:"Main site's address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Direccion internet",placeholder:null,hint:"Pagina principal de la pagina web"});             
 
         mySetting = await Setting.create({
             type: "seo",
@@ -266,6 +271,63 @@ export class Setting extends Model<Setting> {
             key: "sitename",
             value: 'kubiiks'
         });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Nom",placeholder:null,hint:"Nom de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Name",placeholder:null,hint:"Company's name"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Nombre",placeholder:null,hint:"Nombre de la empresa"});             
+
+        //General part
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyPhone",
+          value: '0423133212',
+          placeholder: '0423133212',
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Telephone",placeholder:null,hint:"Número de telephone de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Phone",placeholder:null,hint:"Company's phone number"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Telefono",placeholder:null,hint:"Numero de telefono de la empresa"});             
+
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyEmail",
+          value: 'sales@kubiiks.com',
+          placeholder: 'sales@email.com',
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Adresse courriel",placeholder:null,hint:"Adresse mel de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Email address",placeholder:null,hint:"Company's email address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Correo electronico",placeholder:null,hint:"Direccion de correo electronico de la empresa"});             
+
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyAddress",
+          value: 'Kubiiks SAS, 6 rue Roger Avon, 06610 La Gaude, FRANCE',
+          placeholder: null
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Adresse",placeholder:null,hint:"Adresse postale de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Adress",placeholder:null,hint:"Company's postal address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Direccion",placeholder:null,hint:"Direccion de la empresa"});             
+
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapLatLng",
+          value: '43.61426,6.959808',
+          placeholder: '43.234,6.9503'
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Coordones GPS",placeholder:null,hint:"Coordonnées GPS de l'entreprise (lat,lng)"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"GPS coordinates",placeholder:null,hint:"Company's GPS coordinates (lat,lng)"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Coordenadas GPS",placeholder:null,hint:"Coordenadas GPS de la empresa (lat,lng)"});             
+
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapZoom",
+          value: '14',
+          placeholder: '14',
+          label:"GoogleMap zoom"
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Zoom applicable a GoogleMap (valeur entre 10 et 20)"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"GoogleMap zoom (value between 10 and 20)"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Zoom para GoogleMap (valor entre 10 y 20)"});             
+
+
         //let res = await Setting.findByPk(16);
         //console.log(res);
            

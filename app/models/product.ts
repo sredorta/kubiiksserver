@@ -22,7 +22,7 @@ export const NRole = 'Not a model';
 
   })
   
-@Table
+@Table({})
 export class Product extends Model<Product> {
 
     @PrimaryKey

@@ -10,7 +10,7 @@ export const NSettingTranslation = 'Not a model';
     //attributes: ["id","key","type","value"]
   })
 
-@Table
+@Table({timestamps:false})
 export class SettingTranslation extends Model<SettingTranslation> {
 
   @PrimaryKey
