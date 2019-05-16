@@ -5,8 +5,8 @@ import {UserRole} from './user_role';
 import {User} from './user';
 
 
-export const RoleN = 'Not a model';
-export const NRole = 'Not a model';
+export const ProductN = 'Not a model';
+export const NProduct = 'Not a model';
 
 @DefaultScope({
     attributes: {exclude : []}

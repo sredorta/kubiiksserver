@@ -27,7 +27,7 @@ export const NUser = 'Not a model';
   full: {
     attributes: {exclude : []}
   },
-  fullWidthRoles: {
+  fullWithRoles: {
     attributes: {exclude : []},
     include: [() => Role],
   }

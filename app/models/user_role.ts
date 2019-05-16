@@ -4,8 +4,8 @@ import {AppConfig} from '../utils/Config';
 import {User} from './user';
 import {Role} from './role';
 
-export const SettingN = 'Not a model';
-export const NSetting = 'Not a model';
+export const UserRoleN = 'Not a model';
+export const NUserRole = 'Not a model';
 
 @DefaultScope({})
 

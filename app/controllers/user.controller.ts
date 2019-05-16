@@ -76,34 +76,7 @@ export class UserController {
         //return Middleware.validation(GetUserByIdDTO);
     }
 
-    static tmp = async (req: Request, res: Response, next: NextFunction) => {
-        let myUser : User | null;
-        let myAccount : Account;
-        try {
-            myUser = await User.create({
-                firstName: "sergi",
-                lastName: "redorta",
-                email: "sergi.redorta@hotmail.com",
-                phone: "0423133212",
-                mobile: "0623133212",
-                language: req.user.language,
-                password: "Hello1234",
-                emailValidationKey: Helper.generateRandomString(30),
-                mobileValidationKey: Helper.generateRandomNumber(4)
-            });
-            /*myAccount = await myUser.createAccount({
-                password: Account.hashPassword("Hello1234")
-            });
-            myAccount = await myUser.createAccount({
-                    access: "admin",
-                    password: Account.hashPassword("Hello1234")
-                });   */
-            myUser = await User.findOne();//{include:[{model: Account}] });
-            res.json(myUser);
-        } catch(error) {
-            next(new HttpException(500, error.message, error.errors));    
-        };
-    }
+
 
 
     /////////////////////////////////////////////////////////////////////////////////////

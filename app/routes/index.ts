@@ -135,6 +135,10 @@ export class Routes {
     app.route('/api/auth/get')
       .get(passport.authenticate('jwt',{session: false}),AuthController.getAuthUser);
 
+    /** updateAuthUser or update current logged in user data */
+    app.route('/api/auth/update')
+      .post(passport.authenticate('jwt',{session: false}),AuthController.updateAuthUserChecks(),AuthController.updateAuthUser);
+
 
     /**Email validation endpoint */
     app.route('/api/auth/validate-email')
@@ -148,10 +152,6 @@ export class Routes {
     app.route('/api/auth/reset-password/mobile')
        .post(Middleware.unregistered(),AuthController.resetPasswordByMobileChecks(), AuthController.resetPasswordByMobile);  
 
-
-    //Debug only to be removed
-    app.route("/api/test")
-      .get(UserController.tmp);
     
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART

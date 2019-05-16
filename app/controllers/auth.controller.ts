@@ -210,9 +210,58 @@ export class AuthController {
     /**Get current loggedIn user */
     static getAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //Sending back user
-        let myUser = await User.scope("withRoles").findByPk(req.user.id);
-        res.json(myUser);
+        try {
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);
+            res.json(myUser);
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));
+        }        
     }
+
+    /**Updates curred loggedIn user */
+    static updateAuthUser = async (req: Request, res: Response, next:NextFunction) => {
+        //Sending back user
+        try {
+            let myUser = await User.scope("fullWithRoles").findByPk(req.user.id);
+            if (!myUser) throw new Error("User not found !"); 
+            if (req.body.firstName)
+                myUser.firstName = req.body.firstName;
+            if (req.body.lastName)
+                myUser.lastName = req.body.lastName;
+            if (req.body.email)
+                myUser.email = req.body.email;
+            if (req.body.phone)
+                myUser.phone = req.body.phone;            
+            if (req.body.mobile)
+                myUser.mobile = req.body.mobile;            
+            if (req.body.passwordOld) {
+                if (!myUser.checkPassword(req.body.passwordOld))
+                    next (new HttpException(400, messages.authInvalidCredentials, null)); 
+                else     
+                    myUser.password = User.hashPassword(req.body.password);   
+            }
+            myUser = await myUser.save();  
+            myUser = await User.scope("withRoles").findByPk(req.user.id);  
+            res.json(myUser);
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));
+        }
+    }    
+    /**Parameter validation */
+    static updateAuthUserChecks() {
+        return [
+            body('firstName').optional().custom(CustomValidators.nameValidator('firstName')),
+            body('lastName').optional().custom(CustomValidators.nameValidator('lastName')),
+            body('email').optional().isEmail(),
+            body('phone').optional().custom(CustomValidators.phone('phone')),
+            body('mobile').optional().custom(CustomValidators.mobile('mobile')),
+            body('password').optional().custom(CustomValidators.passwordUpdate()),
+
+            body('dummy').custom(CustomValidators.dBuserNotPresentExceptMe(User)),
+            Middleware.validate()
+        ]
+    }        
+
 
     ///////////////////////////////////////////////////////////////////////////
     //Validate Email when clicking to email link
@@ -253,7 +302,7 @@ export class AuthController {
         }
     }
     //TODO: Use validation here !!!
-    
+
 
     ///////////////////////////////////////////////////////////////////////////
     // resetPasswordEmail:  Resets the password by sending new one by email

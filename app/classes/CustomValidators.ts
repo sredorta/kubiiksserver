@@ -26,6 +26,20 @@ export class CustomValidators extends Error {
             return Promise.resolve();
         }
     }
+
+    static passwordUpdate() {
+        return (value:any, {req} : {req:Request}) => {
+            //Password and passwordOld must exist and fullfill requirements !!!
+            if (!Helper.passwordPassQualityRequired(req.body.password)) {
+                return Promise.reject({type:'password'});
+            }
+            if (!Helper.passwordPassQualityRequired(req.body.passwordOld)) {
+                return Promise.reject({type:'password'});
+            }
+            return Promise.resolve();
+        }
+    }
+
     
     /**Does firstName and lastName validation based on shared data validation*/
     static nameValidator(field:string) {
@@ -126,11 +140,9 @@ export class CustomValidators extends Error {
         return (value:any, {req} : {req:Request}) => {
             let query : any[] = [];
             query.push({email:req.body.email});
-            if (Helper.isSharedSettingMatch("phone", "include") || Helper.isSharedSettingMatch("phone", "optional") ) 
-                if (req.body.phone != undefined)
+            if (req.body.phone != undefined && req.body.phone != null)
                     query.push({phone:req.body.phone});
-            if (Helper.isSharedSettingMatch("mobile", "include") || Helper.isSharedSettingMatch("mobile", "optional") ) 
-                if (req.body.phone != undefined)
+            if (req.body.phone != undefined && req.body.phone != null)
                     query.push({phone:req.body.phone});
             return MyClass.findOne({
                 where: {[Op.or]: query}
@@ -145,14 +157,13 @@ export class CustomValidators extends Error {
     static dBuserNotPresentExceptMe(MyClass:any) {
         return (value:any, {req} : {req:Request}) => {
             let query : any[] = [];
-            query.push({email:req.body.email});
-            if (Helper.isSharedSettingMatch("phone", "include") || Helper.isSharedSettingMatch("phone", "optional") ) 
-                if (req.body.phone != undefined)
-                    query.push({phone:req.body.phone});
-            if (Helper.isSharedSettingMatch("mobile", "include") || Helper.isSharedSettingMatch("mobile", "optional") ) 
-                if (req.body.phone != undefined)
-                    query.push({phone:req.body.phone});
-            console.log(query);
+            if (req.body.email != undefined && req.body.email!= null)
+                query.push({email:req.body.email});
+            if (req.body.phone != undefined && req.body.phone!= null)
+                query.push({phone:req.body.phone});
+            if (req.body.mobile != undefined && req.body.mobile!= null)
+                query.push({mobile:req.body.mobile});
+       
             return MyClass.findOne({
                 where: [{id:{[Op.not]:req.user.id}},{[Op.or]: query}]
                 }).then((user:any) => {
