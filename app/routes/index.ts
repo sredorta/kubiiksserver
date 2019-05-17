@@ -139,6 +139,11 @@ export class Routes {
     app.route('/api/auth/update')
       .post(passport.authenticate('jwt',{session: false}),AuthController.updateAuthUserChecks(),AuthController.updateAuthUser);
 
+    /** deleteAuthUser: delete current logged in user data */
+    app.route('/api/auth/delete')
+      .delete(passport.authenticate('jwt',{session: false}),AuthController.deleteAuthUser);
+
+
 
     /**Email validation endpoint */
     app.route('/api/auth/validate-email')

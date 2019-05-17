@@ -261,7 +261,18 @@ export class AuthController {
             Middleware.validate()
         ]
     }        
-
+    /**Deletes current loggedIn user */
+    static deleteAuthUser = async (req: Request, res: Response, next:NextFunction) => {
+        //Sending back user
+        try {
+            let myUser = await User.findByPk(req.user.id);
+            if (!myUser) throw new Error("User not found !"); 
+            myUser.destroy(); 
+            res.sendStatus(204);
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));
+        }
+    }    
 
     ///////////////////////////////////////////////////////////////////////////
     //Validate Email when clicking to email link
