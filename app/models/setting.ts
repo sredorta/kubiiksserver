@@ -601,6 +601,47 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"GoogleMap zoom (value between 10 and 20)"});    
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Zoom para GoogleMap (valor entre 10 y 20)"});             
 
+
+        //Legal part
+        mySetting = await Setting.create({
+          type: "legal",
+          key: "legalUserData",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>C'est un test</h1><p>pour voir ce qui ce passe</p>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>this is a test</h1><p>to see what happens</p>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Esto es un test</h1><p>para ver que passa</p>"});             
+
+        mySetting = await Setting.create({
+          type: "legal",
+          key: "legalUserData.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Conditions generales d'utilization de donnees personnelles"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"General conditions of personnal data usage"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Condiciones generales de utilizacion de datos personnales"});             
+
+        mySetting = await Setting.create({
+          type: "legal",
+          key: "legalSales",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>C'est un test ventes</h1><p>pour voir ce qui ce passe</p>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>this is a test sales</h1><p>to see what happens</p>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Esto es un test ventas</h1><p>para ver que passa</p>"});             
+
+        mySetting = await Setting.create({
+          type: "legal",
+          key: "legalSales.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Conditions generales de vente"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"General conditions"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Condiciones generales de venta"});             
+
+
 /*
     matInputAppearance: "fill",   //Mat input appearance "outline", "default", "fill"...
     matInputHasLabel: true,
