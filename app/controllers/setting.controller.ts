@@ -18,6 +18,11 @@ export class SettingController {
 
     /**Get all shared settings with the current language translation*/
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
+        /*try {
+          res.json(await Setting.findAll());
+        } catch (error) {
+            next(new HttpException(500, error.message, error.errors));
+        }*/
         Setting.findAll().then((settings)=> {
             let result : any[] = [];
             for (let setting of settings) {
@@ -31,6 +36,11 @@ export class SettingController {
 
     /**Get all shared settings with the current language translation including label,hint and placeholder additionally*/
     static getAllFull = async (req: Request, res: Response, next:NextFunction) => {
+        /*try {
+            res.json(await Setting.scope("full").findAll());
+        } catch (error) {
+            next(new HttpException(500, error.message, error.errors));
+        }*/
         Setting.scope("full").findAll().then((settings)=> {
             let result : any[] = [];
             for (let setting of settings) {
@@ -80,7 +90,7 @@ export class SettingController {
     }
 
     /**Get setting by key */
-    static getByKey = async (req: Request, res: Response, next:NextFunction) => {
+/*    static getByKey = async (req: Request, res: Response, next:NextFunction) => {
         const key = req.body.key;
         Setting.findOne({
             where: {
@@ -91,15 +101,15 @@ export class SettingController {
         }).catch( (error) => {
             next(new HttpException(500, error.message, error.errors));
         });
-    }   
+    }   */
 
     /**getByKey parameter checking */
-    public static getByKeyChecks() {
+/*    public static getByKeyChecks() {
         return [
             body('key').exists().withMessage('exists').isString(),
             Middleware.validate()
         ]
-    }
+    }*/
 
     /**Email transporter check */
     public static emailCheck = async (req: Request, res: Response, next:NextFunction) => {

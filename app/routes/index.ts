@@ -85,11 +85,10 @@ export class Routes {
       .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.updateChecks(),SettingController.update);
 
 
+/*    app.route('/api/settings/get/key')
+      .post(SettingController.getByKeyChecks(),SettingController.getByKey);*/
 
-
-    app.route('/api/settings/get/key')
-      .post(SettingController.getByKeyChecks(),SettingController.getByKey);
-
+    /**Checks that email service is up and running */
     app.route('/api/settings/email')
       .get(SettingController.emailCheck);
 

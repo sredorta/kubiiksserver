@@ -3,6 +3,7 @@ import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/Config';
 import { SettingTranslation } from './setting_translation';
 import { settings } from 'cluster';
+import { isSpreadAssignment } from 'typescript';
 
 export const SettingN = 'Not a model';
 export const NSetting = 'Not a model';
@@ -10,6 +11,7 @@ export const NSetting = 'Not a model';
 export enum SettingType {"shared", "i18n", "social"};
 
 @DefaultScope({
+    where : {isAdmin : false},
     attributes: ["id","key","type","value"],
     include: [() => SettingTranslation]
   })
@@ -31,31 +33,22 @@ export class Setting extends Model<Setting> {
   @Column(DataTypes.STRING(50))
   type!: string;
 
-  @AllowNull(false)
+  @AllowNull(true)
   @Column(DataTypes.STRING(1000))
   value!: string;
 
-  @AllowNull(true)
-  //@Default("label")
-  @Column(DataTypes.STRING(1000))
-  label!: string;
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataTypes.BOOLEAN)
+  isAdmin!:boolean;
 
-  @AllowNull(true)
-  //@Default("placeholder")
-  @Column(DataTypes.STRING(1000))
-  placeholder!: string;
-
-  @AllowNull(true)
-  //@Default("hint")
-  @Column(DataTypes.STRING(1000))
-  hint!: string;
 
   @HasMany(() => SettingTranslation)
   translations!: SettingTranslation[];  
 
 
   /**Gets the setting value of the specified key */
-  public static getByKey(key:string) : Promise<Setting> {
+/*  public static getByKey(key:string) : Promise<Setting> {
     let myPromise : Promise<Setting>;
     myPromise =  new Promise<Setting>((resolve,reject) => {
       async function _work() {
@@ -70,10 +63,10 @@ export class Setting extends Model<Setting> {
       _work();
     });
     return myPromise;
-  }
+  }*/
 
   /**Gets all the settings of the specified type */
-  public static getByType(type:SettingType) : Promise<Setting[]> {
+/*  public static getByType(type:SettingType) : Promise<Setting[]> {
     let myPromise : Promise<Setting[]>;
     myPromise =  new Promise<Setting[]>((resolve,reject) => {
       async function _work() {
@@ -88,7 +81,7 @@ export class Setting extends Model<Setting> {
       _work();
     });
     return myPromise;      
-  }
+  }*/
 
   /**From array of settings we get the value of the one that matches they given key*/
   public static getValueFromArray(array:Setting[], key:string) : string | null {
@@ -97,22 +90,16 @@ export class Setting extends Model<Setting> {
     return null;
   }
 
-  /**Sanitize output by merging label,hint,placeholder with the language */
+  /**Sanitize output by replacing translated value */
   public sanitize(iso:string, scope:"default" | "full" = "default") {
     let result : any;
-    let myLabel : string = this.label;
-    let myPlaceholder : string = this.placeholder;
-    let myHint : string = this.hint;
     let myValue : string = this.value;
     let myTranslatedSetting : SettingTranslation | undefined;
 
-    //Replace label,hint,placeholder of Setting with current language
+    //Replace value of Setting with current language
     if (this.translations.length>0) {
       myTranslatedSetting = this.translations.find(obj => obj.iso == iso);
       if (myTranslatedSetting) {
-        myLabel = myTranslatedSetting.label==null?this.label:myTranslatedSetting.label;
-        myPlaceholder = myTranslatedSetting.placeholder==null?this.placeholder:myTranslatedSetting.placeholder;
-        myHint = myTranslatedSetting.hint==null?this.hint:myTranslatedSetting.hint;
         myValue = myTranslatedSetting.value==null?this.value: myTranslatedSetting.value;
       }
     }
@@ -121,10 +108,7 @@ export class Setting extends Model<Setting> {
         result = {id:this.id,
                     key:this.key,
                     type:this.type,
-                    value:this.value,
-                    label:myLabel, 
-                    placeholder:myPlaceholder,
-                    hint:myHint, 
+                    value:myValue, 
                     translations:this.translations};
       break;
       default:  //Translate default value and do not provide translations, neither label,hint,placeholder
@@ -133,7 +117,7 @@ export class Setting extends Model<Setting> {
           type:this.type,
           value:myValue};
     }
-    return result;                           
+    return result;   
 
   }
 
@@ -157,108 +141,279 @@ export class Setting extends Model<Setting> {
             placeholder: "https://www.facebook.com...",
             hint: "Link to your company facebook page, let it empty if you don't have"
         });          
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Lien à votre page facebook de l'entreprise, laisse vide si vous en avez pas"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"Link to your company facebook page, let it empty if you don't have"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Link a la pagina facebook de la empresa, deje el campo vacio si no tiene"});             
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkFacebook.label",
+          value: "facebook",
+          isAdmin:true
+         });     
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkFacebook.placeholder",
+          value: "https://www.facebook.com...",
+          isAdmin: true
+         });       
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkFacebook.hint",
+          value: null,
+          isAdmin: true
+         });         
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Lien à votre page facebook de l'entreprise, laisse vide si vous en avez pas"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Link to your company facebook page, let it empty if you don't have"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Link a la pagina facebook de la empresa, deje el campo vacio si no tiene"});             
+
 
         mySetting = await Setting.create({
             type: "social",
             key: "linkGoogleplus",
             value: "https://plus.google.com/u/0/118285710646673394875",
-            label: "google plus",
-            placeholder: "https://plus.google.com...",
-            hint: "Link to your company google plus page, let it empty if you don't have"
         });   
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Lien à votre page google plus de l'entreprise, laisse vide si vous en avez pas"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"Link to your company google plus page, let it empty if you don't have"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Link a la pagina google plus de la empresa, deje el campo vacio si no tiene"});             
+
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkGoogleplus.label",
+          value: "google plus",
+          isAdmin:true
+        });   
+
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkGoogleplus.placeholder",
+          value: "https://plus.google.com...",
+          isAdmin:true
+        });   
+
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkGoogleplus.hint",
+          value: null,
+          isAdmin:true
+        });   
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Lien à votre page google plus de l'entreprise, laisse vide si vous en avez pas"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Link to your company google plus page, let it empty if you don't have"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Link a la pagina google plus de la empresa, deje el campo vacio si no tiene"});             
 
         mySetting = await Setting.create({
             type: "social",
             key: "linkInstagram",
             value: "https://www.instagram.com/sergiredorta/",
-            label: "instagram",
-            placeholder: "https://www.instagram.com...",
-            hint: "Link to your company instagram page, let it empty if you don't have"
-          });   
-          await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Lien à votre page instagram de l'entreprise, laisse vide si vous en avez pas"});  
-          await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"Link to your company instagram page, let it empty if you don't have"});    
-          await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Link a la pagina instagram de la empresa, deje el campo vacio si no tiene"});             
+         });  
+        mySetting = await Setting.create({
+            type: "social",
+            key: "linkInstagram.label",
+            value: "instagram",
+            isAdmin:true
+        }); 
+        mySetting = await Setting.create({
+            type: "social",
+            key: "linkInstagram.placeholder",
+            value: "https://www.instagram.com...",
+            isAdmin:true
+        }); 
+        mySetting = await Setting.create({
+            type: "social",
+            key: "linkInstagram.hint",
+            value: null,
+            isAdmin:true
+        });                                
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Lien à votre page instagram de l'entreprise, laisse vide si vous en avez pas"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Link to your company instagram page, let it empty if you don't have"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Link a la pagina instagram de la empresa, deje el campo vacio si no tiene"});             
   
 
         mySetting = await Setting.create({
             type: "social",
             key: "linkLinkedin",
             value: "https://www.linkedin.com/company/kubiiks/",
-            label: "linked in",
-            placeholder: "https://www.linkedin.com...",
-            hint: "Link to your company linkedIn page, let it empty if you don't have"
-        });             
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Lien à votre page linkedin de l'entreprise, laisse vide si vous en avez pas"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"Link to your company linkedin page, let it empty if you don't have"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Link a la pagina linkedin de la empresa, deje el campo vacio si no tiene"});             
+        });   
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkLinkedin.label",
+          value: "linked in",
+          isAdmin:true
+        });   
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkLinkedin.placeholder",
+          value: "https://www.linkedin.com...",
+          isAdmin:true
+         });   
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkLinkedin.hint",
+          value: null,
+          isAdmin:true
+        });   
+                
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Lien à votre page linkedin de l'entreprise, laisse vide si vous en avez pas"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Link to your company linkedin page, let it empty if you don't have"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Link a la pagina linkedin de la empresa, deje el campo vacio si no tiene"});             
 
         mySetting = await Setting.create({
             type: "social",
             key: "linkTwitter",
             value: "",
-            label: "twitter",
-            placeholder: "https://www.twitter.com...",
-            hint: "Link to your company twitter page, let it empty if you don't have"
         });   
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Lien à votre page twitter de l'entreprise, laisse vide si vous en avez pas"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"Link to your company twitter page, let it empty if you don't have"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Link a la pagina twitter de la empresa, deje el campo vacio si no tiene"});             
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkTwitter.label",
+          value: "twitter",
+          isAdmin:true
+       });  
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkTwitter.placeholder",
+          value: "https://www.twitter.com...",
+          isAdmin:true
+        });  
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkTwitter.hint",
+          value: null,
+          isAdmin:true
+        });                    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Lien à votre page twitter de l'entreprise, laisse vide si vous en avez pas"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Link to your company twitter page, let it empty if you don't have"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Link a la pagina twitter de la empresa, deje el campo vacio si no tiene"});             
 
         mySetting = await Setting.create({
             type: "social",
             key: "linkYoutube",
             value: "https://www.youtube.com/user/sergiredorta",
-            label: "youtube",
-            placeholder: "https://www.youtube.com...",
-            hint: "Link to your company youtube page, let it empty if you don't have"
-        });      
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Lien à votre page youtube de l'entreprise, laisse vide si vous en avez pas"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"Link to your company youtube page, let it empty if you don't have"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Link a la pagina youtube de la empresa, deje el campo vacio si no tiene"});             
+       });   
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkYoutube.label",
+          value: "youtube",
+          isAdmin:true
+        });
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkYoutube.placeholder",
+          value: "https://www.youtube.com...",
+          isAdmin:true
+        });
+        mySetting = await Setting.create({
+          type: "social",
+          key: "linkYoutube.hint",
+          value: null,
+          isAdmin:true
+        });                     
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Lien à votre page youtube de l'entreprise, laisse vide si vous en avez pas"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Link to your company youtube page, let it empty if you don't have"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Link a la pagina youtube de la empresa, deje el campo vacio si no tiene"});             
 
         mySetting = await Setting.create({
             type: "seo",
             key: "title",
-            value: 'Fallback text'
+            value: null
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"titre en francais",label:"Titre",placeholder:"Titre du site",hint:"Titre du site web"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"titre in english",label:"Title",placeholder:"Sit'es title",hint:"Page's title"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"titre en español",label:"Titulo",placeholder:"Titulo de la pagina web",hint:"Titulo de la pagina principal"});             
-         
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Titre en français"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Title in english"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Titulo en español"});
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "title.label",
+          value: null,
+          isAdmin:true
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Titre"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Title"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Titulo"});      
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "title.placeholder",
+          value: null,
+          isAdmin:true
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Titre du site"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Sit'es title"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Titulo de la pagina web"});             
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "title.hint",
+          value: null,
+          isAdmin:true
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Titre du site web"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Page's title"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Titulo de la pagina principal"});             
+
+
         mySetting = await Setting.create({
             type: "seo",
             key: "description",
-            value: 'Fallback text'
+            value: null
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description en francais",label:"description",placeholder:"Description",hint:"Description de la page"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description in english",label:"description",placeholder:"Description",hint:"Page's description"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español",label:"descripcion",placeholder:"Descripcion",hint:"Descripcion de la pagina"});             
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description en francais"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description in english"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español"});             
          
-        //TODO: Maybe this tag is not required anymore, so remove if this is the case
         mySetting = await Setting.create({
-            type: "seo",
-            key: "keywords",
-            value: 'Fallback text'
+          type: "seo",
+          key: "description.label",
+          value: null,
+          isAdmin:true
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"keyword en francais",label:"Mots clefs",placeholder:"placeholder",hint:"Mots clefs pour la recherche"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"keyword in english",label:"Keywords",placeholder:"placeholder",hint:"Keywords for the search"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"keyword en español",label:"Palabras clave",placeholder:"placeholder",hint:"Palabras clave para la busqueda"});             
-                 
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"descripcion"});             
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "description.placeholder",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Description"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Description"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Descripcion"});             
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "description.hint",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Description de la page"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Page's description"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Descripcion de la pagina"});             
+               
         mySetting = await Setting.create({
             type: "seo",
             key: "url",
             value: 'https://www.kubiiks.com',
-            placeholder: "https://www.mysite.com"
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Adresse internet",placeholder:null,hint:"Adresse principale du site"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Internet address",placeholder:null,hint:"Main site's address"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Direccion internet",placeholder:null,hint:"Pagina principal de la pagina web"});             
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "url.placeholder",
+          value: "https://www.mysite.com",
+          isAdmin:true,
+        });        
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "url.label",
+          value: null,
+          isAdmin:true,
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Adresse internet"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Internet address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Direccion internet"});             
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "url.hint",
+          value: null,
+          isAdmin:true,
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Adresse principale du site"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Main site's address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Pagina principal de la pagina web"});             
 
         mySetting = await Setting.create({
             type: "seo",
@@ -266,74 +421,185 @@ export class Setting extends Model<Setting> {
             value: 'https://www.kubiiks.com/api/my-image.jpg'
         });
 
+
         mySetting = await Setting.create({
             type: "seo",
             key: "sitename",
             value: 'kubiiks'
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Nom",placeholder:null,hint:"Nom de l'entreprise"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Name",placeholder:null,hint:"Company's name"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Nombre",placeholder:null,hint:"Nombre de la empresa"});             
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "sitename.label",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Nom"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Name"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Nombre"});             
+
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "sitename.hint",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Nom de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Company's name"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Nombre de la empresa"});             
+
+
 
         //General part
         mySetting = await Setting.create({
           type: "general",
           key: "companyPhone",
-          value: '0423133212',
-          placeholder: '0423133212',
+          value: '0423133212'
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Telephone",placeholder:null,hint:"Número de telephone de l'entreprise"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Phone",placeholder:null,hint:"Company's phone number"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Telefono",placeholder:null,hint:"Numero de telefono de la empresa"});             
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyPhone.placeholder",
+          value: '0423133212'
+        });
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyPhone.label",
+          value: null,
+          isAdmin:true
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Telephone"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Phone"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Telefono"});             
+
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyPhone.hint",
+          value: null,
+          isAdmin:true
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Número de telephone de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Company's phone number"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Numero de telefono de la empresa"});             
+
 
         mySetting = await Setting.create({
           type: "general",
           key: "companyEmail",
-          value: 'sales@kubiiks.com',
-          placeholder: 'sales@email.com',
+          value: 'sales@kubiiks.com'
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Adresse courriel",placeholder:null,hint:"Adresse mel de l'entreprise"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Email address",placeholder:null,hint:"Company's email address"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Correo electronico",placeholder:null,hint:"Direccion de correo electronico de la empresa"});             
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyEmail.placeholder",
+          value: 'sales@kubiiks.com',
+          isAdmin:true
+        });        
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyEmail.label",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Adresse courriel"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Email address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Correo electronico"});             
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyEmail.hint",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Adresse mel de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Company's email address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Direccion de correo electronico de la empresa"});             
+
+
+
 
         mySetting = await Setting.create({
           type: "general",
           key: "companyAddress",
           value: 'Kubiiks SAS, 6 rue Roger Avon, 06610 La Gaude, FRANCE',
-          placeholder: null
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Adresse",placeholder:null,hint:"Adresse postale de l'entreprise"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"Adress",placeholder:null,hint:"Company's postal address"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Direccion",placeholder:null,hint:"Direccion de la empresa"});             
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyAddress.label",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Adresse"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Adress"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Direccion"});             
+        mySetting = await Setting.create({
+          type: "general",
+          key: "companyAddress.hint",
+          value: null,
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Adresse postale de l'entreprise"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Company's postal address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Direccion de la empresa"});             
+
+
 
         mySetting = await Setting.create({
           type: "general",
           key: "gmapLatLng",
-          value: '43.61426,6.959808',
-          placeholder: '43.234,6.9503'
+          value: '43.61426,6.959808'
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:"Coordones GPS",placeholder:null,hint:"Coordonnées GPS de l'entreprise (lat,lng)"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:"GPS coordinates",placeholder:null,hint:"Company's GPS coordinates (lat,lng)"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:"Coordenadas GPS",placeholder:null,hint:"Coordenadas GPS de la empresa (lat,lng)"});             
+
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapLatLng.placeholder",
+          value: '43.61426,6.959808',
+          isAdmin:true
+        });        
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapLatLng.label",
+          value: '43.61426,6.959808',
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Coordones GPS"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"GPS coordinates"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Coordenadas GPS"});             
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapLatLng.hint",
+          value: '43.61426,6.959808',
+          isAdmin:true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Coordonnées GPS de l'entreprise (lat,lng)"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Company's GPS coordinates (lat,lng)"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Coordenadas GPS de la empresa (lat,lng)"});             
+
 
         mySetting = await Setting.create({
           type: "general",
           key: "gmapZoom",
           value: '14',
-          placeholder: '14',
-          label:"GoogleMap zoom"
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:null,label:null,placeholder:null,hint:"Zoom applicable a GoogleMap (valeur entre 10 et 20)"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:null,label:null,placeholder:null,hint:"GoogleMap zoom (value between 10 and 20)"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:null,label:null,placeholder:null,hint:"Zoom para GoogleMap (valor entre 10 y 20)"});             
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapZoom.label",
+          value: 'GoogleMap zoom',
+          isAdmin:true
+        });
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapZoom.placeholder",
+          value: '14',
+          isAdmin:true
 
-
-        //let res = await Setting.findByPk(16);
-        //console.log(res);
-           
-        //let mySettingTranslation = SettingTranslation.build({iso:"fr",value:"valeur en fracais"});  
-        //mySetting.$create('translations',mySettingTranslation);
-
+        });
+        mySetting = await Setting.create({
+          type: "general",
+          key: "gmapZoom.hint",
+          value: null,
+          isAdmin:true
+        });        
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Zoom applicable a GoogleMap (valeur entre 10 et 20)"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"GoogleMap zoom (value between 10 and 20)"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Zoom para GoogleMap (valor entre 10 y 20)"});             
 
 /*
     matInputAppearance: "fill",   //Mat input appearance "outline", "default", "fill"...

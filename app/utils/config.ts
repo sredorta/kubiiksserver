@@ -57,7 +57,6 @@ import * as dotenv from "dotenv";
             }
         },
         "sharedSettings" : [
-            {"key": "gmapsKey", "value": <string>process.env.KEY_GMAPS},
             {"key": "signup_firstName", "value":"include"},
             {"key": "signup_lastName", "value":"include"},
             {"key": "signup_phone", "value":"exclude"},
