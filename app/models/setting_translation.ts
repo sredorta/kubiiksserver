@@ -27,7 +27,7 @@ export class SettingTranslation extends Model<SettingTranslation> {
   iso!: string;
 
   @AllowNull(true)
-  @Column(DataTypes.STRING(1000))
+  @Column(DataTypes.STRING(40000))
   value!: string;
 
   @BelongsTo(() => Setting)
