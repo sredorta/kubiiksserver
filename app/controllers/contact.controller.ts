@@ -9,12 +9,6 @@ import {messages} from '../middleware/common';
 
 
 
-/**Payload interface */
-export interface IJwtPayload {
-    /**Contains user ID */
-    id:number
-}
-
 export class ContactController {
 
     constructor() {}
@@ -23,6 +17,7 @@ export class ContactController {
         const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
         let myEmail = {
             from: AppConfig.emailSmtp.sender,
+            replyTo: req.body.email,
             to: AppConfig.emailSmtp.sender,
             subject: req.body.subject,
             text: req.body.message,
@@ -35,6 +30,7 @@ export class ContactController {
             console.log(error);
             next(new HttpException(500, messages.authEmailSentError,null));
         });
+        //TODO: PUSH NOTIFICATION TO ADMIN USERS !!!!
        
     }
     /**Parameter validation */
