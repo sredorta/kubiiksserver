@@ -167,15 +167,20 @@ export class AuthController {
     };
 
     /**Gets current user stored fields in the system */
-    static oauth2ValidateFields =  (req:Request, res:Response,next:NextFunction) => {
-        let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
-        //If terms are not validated we need to show signup completion form, if not we can move directly to loggedIn area
-        if (myUser.terms == false) {
-            res.json({complete:false, user:myUser});
-        } else {
-            //Return user with roles as token is already available (equivalent to getAuthUser)
-            res.json({complete:true, user:myUser});
-        }
+    static oauth2ValidateFields =  async (req:Request, res:Response,next:NextFunction) => {
+        try {
+            let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
+            //If terms are not validated we need to show signup completion form, if not we can move directly to loggedIn area
+            if (myUser.terms == false) {
+                res.json({complete:false, user:myUser});
+            } else {
+                //Return user with roles as token is already available (equivalent to getAuthUser)
+                let myUserFull = await User.scope("withRoles").findByPk(myUser.id);
+                res.json({complete:true, user:myUserFull});
+            }
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));
+        }    
     }
 
 

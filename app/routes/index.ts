@@ -76,9 +76,14 @@ export class Routes {
     app.route('/api/settings/all')
       .get(SettingController.getAll);
 
-    /**Gets all setting value with current language translated value,label,hint and placeholder */  
+    /**Gets all setting value with all translations */  
     app.route('/api/settings/full')
       .get(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.getAllFull);
+
+    /**Gets one setting value with all translations */  
+    app.route('/api/settings/full/field')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
+
 
     /**Saves value for the setting with translations if required */  
     app.route('/api/settings/update')

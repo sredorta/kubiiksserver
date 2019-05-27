@@ -576,9 +576,6 @@ export class Setting extends Model<Setting> {
 
 
 
-
-
-
         mySetting = await Setting.create({
           type: "general",
           key: "gmapLatLng",
@@ -640,10 +637,10 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Zoom para GoogleMap (valor entre 10 y 20)"});             
 
 
-        //Legal part
+        //CONTENT PART
         mySetting = await Setting.create({
-          type: "legal",
-          key: "legalUserData",
+          type: "content",
+          key: "contentUserData",
           value: null,
         });
         await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:'<b style=""><font size="5">COLLECTE ET UTILISATION DES DONNÉES À CARACTÈRE PERSONNEL</font></b><div><hr id="null"></div><div><div><br></div><div>La collecte des données à caractère personnel pour les prestations proposées par le site ainsi que leur traitement sont effectués dans le respect de la loi « Informatique, Fichiers et Libertés » du 6 janvier 1978 modifiée et ses décrets d’application.</div></div><div><br></div><div><div>La collecte des données à caractère personnel concernant les utilisateurs du site a pour finalités principales l’identification des utilisateurs pour la fourniture des services et prestations proposés sur le site.</div></div><div><br></div><div><div>Les données récoltées ne sont jamais transmis à des tiers sauf si le client a donné son consentement préalable et ce sous réserve que les tiers se soient clairement engagés à respecter toutes les dispositions de la Loi du 6 janvier 1978 modifiée.</div></div><div><br></div><div>En application de la loi, toute personne ayant transmis des données à caractère personnel dispose d’un droit d’accès, de rectification et de suppression des données ainsi que d’un droit d’opposition au traitement des données à caractère personnel la concernant. A tout moment, vous pouvez demander à exercer ce droit en nous contactant.<br></div><div><br></div><div><div>Les visiteurs du site sont informés que pour les besoins de la navigation sur ce site,&nbsp; nous pouvons avoir recours à la collecte automatique de certaines informations relatives aux utilisateurs à l\'aide des cookies. Si l\'utilisateur du site ne souhaite pas l’utilisation de cookies par Autoradios-GPS, il peut refuser l’activation des cookies par le biais des options proposés par son navigateur internet. Pour des raisons techniques, si l\'utilisateur désactive les cookies dans son navigateur, certaines prestations proposées sur le site pourront ne pas lui être accessibles.</div></div><div><br></div>'});  
@@ -651,8 +648,8 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:'<div><font size="5"><b>PERSONAL DATA USAGE AND STORAGE ESPAÑOL !!!!</b></font></div><div><hr id="null"><br></div><div>The personal data is collected and stored respecting the french law « Informatique, Fichiers et Libertés » of 6th january 1978 and all its ammendements.</div><div><br></div><div>The personal data is collected for user identification among others.</div><div><br></div><div>The collected data will never be given to third parties except if the user has given a waiver and only in the case that the third parties are commited to respect the french law « Informatique, Fichiers et Libertés » of 6th january 1978 and all its ammendements.</div><div><br></div><div>Following the law, any person that has sent personal data has access to such data and is able to modify or suppress such data. At any moment, you can ask for this right by contacting us.</div><div><br></div><div>Site visitors are informed that for a better navigation experience, we might be collecting some information using cookies or equivalent. An option to the visitor is offered so that can disable such feature. For technical reasons, by disabling the usage of cookies some features might not be available to the user.</div><div><br></div><div><br></div>'});             
 
         mySetting = await Setting.create({
-          type: "legal",
-          key: "legalUserData.title",
+          type: "content",
+          key: "contentUserData.title",
           value: null,
           isAdmin: true
         });
@@ -661,8 +658,8 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Condiciones generales de utilizacion de datos personnales"});             
 
         mySetting = await Setting.create({
-          type: "legal",
-          key: "legalSales",
+          type: "content",
+          key: "contentSales",
           value: null,
         });
         await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>C'est un test ventes</h1><p>pour voir ce qui ce passe</p>"});  
@@ -670,8 +667,8 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Esto es un test ventas</h1><p>para ver que passa</p>"});             
 
         mySetting = await Setting.create({
-          type: "legal",
-          key: "legalSales.title",
+          type: "content",
+          key: "contentSales.title",
           value: null,
           isAdmin: true
         });
@@ -700,7 +697,7 @@ export class Setting extends Model<Setting> {
 
         mySetting = await Setting.create({
           type: "content",
-          key: "contentContact",
+          key: "contentContactHeader",
           value: null,
         });
         await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>Contactez-nous</h1><p>pour voir ce qui ce passe</p>"});  
@@ -709,14 +706,112 @@ export class Setting extends Model<Setting> {
 
         mySetting = await Setting.create({
           type: "content",
-          key: "contentContact.title",
+          key: "contentContactHeader.title",
           value: null,
           isAdmin: true
         });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Texte section contact"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Contact text"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Texto de seccion contacto"});  
-/*
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Entete section contact"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Contact header"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Cabecera de seccion contacto"});  
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactFooter",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>Pied de page</h1><p>pour voir ce qui ce passe</p>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>Footer</h1><p>to see what happens</p>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Pie de pagina</h1><p>para ver que passa</p>"});             
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactFooter.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Pied de page section contact"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Contact footer"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Texto de pie de pagina de contacto"});  
+
+
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactPhone",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>Appllez-nous</h1><p>pour voir ce qui ce passe</p>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>Call us</h1><p>to see what happens</p>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Llamanos</h1><p>para ver que passa</p>"});             
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactPhone.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Contact telephone"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Contact phone"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Contacto por telefono"});  
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactTime",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>Nos horaires</h1><p>Du lundi au vendredi</p><p>De 9h à 12h et de 14h à 18h</p><p>Mercredi apres-midi fermé</p>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>Call us</h1><p>to see what happens</p>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Llamanos</h1><p>para ver que passa</p>"});             
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactTime.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Contact horaires"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Contact timetable"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Contacto horarios"});  
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactForm",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>Écrivez-nous</h1><p>On vous répond dans la journee</p>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>Write us</h1><p>to see what happens</p>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Escribenos</h1><p>para ver que passa</p>"});             
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactForm.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Contact formulaire"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Contact form"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Contacto formulario"});  
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactAddress",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>Notre addresse</h1><p>Kubiiks SAS</p><p>6, rue Roger Avon</p><p>06610 La Gaude</p><p>France</p><h2>Ou nous trouver ?</h2>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>Write us</h1><p>to see what happens</p>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>Escribenos</h1><p>para ver que passa</p>"});             
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentContactAddress.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Contact addresse"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Contact address"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Contacto direccion"});  
+
+  /*
     matInputAppearance: "fill",   //Mat input appearance "outline", "default", "fill"...
     matInputHasLabel: true,
     matInputHasHint: true,*/ 

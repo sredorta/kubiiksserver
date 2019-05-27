@@ -34,13 +34,8 @@ export class SettingController {
         });
     }
 
-    /**Get all shared settings with the current language translation including label,hint and placeholder additionally*/
+    /**Get all shared settings with all translations*/
     static getAllFull = async (req: Request, res: Response, next:NextFunction) => {
-        /*try {
-            res.json(await Setting.scope("full").findAll());
-        } catch (error) {
-            next(new HttpException(500, error.message, error.errors));
-        }*/
         Setting.scope("full").findAll().then((settings)=> {
             let result : any[] = [];
             for (let setting of settings) {
@@ -51,6 +46,27 @@ export class SettingController {
             next(new HttpException(500, error.message, error.errors));
         });
     }
+
+    /**Get one setting with all translations*/
+    static getFieldFull = async (req: Request, res: Response, next:NextFunction) => {
+        let query :any =  {};
+        query['key'] = req.body.key;
+        Setting.scope("full").findOne({where:query}).then((setting)=> {
+            if (setting)
+                setting.sanitize(res.locals.language,"full");        
+            res.json(setting);
+        }).catch( (error) => {
+            next(new HttpException(500, error.message, error.errors));
+        });
+    }
+    /**Get one full field checks */
+    static getFieldFullChecks() {
+        let myValidationArray = [];
+        myValidationArray.push(body('key').exists().withMessage('exists').custom(CustomValidators.dBExists(Setting,"key")));
+        myValidationArray.push(Middleware.validate());
+        return myValidationArray;
+    }
+
 
     /**Update value with translations if required, we expect object with id,default, fr,en... */
     static update = async (req: Request, res: Response, next:NextFunction) => {
@@ -68,8 +84,8 @@ export class SettingController {
                 myTrans.value = trans.value;
                 await myTrans.save();
             }
-
-            res.json(mySetting.sanitize(res.locals.language,"full")); 
+            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.authEmailValidate("test")}});
+            //res.json(mySetting.sanitize(res.locals.language,"full")); 
         } catch(error) {
             next(new HttpException(500, error.message, error.errors));    
         }
