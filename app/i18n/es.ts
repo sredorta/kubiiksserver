@@ -37,6 +37,8 @@ export const messages = {
 
     apiRouteNotFound: 'El servidor no encontró la petición',
 
+    messageSent: 'Su mensaje a sido enviado',
+
 
     title: 'Implementation simple de i18n avec TypeScript',
     greeting: (name = 'John Doe') => `Bonjour, ${name}.`,

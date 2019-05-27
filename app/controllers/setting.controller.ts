@@ -84,8 +84,8 @@ export class SettingController {
                 myTrans.value = trans.value;
                 await myTrans.save();
             }
-            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.authEmailValidate("test")}});
-            //res.json(mySetting.sanitize(res.locals.language,"full")); 
+            //Return result with message so that we can show in the ui saved action
+            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.authEmailValidate("test")}}); 
         } catch(error) {
             next(new HttpException(500, error.message, error.errors));    
         }

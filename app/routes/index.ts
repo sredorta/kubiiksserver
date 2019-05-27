@@ -21,6 +21,7 @@ import {User} from '../models/user';
 import {Helper} from '../classes/Helper';
 import { Product } from '../models/product';
 import {check, validationResult,body} from 'express-validator/check';
+import { ContactController } from '../controllers/contact.controller';
 
 
 
@@ -162,6 +163,15 @@ export class Routes {
        .post(Middleware.unregistered(),AuthController.resetPasswordByMobileChecks(), AuthController.resetPasswordByMobile);  
 
     
+    /////////////////////////////////////////////////////////////////
+    // CONTACT CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
+    /** Send email from contact form*/
+    app.route('/api/contact/email')
+      .post(ContactController.sendEmailChecks(), ContactController.sendEmail);  
+  
+
+
     /////////////////////////////////////////////////////////////////
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
