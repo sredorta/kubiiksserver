@@ -167,22 +167,76 @@ export class Middleware {
 
 
     /** Checks that the registered user is an administrator if not errors */     
-    public static admin() {
+    public static hasAdminRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
-                let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
+                let myUser = await User.scope("withRoles").findByPk(req.user.id);
                 if (myUser) {
-                    if (await myUser.hasRole("admin"))
+                    if (myUser.hasRole("admin"))
                         next();
                     else
-                        next(new HttpException(403, messages.authTokenInvalidAdmin, null));
+                        next(new HttpException(403, messages.authTokenInvalidRole('admin'), null));
                 } else
-                    next(new HttpException(403, messages.authTokenInvalidAdmin, null));
+                    next(new HttpException(403, messages.authTokenInvalidRole('admin'), null));
             } catch(error) {
-                next(new HttpException(403, messages.authTokenInvalidAdmin, null));
+                next(new HttpException(403, messages.authTokenInvalidRole('admin'), null));
             }
         }
     }
+
+    /** Checks that the registered user has content role or is an administrator if not errors */     
+    public static hasContentRights() {
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            try {
+                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                if (myUser) {
+                    if (await myUser.hasRole("content") )
+                        next();
+                    else
+                        next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+                } else
+                    next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+            } catch(error) {
+                next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+            }
+        }
+    }    
+
+    /** Checks that the registered user has content role or is an administrator if not errors */     
+    public static hasBlogRights() {
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            try {
+                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                if (myUser) {
+                    if (await myUser.hasRole("blog") )
+                        next();
+                    else
+                        next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+                } else
+                    next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+            } catch(error) {
+                next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+            }
+        }
+    }       
+
+    /** Checks that the registered user has 'users role or is an administrator if not errors */     
+    public static hasUsersRights() {
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            try {
+                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                if (myUser) {
+                    if (await myUser.hasRole("users") )
+                        next();
+                    else
+                        next(new HttpException(403, messages.authTokenInvalidRole('users'), null));
+                } else
+                    next(new HttpException(403, messages.authTokenInvalidRole('users'), null));
+            } catch(error) {
+                next(new HttpException(403, messages.authTokenInvalidRole('users'), null));
+            }
+        }
+    }    
 
     public static catchFacebookResponse() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {

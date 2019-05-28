@@ -23,7 +23,7 @@ export const messages = {
     //auth
     authTokenMissing: 'Authentification necessaire pour acceder',
     authTokenInvalid: "Votre session n'est pas valide, connectez-vous a nouveau",
-    authTokenInvalidAdmin: "Droit d'administrateur requis pour cette operation",
+    authTokenInvalidRole: (name = 'field') => `Le droit '${name}' est requis pour cette operation`,
     authInvalidCredentials: 'Credentiels invalides',
     authTooManyTrials:  'Trop d\'essais invalides, essaye a nouveau dans quelques minutes',
     authAlreadyLoggedIn:  'Utilisateur déjà connecté',

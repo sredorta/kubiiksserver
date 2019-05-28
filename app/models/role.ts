@@ -45,8 +45,10 @@ export class Role extends Model<Role> {
         async function _seed() {
             try {
               await Role.create({name:"admin"});
-              await Role.create({name:"chat"});
+              await Role.create({name:"content"});
               await Role.create({name:"blog"});
+              await Role.create({name:"users"});
+              await Role.create({name:"chat"});
 
             } catch(err) {
                 console.log("ERROR: Could not seed USERS !!!")

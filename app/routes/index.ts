@@ -61,7 +61,7 @@ export class Routes {
 
     //ACCESS CONTROL:
     // use Middleware.registered() for actions required access standard or admin
-    // use Middleware.registered() + Middleware.admin() for actions requiring admin rights
+    // use Middleware.registered() + Middleware.hasAdminRights() for actions requiring admin rights
 
 
     //NAMING CONVENTIONS ENDPOINTS
@@ -84,16 +84,24 @@ export class Routes {
 
     /**Gets all setting value with all translations */  
     app.route('/api/settings/full')
-      .get(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.getAllFull);
+      .get(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.getAllFull);
 
     /**Gets one setting value with all translations */  
     app.route('/api/settings/full/field')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
 
 
     /**Saves value for the setting with translations if required */  
     app.route('/api/settings/update')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),SettingController.updateChecks(),SettingController.update);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.updateChecks(),SettingController.update);
+
+    /**Saves value for the setting with translations if required for content type settings */  
+    app.route('/api/settings/update/content')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.updateChecks(),SettingController.update);
+
+    /**Saves value for the setting with translations if required */  
+    app.route('/api/settings/update/blog')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),SettingController.updateChecks(),SettingController.update);
 
 
 /*    app.route('/api/settings/get/key')
@@ -181,40 +189,40 @@ export class Routes {
     // USER CONTROLLER PART
     ////////////////////////////////////////////////////////////////
 
-    /**Get all user details. Admin required */
+    /**Get all user details. Admin or 'users' required */
     app.route("/api/users/all")
-        .get(passport.authenticate('jwt',{session: false}),Middleware.admin(),UserController.getAll);
+        .get(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),UserController.getAll);
 
-    /**Get user details by id. Admin required */
+    /**Get user details by id. Admin or 'users' required */
     app.route('/api/users/get/id')
-        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),UserController.getUserByIdChecks(),UserController.getOneById);
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),UserController.getUserByIdChecks(),UserController.getOneById);
 
-    /**Get all available roles. Admin required */
+    /**Get all available roles. Admin or 'users' required */
     app.route("/api/roles/all")
-        .get(passport.authenticate('jwt',{session: false}),Middleware.admin(),RoleController.getAll);        
+        .get(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),RoleController.getAll);        
 
     /** Attaches a role to a specific user. Admin required */   
     app.route('/api/roles/attach')
-        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),RoleController.attachChecks(),RoleController.attach)
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),RoleController.attachChecks(),RoleController.attach)
 
     /** Detaches a role from specific user. Admin required */    
     app.route('/api/roles/detach')
-        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),RoleController.detachChecks(),RoleController.detach)   
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),RoleController.detachChecks(),RoleController.detach)   
         
     /** Detaches a role from specific user. Admin required */    
     app.route('/api/users/delete')
-        .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),UserController.deleteChecks(),UserController.delete)           
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),UserController.deleteChecks(),UserController.delete)           
 
     /////////////////////////////////////////////////////////////////
     // HANDLE GALLERY
     ////////////////////////////////////////////////////////////////  
     /**Uploads to content folder */ 
     app.route('/api/upload/editor/content')
-      .post(uploads.content.single('file'), GalleryController.uploadImageToContent);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.content.single('file'), GalleryController.uploadImageToContent);
 
     /**Uploads image to blog folder */
     app.route('/api/upload/editor/blog')
-      .post(uploads.content.single('file'), GalleryController.uploadImageToBlog);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.content.single('file'), GalleryController.uploadImageToBlog);
       
 
     /////////////////////////////////////////////////////////////////

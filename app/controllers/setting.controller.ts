@@ -16,13 +16,8 @@ import { SettingTranslation } from '../models/setting_translation';
 
 export class SettingController {
 
-    /**Get all shared settings with the current language translation*/
+    /**Get all settings with the current language translation*/
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
-        /*try {
-          res.json(await Setting.findAll());
-        } catch (error) {
-            next(new HttpException(500, error.message, error.errors));
-        }*/
         Setting.findAll().then((settings)=> {
             let result : any[] = [];
             for (let setting of settings) {
@@ -104,6 +99,88 @@ export class SettingController {
         myValidationArray.push(Middleware.validate());
         return myValidationArray;
     }
+
+
+    /**Update content type setting. Requires 'content' rights */
+    static updateContent = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let mySetting = await Setting.scope("full").findByPk(req.body.id);
+            if (!mySetting) throw new Error("Setting not found");
+            if (mySetting) {
+                if (mySetting.type != "content") {
+                    throw new Error(messages.authTokenInvalidRole('admin'));
+                }
+                mySetting.value = req.body.value;
+                mySetting = await mySetting.save();
+            }
+            //Update now the Translations if any
+            for (let trans of req.body.translations) {
+                let myTrans = await mySetting.translations.find(obj => obj.id == trans.id);
+                if (!myTrans) throw new Error("Translation not found");
+                myTrans.value = trans.value;
+                await myTrans.save();
+            }
+            //Return result with message so that we can show in the ui saved action
+            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.saved}}); 
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));    
+        }
+
+    }
+   /**UpdateContent checks */
+    static updateContentChecks() {
+        let myValidationArray = [];
+        myValidationArray.push(body('id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,"id")));
+        myValidationArray.push(body('value').exists().withMessage('exists'));
+        myValidationArray.push(body('translations').exists().withMessage('exists').isArray());
+        myValidationArray.push(body('translations.*.id').isNumeric().custom(CustomValidators.dBExists(SettingTranslation,"id")));
+        myValidationArray.push(body('translations.*.value').exists().withMessage('exists'));
+        myValidationArray.push(Middleware.validate());
+        return myValidationArray;
+    }
+
+    /**Update blog type setting. Requires 'blog' rights */
+    static updateBlog = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let mySetting = await Setting.scope("full").findByPk(req.body.id);
+            if (!mySetting) throw new Error("Setting not found");
+            if (mySetting) {
+                if (mySetting.type != "blog") {
+                    throw new Error(messages.authTokenInvalidRole('admin'));
+                }
+                mySetting.value = req.body.value;
+                mySetting = await mySetting.save();
+            }
+            //Update now the Translations if any
+            for (let trans of req.body.translations) {
+                let myTrans = await mySetting.translations.find(obj => obj.id == trans.id);
+                if (!myTrans) throw new Error("Translation not found");
+                myTrans.value = trans.value;
+                await myTrans.save();
+            }
+            //Return result with message so that we can show in the ui saved action
+            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.saved}}); 
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));    
+        }
+
+    }
+    //We expect following format
+    //  {id:<SettingId>, value:<SettingValue>, translations:[{id:<SettingTranslationId>,value:<SettingTranslationValue},...]}
+    /**Update checks */
+    static updateBlogChecks() {
+        let myValidationArray = [];
+        myValidationArray.push(body('id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,"id")));
+        myValidationArray.push(body('value').exists().withMessage('exists'));
+        myValidationArray.push(body('translations').exists().withMessage('exists').isArray());
+        myValidationArray.push(body('translations.*.id').isNumeric().custom(CustomValidators.dBExists(SettingTranslation,"id")));
+        myValidationArray.push(body('translations.*.value').exists().withMessage('exists'));
+        myValidationArray.push(Middleware.validate());
+        return myValidationArray;
+    }
+
+
+
 
     /**Get setting by key */
 /*    static getByKey = async (req: Request, res: Response, next:NextFunction) => {

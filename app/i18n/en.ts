@@ -24,7 +24,7 @@ export const messages = {
     //auth
     authTokenMissing: 'Authentification is required and not provided',
     authTokenInvalid: 'Your session is not valid anymore, log in again',
-    authTokenInvalidAdmin: 'Administrator rights are required',
+    authTokenInvalidRole: (name = 'field') => `'${name}' rights are required`,
     authInvalidCredentials: 'Invalid credentials',
     authTooManyTrials:  'Too many failed trials, please try again in few minutes',
     authAlreadyLoggedIn:  'User already logged in',
