@@ -38,6 +38,7 @@ export const messages = {
     apiRouteNotFound: "Le serveur n'a pas trouvé la requete demandé",
 
     messageSent: 'Votre message à bien été envoyé',
+    saved : 'Modifications enregistrées correctement',
 
 
     title: 'Implementation simple de i18n avec TypeScript',

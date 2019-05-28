@@ -13,9 +13,14 @@ export class GalleryController {
 
     constructor() {}
 
-    /**Uploads image and returns imageUrl for angular-editor*/
-    static uploadEditor = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({imageUrl: "https://localhost:3000/public/" + req.file.filename});  
+    /**Uploads image to content folder and returns imageUrl for angular-editor*/
+    static uploadImageToContent = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: "https://localhost:3000/public/images/content/" + req.file.filename});  
+    }
+
+    /**Uploads image to blog folder and returns imageUrl for angular-editor*/
+    static uploadImageToBlog = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: "https://localhost:3000/public/images/content/" + req.file.filename});  
     }
 
     static test = async (req: Request, res: Response, next:NextFunction) => {

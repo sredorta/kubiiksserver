@@ -207,19 +207,15 @@ export class Routes {
 
     /////////////////////////////////////////////////////////////////
     // HANDLE GALLERY
-    ////////////////////////////////////////////////////////////////   
-    app.route('/api/upload/editor')
-      .post(uploads.single('file'), GalleryController.uploadEditor);
-      //.post(GalleryController.uploadEditor);
+    ////////////////////////////////////////////////////////////////  
+    /**Uploads to content folder */ 
+    app.route('/api/upload/editor/content')
+      .post(uploads.content.single('file'), GalleryController.uploadImageToContent);
 
-    app.route('/api/upload/editor')
-      .get(GalleryController.uploadEditor); 
+    /**Uploads image to blog folder */
+    app.route('/api/upload/editor/blog')
+      .post(uploads.content.single('file'), GalleryController.uploadImageToBlog);
       
-      
-    app.route('/gallery/editor')
-        .post(GalleryController.test);
-    app.route('/gallery/editor')
-        .get(GalleryController.test);        
 
     /////////////////////////////////////////////////////////////////
     // HANDLE NON EXISTING ROUTES
