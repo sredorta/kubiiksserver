@@ -1,5 +1,6 @@
 import express from 'express';
 import {Response,Request,NextFunction} from 'express';
+import * as multer from 'multer';
 //i18n part
 //import { messages as en } from '../i18n/en';
 import { messages as en} from '../i18n/en';
@@ -34,7 +35,7 @@ export class Middleware {
             res.header("Access-Control-Allow-Origin", "*");
 
             res.header("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE,UPDATE");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization");
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-client-key, x-client-token, x-client-secret, Authorization, enctype");
             next();
         }
     }
@@ -189,5 +190,19 @@ export class Middleware {
             next();
         }
     }
+
+    /**Multer for file uploads */
+/*    public static multer() {
+        const storage = multer.diskStorage({
+            destination: function(req, file, cb) {
+              cb(null, "uploads/");
+            },
+            filename: function(req, file, cb) {
+              cb(null, file.originalname);
+            }
+          });
+          
+          const uploads = multer({ storage: storage });
+    }*/
 
 }

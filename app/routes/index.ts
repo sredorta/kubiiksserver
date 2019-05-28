@@ -5,11 +5,15 @@ import {UserController} from '../controllers/user.controller';
 import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
 import {RoleController} from '../controllers/role.controller';
+import { ContactController } from '../controllers/contact.controller';
+import { GalleryController } from '../controllers/gallery.controller';
 import { messages } from "../middleware/common";
 import {Middleware} from '../middleware/common';
 import {HttpException} from  '../classes/HttpException';
 import https from 'https';
 import passport from "passport";
+import {join} from 'path';
+
 import jwt from "jsonwebtoken";
 import {AppConfig} from '../utils/Config';
 
@@ -21,7 +25,8 @@ import {User} from '../models/user';
 import {Helper} from '../classes/Helper';
 import { Product } from '../models/product';
 import {check, validationResult,body} from 'express-validator/check';
-import { ContactController } from '../controllers/contact.controller';
+import uploads from '../utils/multer';
+
 
 
 
@@ -201,16 +206,33 @@ export class Routes {
         .post(passport.authenticate('jwt',{session: false}),Middleware.admin(),UserController.deleteChecks(),UserController.delete)           
 
     /////////////////////////////////////////////////////////////////
+    // HANDLE GALLERY
+    ////////////////////////////////////////////////////////////////   
+    app.route('/api/upload/editor')
+      .post(uploads.single('file'), GalleryController.uploadEditor);
+      //.post(GalleryController.uploadEditor);
+
+    app.route('/api/upload/editor')
+      .get(GalleryController.uploadEditor); 
+      
+      
+    app.route('/gallery/editor')
+        .post(GalleryController.test);
+    app.route('/gallery/editor')
+        .get(GalleryController.test);        
+
+    /////////////////////////////////////////////////////////////////
     // HANDLE NON EXISTING ROUTES
     ////////////////////////////////////////////////////////////////
-    app.route('*')
+    //This part is disabled as it interferes with public folder !
+    /*app.route('*')
       .get(function(req, res, next){
         next(new HttpException(404, messages.apiRouteNotFound, null));
-        });
+        });*/
     app.route('*')
       .post(function(req, res, next){
           next(new HttpException(404, messages.apiRouteNotFound, null));
-      });        
+      });       
 
     }
 }

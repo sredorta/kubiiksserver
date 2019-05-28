@@ -46,7 +46,6 @@ class App {
         Passport.jwt();
         Passport.facebook();
         Passport.google();
-
     }
 
     //Call here the error Handling middleware

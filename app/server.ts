@@ -1,4 +1,5 @@
 import app from "./app";
+import express from 'express';
 import {Sequelize} from 'sequelize-typescript';
 //import {Sequelize as SequelizeOrig} from 'sequelize';
 import fs from 'fs';
@@ -45,6 +46,11 @@ async function startServer() {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");
         console.error(err.stack);
       });
+
+    //Serve static files   
+    app.use('/public', express.static(__dirname + '/public', { maxAge: '1y' }));
+
+
     console.log('STARTED SERVER ON PORT : ' + AppConfig.api.port);
     //Serve with SSL or not
     if (!AppConfig.api.ssl)
