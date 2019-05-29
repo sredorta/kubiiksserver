@@ -12,6 +12,7 @@ import {UserRole} from './models/user_role';
 import {AppConfig} from './utils/config';
 import {Response,Request,NextFunction} from 'express';
 import { Product } from "./models/product";
+import { Article } from "./models/article";
 
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
@@ -41,6 +42,7 @@ async function startServer() {
     await Setting.seed(); //Seed settings from the config.json for FE sharing
     await Role.seed();
     await User.seed();
+    await Article.seed();
 
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");

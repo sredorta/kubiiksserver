@@ -7,6 +7,8 @@ import {AuthController} from '../controllers/auth.controller';
 import {RoleController} from '../controllers/role.controller';
 import { ContactController } from '../controllers/contact.controller';
 import { GalleryController } from '../controllers/gallery.controller';
+import { ArticleController } from '../controllers/article.controller';
+
 import { messages } from "../middleware/common";
 import {Middleware} from '../middleware/common';
 import {HttpException} from  '../classes/HttpException';
@@ -224,6 +226,24 @@ export class Routes {
     app.route('/api/upload/editor/blog')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.content.single('file'), GalleryController.uploadImageToBlog);
       
+    /////////////////////////////////////////////////////////////////
+    // HANDLE BLOG ARTICLES
+    //////////////////////////////////////////////////////////////// 
+
+    /**Gets all articles */
+    app.route('/api/articles')
+      .get(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.getAll);
+
+    /**Gets all articles of a cathegory */ 
+    app.route('/api/articles/cathegory')
+      .post(ArticleController.getByCathegoryChecks(), ArticleController.getByCathegory);
+
+
+    //TODO: do this !!!  
+    /**Gets article by id with all the translations, you need to see admin or blog to access here*/ 
+    app.route('/api/articles/full')
+      .post(ArticleController.getByCathegoryChecks(), ArticleController.getByCathegory);
+
 
     /////////////////////////////////////////////////////////////////
     // HANDLE NON EXISTING ROUTES

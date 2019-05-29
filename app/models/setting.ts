@@ -2,8 +2,7 @@ import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Defa
 import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/Config';
 import { SettingTranslation } from './setting_translation';
-import { settings } from 'cluster';
-import { isSpreadAssignment } from 'typescript';
+
 
 export const SettingN = 'Not a model';
 export const NSetting = 'Not a model';
@@ -694,6 +693,26 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Texte de connexion"});  
         await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Signup text"});    
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Texto de connexion"});   
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentSignupLogo",
+          value: null,
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"<h1>logo</h1>"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"<h1>logo</h1>"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"<h1>logo</h1>"});             
+
+        mySetting = await Setting.create({
+          type: "content",
+          key: "contentSignupLogo.title",
+          value: null,
+          isAdmin: true
+        });
+        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Logo pour connexion"});  
+        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Signup logo"});    
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Logotypo de connexion"});
+
 
         mySetting = await Setting.create({
           type: "content",
