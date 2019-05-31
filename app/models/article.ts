@@ -30,6 +30,11 @@ export class Article extends Model<Article> {
   @Column(DataTypes.STRING(300))
   image!: string;
 
+  @AllowNull(false)
+  @Default(false)
+  @Column(DataTypes.BOOLEAN)
+  public!: boolean;  
+
   @HasMany(() => ArticleTranslation)
   translations!: ArticleTranslation[];  
 
@@ -99,6 +104,23 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 2 blog",description:"description fr 2 blog",content:"<h1>contenu 1 blog</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 2 blog",description:"description en 2 blog",content:"<h1>content 1 blog</h1>"});    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 2 blog",description:"descripcion es 2 blog",content:"<h1>conteido 1 blog</h1>"});             
+
+        myArticle = await Article.create({
+            cathegory: "content",
+            image:null
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1 content",description:"description fr 1 content",content:"<h1>contenu 1 content</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1 content",description:"description en 1 content",content:"<h1>content 1 content</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1 content",description:"descripcion es 1 content",content:"<h1>conteido 1 content</h1>"});             
+
+        myArticle = await Article.create({
+            cathegory: "content",
+            image:null
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 2 content",description:"description fr 2 content",content:"<h1>contenu 1 content</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 2 content",description:"description en 2 content",content:"<h1>content 1 content</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 2 content",description:"descripcion es 2 content",content:"<h1>conteido 1 content</h1>"});             
+
 
     }
     return _seed();
