@@ -119,18 +119,18 @@ export class Article extends Model<Article> {
             key: "signup-header",
             image:null
         });                    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1 content",description:"description fr 1 content",content:"<h1>contenu 1 content</h1>"});  
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1 content",description:"description en 1 content",content:"<h1>content 1 content</h1>"});    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1 content",description:"descripcion es 1 content",content:"<h1>conteido 1 content</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Se connecter: Entete de s'enregistrer",description:"Entete de la page se connecter. On essaye avec un texte tres long pour voir si tout va bien",content:"<h1>contenu 1 content</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Signup: Signup header",description:"Signup header content",content:"<h1>content 1 content</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Conectarse: Cabecera de conectarse",description:"Contenido de la cabecera de connectarse",content:"<h1>conteido 1 content</h1>"});             
 
         myArticle = await Article.create({
             cathegory: "content",
             key: "signup-side",
             image:null
         });                    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 2 content",description:"description fr 2 content",content:"<h1>contenu 2 cote</h1>"});  
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 2 content",description:"description en 2 content",content:"<h1>content 2 content</h1>"});    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 2 content",description:"descripcion es 2 content",content:"<h1>conteido 2 content</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Se connecter: Contenu lateral",description:"Contenu lateral de la page de connexion. Ce contenu aparait seulement sur ecrans de grande taille et non sur mobiles",content:"<h1>contenu 2 cote</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Signup: Side content",description:"Only appears in large screens",content:"<h1>content 2 content</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Conectarse: Contenido lateral",description:"Solo aparece en pantallas grandes",content:"<h1>conteido 2 content</h1>"});             
 
         //CONTACT
         myArticle = await Article.create({

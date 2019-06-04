@@ -96,11 +96,9 @@ export class ArticleController {
                                 translation.title = data.title;
                             if (data.description)
                                 translation.description = data.description;                                
-                            translation.save();
+                            await translation.save();
                         }
                     }
-                    article.translations = req.body.article.translations;
-                    //let result = await article.save();
                     res.json(await Article.findByPk(req.body.article.id));
                 }
         } catch(error) {
