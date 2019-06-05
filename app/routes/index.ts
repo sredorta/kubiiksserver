@@ -247,6 +247,23 @@ export class Routes {
     app.route('/api/article/full/blog')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.getBlogByIdFullChecks(), ArticleController.getBlogByIdFull);      
 
+    /**Deletes article by id with all the translations, you need to see admin or content to access here*/ 
+    app.route('/api/article/delete/content')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),ArticleController.deleteContentChecks(), ArticleController.deleteContent);
+
+    /**Deletes blog article by id with all the translations, you need to see admin or blog to access here*/ 
+    app.route('/api/article/delete/blog')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.deleteBlogChecks(), ArticleController.deleteBlog);      
+
+    /**Creates article in the cathegory with all the translations, you need to see admin or content to access here*/ 
+    app.route('/api/article/create/content')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),ArticleController.createContentChecks(), ArticleController.createContent);
+
+    /**Creates blog article with all the translations, you need to see admin or blog to access here*/ 
+    app.route('/api/article/create/blog')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.createBlogChecks(), ArticleController.createBlog);      
+
+
     /**Updates content article, you need to see admin or content to access here*/ 
     app.route('/api/article/update/content')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),ArticleController.updateContentChecks(), ArticleController.updateContent);

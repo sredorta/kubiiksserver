@@ -1,6 +1,8 @@
 export const messages = {
     description: "Esto es una api",
     User: 'Usuario',
+    cathegory: "categoria",
+
     validationExists: (name = 'field') => `Falta el parametro '${name}'`,
     validationDBExists: (name = 'field') => `'${name}' no encontrado en la base de datos`,
     validationDBMissing: (name = 'field') => `'${name}' ya existe en la base de datos`,
@@ -34,6 +36,11 @@ export const messages = {
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
     authEmailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
     oauth2MissingField : (name = 'field') => `Error de autentificacion, impossible de recuperar el campo ${name} `,
+
+    articleDelete: 'Articulo eliminado correctamente',
+    articleNewTitle: 'Nuevo articlulo',
+    articleNewDescription: 'Ejemplo de descripcion',
+    articleNewContent:  '<h1>Nuevo articulo</h1>',
 
     apiRouteNotFound: 'El servidor no encontró la petición',
 

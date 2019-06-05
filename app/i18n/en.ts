@@ -3,6 +3,7 @@ export const messages = {
 
     //Validation messages
     User: 'User',
+    cathegory: "cathegory",
     validationExists: (name = 'field') => `Missing parameter '${name}'`,
     validationDBExists: (name = 'field') => `'${name}' not found in the database`,
     validationDBMissing: (name = 'field') => `'${name}' already in the database`,
@@ -34,6 +35,11 @@ export const messages = {
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
     authEmailSentError: 'An error happened when sending the email, please contact the administrator',
     oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
+
+    articleDelete: 'Article was successfully deleted',
+    articleNewTitle: 'New article',
+    articleNewDescription: 'Example of description',
+    articleNewContent:  '<h1>New article</h1>',
 
     apiRouteNotFound: 'The server could not found the requested action',
 
