@@ -10,6 +10,7 @@ import {AppConfig} from '../utils/Config';
 import {messages} from '../middleware/common';
 import { Article } from '../models/article';
 import { ArticleTranslation } from '../models/article_translation';
+import { User } from '../models/user';
 
 
 
@@ -30,45 +31,18 @@ export class ArticleController {
     }
 
     /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static getContentByIdFull = async (req: Request, res: Response, next:NextFunction) => {
+    static getByIdFull = async (req: Request, res: Response, next:NextFunction) => {
         try {
             let result = [];
             let article = await Article.findByPk(req.body.id);
-            if (article)
-                if (article.cathegory=="blog") {
-                    next( new HttpException(400, "Content loading cannot ask for blog article", null))
-                } else {
+            if (article) 
                     res.json(article);
-                }
         } catch(error) {
             next(error);
         }
     }
     /**Parameter validation */
-    static getContentByIdFullChecks() {
-        return [
-            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
-            Middleware.validate()
-        ]
-    }
-
-    /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static getBlogByIdFull = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let result = [];
-            let article = await Article.findByPk(req.body.id);
-            if (article)
-                if (article.cathegory!="blog") {
-                    next( new HttpException(400, "Blog loading cannot ask for content article", null))
-                } else {
-                    res.json(article);
-                }
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static getBlogByIdFullChecks() {
+    static getByIdFullChecks() {
         return [
             body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
             Middleware.validate()
@@ -77,59 +51,49 @@ export class ArticleController {
 
 
     /**Deletes article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static deleteContent = async (req: Request, res: Response, next:NextFunction) => {
+    static delete = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            let result = [];
             let article = await Article.findByPk(req.body.id);
-            if (article)
-                if (article.cathegory=="blog" || article.cathegory=="content") {
-                    next( new HttpException(400, "Content Article deletion cannot ask for blog article", null))
-                } else {
-                    await article.destroy();
-                    res.send({message: {show:true,text:messages.articleDelete}}); 
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
+            if (article && myUser) {
+                if (article.cathegory=="content") {
+                    return next(new HttpException(403, messages.articleContentNotDelete, null));
                 }
+                if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+                }
+                if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+                }
+                await article.destroy();
+                res.send({message: {show:true,text:messages.articleDelete}}); 
+            }
         } catch(error) {
             next(error);
         }
     }
     /**Parameter validation */
-    static deleteContentChecks() {
+    static deleteChecks() {
         return [
             body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
             Middleware.validate()
         ]
-    }
-
-    /**Deletes article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static deleteBlog = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let result = [];
-            let article = await Article.findByPk(req.body.id);
-            if (article)
-                if (article.cathegory!="blog") {
-                    next( new HttpException(400, "Blog article deletion cannot ask for content article", null))
-                } else {
-                    await article.destroy();
-                    res.send({message: {show:true,text:messages.articleDelete}}); 
-                }
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static deleteBlogChecks() {
-        return [
-            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
-            Middleware.validate()
-        ]
-    }
+    }    
 
     /**Creates article content on the given cathegory. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static createContent = async (req: Request, res: Response, next:NextFunction) => {
+    static create = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            if (req.body.cathegory =="blog" || req.body.cathegory =="content") {
-                next( new HttpException(400, "Content Article creation cannot ask for blog article", null))
-            } else {
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
+            if (myUser) {
+                if (req.body.cathegory=="content") {
+                    return next(new HttpException(403, messages.articleContentNotCreate, null));
+                }
+                if (req.body.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+                }
+                if (!(req.body.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+                }
                 let myArticle = await Article.create({
                     cathegory: req.body.cathegory
                 });
@@ -144,61 +108,37 @@ export class ArticleController {
                         });
                     } 
                 }
-                res.json(await Article.findByPk(myArticle.id));
+                res.json(await Article.findByPk(myArticle.id));                
             }
         } catch(error) {
             next(error);
         }
     }
     /**Parameter validation */
-    static createContentChecks() {
+    static createChecks() {
         return [
             body('cathegory').exists().withMessage('exists').not().isEmpty(),
-            body('cathegory').custom(CustomValidators.dBExists(Article,messages.cathegory)),
             Middleware.validate()
         ]
     }
-
-    /**Creates article 'blog' on the given cathegory. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static createBlog = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            if (req.body.cathegory !="blog") {
-                next( new HttpException(400, "Content Article creation cannot ask for blog article", null))
-            } else {
-                res.json(await Article.create());
-            }
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static createBlogChecks() {
-        return [
-            body('cathegory').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'cathegory')),
-            Middleware.validate()
-        ]
-    }
-
-
-
-
-
-    
-
 
     /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static updateContent = async (req: Request, res: Response, next:NextFunction) => {
+    static update = async (req: Request, res: Response, next:NextFunction) => {
         try {
             console.log(req.body);
-            let result = [];
             let article = await Article.findByPk(req.body.article.id);
-            if (article)
-                if (article.cathegory=="blog") {
-                    next( new HttpException(400, "Content loading cannot ask for blog article", null))
-                } else {
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
+            if (article && myUser) {
+                if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+                }
+                if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+                }            
                     //TODO::Update here image if required
                     article.public = req.body.article.public;
-                    article.cathegory = req.body.article.cathegory;
+                    article.backgroundImage = req.body.article.backgroundImage;
+                    //We don't allow cathegory update as it would be able to change to wrong cathegory
                     await article.save();
                     for (let translation of article.translations) {
                         let data : ArticleTranslation = req.body.article.translations.find( (obj:ArticleTranslation) => obj.iso ==  translation.iso);
@@ -219,7 +159,7 @@ export class ArticleController {
         }
     }
     /**Parameter validation */
-    static updateContentChecks() {
+    static updateChecks() {
         return [
             body('article').exists().withMessage('exists'),
             body('article.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
@@ -230,32 +170,4 @@ export class ArticleController {
         ]
     }
 
-
-
-
-
-
-
-
-
-
-
-    static getByCathegory = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let result = [];
-            let articles = await Article.findAll({where: {cathegory: req.body.cathegory}});
-            for (let article of articles) result.push(article.sanitize(res.locals.language, "summary"));
-            res.json(result);
-        } catch(error) {
-            next(error);
-        }
-       
-    }
-    /**Parameter validation */
-    static getByCathegoryChecks() {
-        return [
-            body('cathegory').exists().withMessage('exists').isLength({min:2}).withMessage("minlength"),
-            Middleware.validate()
-        ]
-    }
 }        

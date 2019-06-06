@@ -34,8 +34,13 @@ export class Article extends Model<Article> {
   @Column(DataTypes.STRING(300))
   image!: string;
 
+  @AllowNull(true)
+  @Default("none")
+  @Column(DataTypes.STRING(300))
+  backgroundImage!: string;
+
   @AllowNull(false)
-  @Default(false)
+  @Default(true) //TODO: CHANGE TO FALSE
   @Column(DataTypes.BOOLEAN)
   public!: boolean;  
 

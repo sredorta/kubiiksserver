@@ -36,6 +36,9 @@ export const messages = {
     authEmailSentError: 'An error happened when sending the email, please contact the administrator',
     oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
 
+    articleContentNotCreate: 'Content articles cannot be created',
+    articleContentNotDelete: 'Content articles cannot be deleted',
+
     articleDelete: 'Article was successfully deleted',
     articleNewTitle: 'New article',
     articleNewDescription: 'Example of description',

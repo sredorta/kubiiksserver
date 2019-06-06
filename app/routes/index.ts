@@ -224,7 +224,7 @@ export class Routes {
 
     /**Uploads image to blog folder */
     app.route('/api/upload/editor/blog')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.content.single('file'), GalleryController.uploadImageToBlog);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),uploads.blog.single('file'), GalleryController.uploadImageToBlog);
       
     /////////////////////////////////////////////////////////////////
     // HANDLE BLOG ARTICLES
@@ -234,45 +234,21 @@ export class Routes {
     app.route('/api/articles')
       .get(ArticleController.getAll);
 
-    /**Gets all articles of a cathegory */ 
-    app.route('/api/articles/cathegory')
-      .post(ArticleController.getByCathegoryChecks(), ArticleController.getByCathegory);
-
-
     /**Gets content article by id with all the translations, you need to see admin or content to access here*/ 
-    app.route('/api/article/full/content')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),ArticleController.getContentByIdFullChecks(), ArticleController.getContentByIdFull);
-
-    /**Gets blog article by id with all the translations, you need to see admin or blog to access here*/ 
-    app.route('/api/article/full/blog')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.getBlogByIdFullChecks(), ArticleController.getBlogByIdFull);      
-
-    /**Deletes article by id with all the translations, you need to see admin or content to access here*/ 
-    app.route('/api/article/delete/content')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),ArticleController.deleteContentChecks(), ArticleController.deleteContent);
-
-    /**Deletes blog article by id with all the translations, you need to see admin or blog to access here*/ 
-    app.route('/api/article/delete/blog')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.deleteBlogChecks(), ArticleController.deleteBlog);      
+    app.route('/api/article/full')
+      .post(passport.authenticate('jwt',{session: false}),ArticleController.getByIdFullChecks(), ArticleController.getByIdFull);
+    
+      /**Deletes article by id with all the translations, you need to see admin or content or blog to access here*/ 
+    app.route('/api/article/delete')
+      .post(passport.authenticate('jwt',{session: false}),ArticleController.deleteChecks(), ArticleController.delete);
 
     /**Creates article in the cathegory with all the translations, you need to see admin or content to access here*/ 
-    app.route('/api/article/create/content')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),ArticleController.createContentChecks(), ArticleController.createContent);
-
-    /**Creates blog article with all the translations, you need to see admin or blog to access here*/ 
-    app.route('/api/article/create/blog')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.createBlogChecks(), ArticleController.createBlog);      
-
+    app.route('/api/article/create')
+      .post(passport.authenticate('jwt',{session: false}),ArticleController.createChecks(), ArticleController.create);
 
     /**Updates content article, you need to see admin or content to access here*/ 
-    app.route('/api/article/update/content')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),ArticleController.updateContentChecks(), ArticleController.updateContent);
-
-    /**Updates blog article, you need to see admin or blog to access here*/ 
-    //app.route('/api/article/update/blog')
-    //  .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),ArticleController.getBlogByIdFullChecks(), ArticleController.getBlogByIdFull);      
-
-
+    app.route('/api/article/update')
+      .post(passport.authenticate('jwt',{session: false}),ArticleController.updateChecks(), ArticleController.update);
 
 
 

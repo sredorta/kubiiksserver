@@ -37,6 +37,8 @@ export const messages = {
     authEmailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
     oauth2MissingField : (name = 'field') => `Error de autentificacion, impossible de recuperar el campo ${name} `,
 
+    articleContentNotCreate: "Los articulos de la categoria 'content' no se pueden crear",
+    articleContentNotDelete: "Los articulos de la categoria 'content' no se pueden borrar",
     articleDelete: 'Articulo eliminado correctamente',
     articleNewTitle: 'Nuevo articlulo',
     articleNewDescription: 'Ejemplo de descripcion',

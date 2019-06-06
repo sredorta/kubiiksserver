@@ -67,6 +67,7 @@ import * as dotenv from "dotenv";
             {"key": "profile_mobile", "value":"optional"},            
             {"key": "validation_method", "value":"no_validation"},
             {"key": "login_username", "value":"email"},
-            {"key": "mode", "value":"production"} //Put 'demo' for direct admin access
+            {"key": "mode", "value":"production"}, //Put 'demo' for direct admin access
+            {"key": "article_cathegories", "value":"content,blog,prix,realisations"}, //Article cathegories
         ],
     }

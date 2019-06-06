@@ -37,6 +37,8 @@ export const messages = {
     authEmailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
     oauth2MissingField : (name = 'field') => `Erreur penant l'authentifition, impossible de recuperer le champ ${name} `,
 
+    articleContentNotCreate: "Les articles de la cathegorie 'content' ne peuvent pas être crees",
+    articleContentNotDelete: "Les articles de la cathegorie 'content' ne peuvent pas être efaces",
     articleDelete: 'Article supprimé',
     articleNewTitle: 'Nouveau article',
     articleNewDescription: 'Example de description',
