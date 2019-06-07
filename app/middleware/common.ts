@@ -141,6 +141,26 @@ export class Middleware {
         };
       }
 
+
+    /**Gets logged in user without exiting so that initial data loading can work registered or not */
+    public static getUserFromToken() {
+        return function (req:Request, res:Response, next: NextFunction) {
+            const token = passportJWT.ExtractJwt.fromAuthHeaderWithScheme('Bearer')(req);
+            jwt.verify(token,AppConfig.auth.jwtSecret, (err,decoded) => {
+                if (err) {
+                    req.user = null;
+                    next();
+                } else {
+                    req.user = decoded;
+                    next();
+                }
+            })
+
+
+        }
+    }
+
+
     /**Checks that user has not been already logged in */
     public static unregistered() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {

@@ -28,6 +28,7 @@ import {Helper} from '../classes/Helper';
 import { Product } from '../models/product';
 import {check, validationResult,body} from 'express-validator/check';
 import uploads from '../utils/multer';
+import { InitController } from '../controllers/init.controller';
 
 
 
@@ -73,6 +74,11 @@ export class Routes {
     //  /api/<plural>/create     POST    : add  (returns the new record)
     //  /api/<plural>/delete     DELETE  : remove (by Id)
 
+    /////////////////////////////////////////////////////////////////
+    // INIT CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
+    app.route('/api/initial')
+      .get(Middleware.getUserFromToken(), InitController.get);
  
     /////////////////////////////////////////////////////////////////
     // SETTINGS CONTROLLER PART
