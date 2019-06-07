@@ -15,12 +15,14 @@ export class GalleryController {
 
     /**Uploads image to content folder and returns imageUrl for angular-editor*/
     static uploadImageToContent = async (req: Request, res: Response, next:NextFunction) => {
+        console.log(req.body);
         res.send({imageUrl: "https://localhost:3000/public/images/content/" + req.file.filename});  
     }
 
     /**Uploads image to blog folder and returns imageUrl for angular-editor*/
     static uploadImageToBlog = async (req: Request, res: Response, next:NextFunction) => {
         console.log("We are in blog upload !!");
+        console.log(req.body);
         res.send({imageUrl: "https://localhost:3000/public/images/blog/" + req.file.filename});  
     }
 

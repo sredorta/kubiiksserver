@@ -138,6 +138,7 @@ export class ArticleController {
                     //TODO::Update here image if required
                     article.public = req.body.article.public;
                     article.backgroundImage = req.body.article.backgroundImage;
+                    article.image = req.body.article.image;
                     //We don't allow cathegory update as it would be able to change to wrong cathegory
                     await article.save();
                     for (let translation of article.translations) {
