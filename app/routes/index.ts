@@ -90,30 +90,20 @@ export class Routes {
     app.route('/api/settings/all')
       .get(SettingController.getAll);
 
-    /**Gets all setting value with all translations */  
+    /**Gets all setting value by giving its key with all translations */  
     app.route('/api/settings/full')
-      .get(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.getAllFull);
+      .get(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.getAllFull);
 
-    /**Gets one setting value with all translations */  
+    /**Gets one setting value  by giving its key with all translations */  
     app.route('/api/settings/full/field')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
 
 
     /**Saves value for the setting with translations if required */  
     app.route('/api/settings/update')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.updateChecks(),SettingController.update);
 
-    /**Saves value for the setting with translations if required for content type settings */  
-    app.route('/api/settings/update/content')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.updateChecks(),SettingController.update);
 
-    /**Saves value for the setting with translations if required */  
-    app.route('/api/settings/update/blog')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),SettingController.updateChecks(),SettingController.update);
-
-
-/*    app.route('/api/settings/get/key')
-      .post(SettingController.getByKeyChecks(),SettingController.getByKey);*/
 
     /**Checks that email service is up and running */
     app.route('/api/settings/email')

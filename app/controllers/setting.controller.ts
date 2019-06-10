@@ -13,46 +13,75 @@ import { SettingTranslation } from '../models/setting_translation';
 
 
 
+    /**Gets all articles for all cathegories, admin or blog rights required */
+/*    static getAll = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let result = [];
+            let articles = await Article.findAll({order: [sequelize.literal('id DESC')]});
+            for (let article of articles) result.push(article.sanitize(res.locals.language,"full"));
+            res.json(result);
+        } catch(error) {
+            next(error);
+        }
+    }*/
+
+    /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
+/*    static getByIdFull = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let result = [];
+            let article = await Article.findByPk(req.body.id);
+            if (article) 
+                    res.json(article);
+        } catch(error) {
+            next(error);
+        }
+    }*/
+    /**Parameter validation */
+/*    static getByIdFullChecks() {
+        return [
+            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
+            Middleware.validate()
+        ]
+    }*/
+
 
 export class SettingController {
 
-    /**Get all settings with the current language translation*/
+    /**Get all settings with the current language translation if setting has translations*/
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
-        Setting.findAll().then((settings)=> {
-            let result : any[] = [];
-            for (let setting of settings) {
-                result.push(setting.sanitize(res.locals.language))
-            }   
+        try {
+            let result = [];
+            let settings = await Setting.findAll();
+            for (let setting of settings) result.push(setting.sanitize(res.locals.language));
             res.json(result);
-        }).catch( (error) => {
-            next(new HttpException(500, error.message, error.errors));
-        });
+        } catch(error) {
+            next(error);
+        }
     }
 
     /**Get all shared settings with all translations*/
     static getAllFull = async (req: Request, res: Response, next:NextFunction) => {
-        Setting.scope("full").findAll().then((settings)=> {
-            let result : any[] = [];
-            for (let setting of settings) {
-                result.push(setting.sanitize(res.locals.language,"full"))
-            }          
+        try {
+            let result = [];
+            let settings = await Setting.scope("full").findAll();
+            for (let setting of settings) result.push(setting.sanitize(res.locals.language,"full"));
             res.json(result);
-        }).catch( (error) => {
-            next(new HttpException(500, error.message, error.errors));
-        });
+        } catch(error) {
+            next(error);
+        }        
     }
 
     /**Get one setting with all translations*/
     static getFieldFull = async (req: Request, res: Response, next:NextFunction) => {
         let query :any =  {};
         query['key'] = req.body.key;
-        Setting.scope("full").findOne({where:query}).then((setting)=> {
-            if (setting)
-                setting.sanitize(res.locals.language,"full");        
-            res.json(setting);
-        }).catch( (error) => {
+        try {
+            let setting = await Setting.scope("full").findOne({where:query});
+            if (setting) 
+                res.json(setting);
+        } catch(error) {
             next(new HttpException(500, error.message, error.errors));
-        });
+        }
     }
     /**Get one full field checks */
     static getFieldFullChecks() {
@@ -79,8 +108,10 @@ export class SettingController {
                 myTrans.value = trans.value;
                 await myTrans.save();
             }
-            //Return result with message so that we can show in the ui saved action
-            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.saved}}); 
+            mySetting = await Setting.scope("full").findByPk(req.body.id);
+            if (mySetting) {
+                res.json(mySetting);
+            } 
         } catch(error) {
             next(new HttpException(500, error.message, error.errors));    
         }
@@ -102,7 +133,7 @@ export class SettingController {
 
 
     /**Update content type setting. Requires 'content' rights */
-    static updateContent = async (req: Request, res: Response, next:NextFunction) => {
+ /*   static updateContent = async (req: Request, res: Response, next:NextFunction) => {
         try {
             let mySetting = await Setting.scope("full").findByPk(req.body.id);
             if (!mySetting) throw new Error("Setting not found");
@@ -126,9 +157,9 @@ export class SettingController {
             next(new HttpException(500, error.message, error.errors));    
         }
 
-    }
+    }*/
    /**UpdateContent checks */
-    static updateContentChecks() {
+/*    static updateContentChecks() {
         let myValidationArray = [];
         myValidationArray.push(body('id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,"id")));
         myValidationArray.push(body('value').exists().withMessage('exists'));
@@ -137,10 +168,10 @@ export class SettingController {
         myValidationArray.push(body('translations.*.value').exists().withMessage('exists'));
         myValidationArray.push(Middleware.validate());
         return myValidationArray;
-    }
+    }*/
 
     /**Update blog type setting. Requires 'blog' rights */
-    static updateBlog = async (req: Request, res: Response, next:NextFunction) => {
+/*    static updateBlog = async (req: Request, res: Response, next:NextFunction) => {
         try {
             let mySetting = await Setting.scope("full").findByPk(req.body.id);
             if (!mySetting) throw new Error("Setting not found");
@@ -164,11 +195,11 @@ export class SettingController {
             next(new HttpException(500, error.message, error.errors));    
         }
 
-    }
+    }*/
     //We expect following format
     //  {id:<SettingId>, value:<SettingValue>, translations:[{id:<SettingTranslationId>,value:<SettingTranslationValue},...]}
     /**Update checks */
-    static updateBlogChecks() {
+/*    static updateBlogChecks() {
         let myValidationArray = [];
         myValidationArray.push(body('id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,"id")));
         myValidationArray.push(body('value').exists().withMessage('exists'));
@@ -177,31 +208,6 @@ export class SettingController {
         myValidationArray.push(body('translations.*.value').exists().withMessage('exists'));
         myValidationArray.push(Middleware.validate());
         return myValidationArray;
-    }
-
-
-
-
-    /**Get setting by key */
-/*    static getByKey = async (req: Request, res: Response, next:NextFunction) => {
-        const key = req.body.key;
-        Setting.findOne({
-            where: {
-                "key": key
-            }
-        }).then((result)=> {
-            res.json(result);
-        }).catch( (error) => {
-            next(new HttpException(500, error.message, error.errors));
-        });
-    }   */
-
-    /**getByKey parameter checking */
-/*    public static getByKeyChecks() {
-        return [
-            body('key').exists().withMessage('exists').isString(),
-            Middleware.validate()
-        ]
     }*/
 
     /**Email transporter check */
