@@ -157,6 +157,10 @@ export class SettingController {
         //Generate email html
         res.locals.language = "fr";
         try {
+            //Typically this will come from an article content but in some cases might have been hard coded, like reset password,validation link...
+
+            let content = "<h1>Test of content</h1><p>Try to go to this <a href='test'>nice link</a>";
+
             let myArticle = await Article.findOne({where:{key:"email-header"}});
             if (!myArticle) return next(new HttpException(500, messages.authEmailSentError,null));
             let header = myArticle.sanitize(res.locals.language,"full");
@@ -171,6 +175,10 @@ export class SettingController {
             tmp = await Setting.findOne({where:{key:"companyAddress"}});
             if (!tmp) return next(new HttpException(500, messages.authEmailSentError,null));
             let address = tmp.value.split(";");
+            //Get site address
+            tmp = await Setting.findOne({where:{key:"url"}});
+            if (!tmp) return next(new HttpException(500, messages.authEmailSentError,null));
+            let url = tmp.value;
 
             let icons :any = {};
             let links: any = {};
@@ -197,26 +205,18 @@ export class SettingController {
                         socialLinks[key] = links[key].value;
                     }
             })
-
-
-
-
-            //header = JSON.stringify(header); //Need to stringify to pass to pug
-
-            let myHeader = await Article.getEmailPart("header", res.locals.language);
-            let myFooter = await Article.getEmailPart("footer", res.locals.language);
             
             const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/test";
             let html = pug.renderFile(path.join(__dirname, "../emails/validation."+ res.locals.language + ".pug"), 
                 {title:AppConfig.api.appName,
+                siteUrl:url,
                 header: header,
                 siteAccess: messages.emailSiteAccess,
                 phone:phone,
                 address:address,
                 icons:icons,
                 socialLinks:socialLinks,
-                footer:myFooter,
-                validationLink: link
+                content:content,
             });
             //CSS must be put inline for better support of all browsers
             html =  await InlineCss(html, {extraCss:"",applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});
