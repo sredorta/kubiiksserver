@@ -73,6 +73,49 @@ export class Article extends Model<Article> {
     return result;
   }  
 
+  /**Gets well formatted image for emails */
+  getImage() {
+    if (!this.image) return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
+    else return this.image;
+  }
+
+  /**Gets well formatted bacgkround image for emails */
+  getBackgroundImage() {
+    if (!this.backgroundImage) {
+      if (this.backgroundImage == "none") return "none";
+        return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
+    } else 
+        return this.backgroundImage;
+  }
+
+  /**Gets email header translated content*/
+  public static getEmailPart(part:"header" | "footer",iso:string) {
+    let key = "";
+    if (part =="header") key="email-header";
+    else key="email-footer";
+
+    let myPromise : Promise<string>;
+    myPromise =  new Promise<string>((resolve,reject) => {
+      async function _getContent() {
+        try {
+          let myHeader = await Article.findOne({where:{key: key}});
+          if (!myHeader) reject("Email header generation error");
+          else {
+            let myHeaderTranslated = myHeader.translations.find(obj => obj.iso == iso);
+            if (!myHeaderTranslated) reject("Email header generation error");
+            else {
+              resolve(myHeaderTranslated.content);
+            }
+          }
+        } catch(error) {
+           reject("Email header generation error");
+        }
+      }
+      _getContent();
+    });
+    return myPromise;
+  }
+
   /**Seeds the table initially */
   public static seed() {
     async function _seed() {
@@ -158,6 +201,28 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Se connecter: Contenu lateral",description:"Contenu lateral de la page de connexion. Ce contenu aparait seulement sur ecrans de grande taille et non sur mobiles",content:"<h1>contenu 2 cote</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Signup: Side content",description:"Only appears in large screens",content:"<h1>content 2 content</h1>"});    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Conectarse: Contenido lateral",description:"Solo aparece en pantallas grandes",content:"<h1>conteido 2 content</h1>"});             
+
+
+        //EMAIL FORMATTING
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "email-header",
+          image: null,
+          public:true
+        });
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Kubiiks", description:"Solutione tout", content:'<h1>essay email</h1>'});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Email: Header for emails", description:"Headers for emails sent to your customers", content:'<h1>test email</h1>'});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Correo electronico: Cabecera", description:"Cabecera de los correos electronicos", content:'<h1>prueva email</h1>'});             
+
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "email-footer",
+          image: null,
+          public:true
+        });
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Email: Pie de page des emails", description:"Pied de page des emails envoyes chez vos clients", content:'<h1>pied de page</h1>'});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Email: Footer for emails", description:"Footer for emails sent to your customers", content:'<h1>footer</h1>'});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Correo electronico: Pie de pagina", description:"Pie de pagina de los correos electronicos", content:'<h1>pie de pagina</h1>'});             
 
         //CONTACT
         myArticle = await Article.create({
@@ -251,6 +316,8 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Prix: Entete de page", description:"Entete de la page des prix", content:'prix...'});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Prices: Header", description:"Headers of the price list page", content:'prices...'});    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Cabecera", description:"Cabecera de la pagina de precios", content:'precios...'});             
+
+
 
     }
     return _seed();

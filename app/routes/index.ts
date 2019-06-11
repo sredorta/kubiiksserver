@@ -103,11 +103,17 @@ export class Routes {
     app.route('/api/settings/update')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.updateChecks(),SettingController.update);
 
-
-
     /**Checks that email service is up and running */
     app.route('/api/settings/email')
       .get(SettingController.emailCheck);
+
+    /**Sends email to current loggedin user for testing purposes */
+    app.route('/api/settings/email/send')
+    .get(passport.authenticate('jwt',{session: false}),SettingController.emailSend);  
+
+    app.route('/api/show')
+    .get(SettingController.emailShow);  
+
 
     /////////////////////////////////////////////////////////////////
     // AUTH CONTROLLER PART

@@ -10,40 +10,12 @@ import {body} from 'express-validator/check';
 import { CustomValidators } from '../classes/CustomValidators';
 import { User } from '../models/user';
 import { SettingTranslation } from '../models/setting_translation';
-
-
-
-    /**Gets all articles for all cathegories, admin or blog rights required */
-/*    static getAll = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let result = [];
-            let articles = await Article.findAll({order: [sequelize.literal('id DESC')]});
-            for (let article of articles) result.push(article.sanitize(res.locals.language,"full"));
-            res.json(result);
-        } catch(error) {
-            next(error);
-        }
-    }*/
-
-    /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-/*    static getByIdFull = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let result = [];
-            let article = await Article.findByPk(req.body.id);
-            if (article) 
-                    res.json(article);
-        } catch(error) {
-            next(error);
-        }
-    }*/
-    /**Parameter validation */
-/*    static getByIdFullChecks() {
-        return [
-            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
-            Middleware.validate()
-        ]
-    }*/
-
+import pug from 'pug';
+import path from 'path';
+import { Article } from '../models/article';
+import htmlToText from 'html-to-text';
+import InlineCss from 'inline-css';
+import { IsPhoneNumber } from 'class-validator';
 
 export class SettingController {
 
@@ -131,85 +103,6 @@ export class SettingController {
         return myValidationArray;
     }
 
-
-    /**Update content type setting. Requires 'content' rights */
- /*   static updateContent = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let mySetting = await Setting.scope("full").findByPk(req.body.id);
-            if (!mySetting) throw new Error("Setting not found");
-            if (mySetting) {
-                if (mySetting.type != "content") {
-                    throw new Error(messages.authTokenInvalidRole('admin'));
-                }
-                mySetting.value = req.body.value;
-                mySetting = await mySetting.save();
-            }
-            //Update now the Translations if any
-            for (let trans of req.body.translations) {
-                let myTrans = await mySetting.translations.find(obj => obj.id == trans.id);
-                if (!myTrans) throw new Error("Translation not found");
-                myTrans.value = trans.value;
-                await myTrans.save();
-            }
-            //Return result with message so that we can show in the ui saved action
-            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.saved}}); 
-        } catch(error) {
-            next(new HttpException(500, error.message, error.errors));    
-        }
-
-    }*/
-   /**UpdateContent checks */
-/*    static updateContentChecks() {
-        let myValidationArray = [];
-        myValidationArray.push(body('id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,"id")));
-        myValidationArray.push(body('value').exists().withMessage('exists'));
-        myValidationArray.push(body('translations').exists().withMessage('exists').isArray());
-        myValidationArray.push(body('translations.*.id').isNumeric().custom(CustomValidators.dBExists(SettingTranslation,"id")));
-        myValidationArray.push(body('translations.*.value').exists().withMessage('exists'));
-        myValidationArray.push(Middleware.validate());
-        return myValidationArray;
-    }*/
-
-    /**Update blog type setting. Requires 'blog' rights */
-/*    static updateBlog = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let mySetting = await Setting.scope("full").findByPk(req.body.id);
-            if (!mySetting) throw new Error("Setting not found");
-            if (mySetting) {
-                if (mySetting.type != "blog") {
-                    throw new Error(messages.authTokenInvalidRole('admin'));
-                }
-                mySetting.value = req.body.value;
-                mySetting = await mySetting.save();
-            }
-            //Update now the Translations if any
-            for (let trans of req.body.translations) {
-                let myTrans = await mySetting.translations.find(obj => obj.id == trans.id);
-                if (!myTrans) throw new Error("Translation not found");
-                myTrans.value = trans.value;
-                await myTrans.save();
-            }
-            //Return result with message so that we can show in the ui saved action
-            res.json({setting:mySetting.sanitize(res.locals.language,"full"), message: {show:true, text:messages.saved}}); 
-        } catch(error) {
-            next(new HttpException(500, error.message, error.errors));    
-        }
-
-    }*/
-    //We expect following format
-    //  {id:<SettingId>, value:<SettingValue>, translations:[{id:<SettingTranslationId>,value:<SettingTranslationValue},...]}
-    /**Update checks */
-/*    static updateBlogChecks() {
-        let myValidationArray = [];
-        myValidationArray.push(body('id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,"id")));
-        myValidationArray.push(body('value').exists().withMessage('exists'));
-        myValidationArray.push(body('translations').exists().withMessage('exists').isArray());
-        myValidationArray.push(body('translations.*.id').isNumeric().custom(CustomValidators.dBExists(SettingTranslation,"id")));
-        myValidationArray.push(body('translations.*.value').exists().withMessage('exists'));
-        myValidationArray.push(Middleware.validate());
-        return myValidationArray;
-    }*/
-
     /**Email transporter check */
     public static emailCheck = async (req: Request, res: Response, next:NextFunction) => {
         const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
@@ -229,6 +122,109 @@ export class SettingController {
          });
     }
 
+    /**Email testing for now */
+    static emailSend = async (req: Request, res: Response, next:NextFunction) => {
+        //Generate email html
+        try {
+            let myHeader = await Article.getEmailPart("header", res.locals.language);
+            let myFooter = await Article.getEmailPart("footer", res.locals.language);
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);
+            if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null))
+            const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/test";
+            let html = pug.renderFile(path.join(__dirname, "../emails/validation."+ res.locals.language + ".pug"), {title:AppConfig.api.appName,header: myHeader,footer:myFooter,validationLink: link});
+            //CSS must be put inline for better support of all browsers
+            html =  await InlineCss(html, {extraCss:"",applyStyleTags:true,applyLinkTags:true,removeStyleTags:true,removeLinkTags:true,url:"filePath"});
+            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+            let myEmail = {
+                            from: AppConfig.emailSmtp.sender,
+                            to: myUser.email,
+                            subject: messages.authEmailValidateSubject(AppConfig.api.appName),
+                            text: htmlToText.fromString(html),
+                            html: html
+            }
+            console.log(html);
+            console.log("text:");
+            console.log(htmlToText.fromString(html));
+            await transporter.sendMail(myEmail);
+            res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
+
+        } catch (error) {
+            next(new HttpException(500, messages.authEmailSentError,null));
+
+        }
+    }
+    static emailShow = async (req: Request, res: Response, next:NextFunction) => {
+        //Generate email html
+        res.locals.language = "fr";
+        try {
+            let myArticle = await Article.findOne({where:{key:"email-header"}});
+            if (!myArticle) return next(new HttpException(500, messages.authEmailSentError,null));
+            let header = myArticle.sanitize(res.locals.language,"full");
+            header.image = myArticle.getImage();
+            header.backgroundImage = myArticle.getBackgroundImage();
+
+            //Get phone from settings
+            let tmp = await Setting.findOne({where:{key:"companyPhone"}});
+            if (!tmp) return next(new HttpException(500, messages.authEmailSentError,null));
+            let phone = tmp.value;
+            //Get address from settings
+            tmp = await Setting.findOne({where:{key:"companyAddress"}});
+            if (!tmp) return next(new HttpException(500, messages.authEmailSentError,null));
+            let address = tmp.value.split(";");
+
+            let icons :any = {};
+            let links: any = {};
+            icons["phone"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/phone.png";
+            icons["address"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/address.png";
+            icons["facebook"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/facebook.png";
+            icons["instagram"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/instagram.png";
+            icons["twitter"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/twitter.png";
+            icons["linkedin"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/linkedin.png";
+            icons["youtube"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/youtube.png";
+            icons["google"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/google.png";
+            links["facebook"] = await Setting.findOne({where:{key:"linkFacebook"}});
+            links["instagram"] = await Setting.findOne({where:{key:"linkInstagram"}});
+            links["twitter"] = await Setting.findOne({where:{key:"linkTwitter"}});
+            links["linkedin"] = await Setting.findOne({where:{key:"linkLinkedin"}});
+            links["youtube"] = await Setting.findOne({where:{key:"linkYoutube"}});
+            links["google"] = await Setting.findOne({where:{key:"linkGoogleplus"}});
+            let myValue : string = "";
+            let socialLinks : any = {};
+            Object.keys(links).forEach(key => {
+                if (links[key].value)
+                    myValue = links[key].value;
+                    if (myValue != "") {
+                        socialLinks[key] = links[key].value;
+                    }
+            })
 
 
+
+
+            //header = JSON.stringify(header); //Need to stringify to pass to pug
+
+            let myHeader = await Article.getEmailPart("header", res.locals.language);
+            let myFooter = await Article.getEmailPart("footer", res.locals.language);
+            
+            const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/test";
+            let html = pug.renderFile(path.join(__dirname, "../emails/validation."+ res.locals.language + ".pug"), 
+                {title:AppConfig.api.appName,
+                header: header,
+                siteAccess: messages.emailSiteAccess,
+                phone:phone,
+                address:address,
+                icons:icons,
+                socialLinks:socialLinks,
+                footer:myFooter,
+                validationLink: link
+            });
+            //CSS must be put inline for better support of all browsers
+            html =  await InlineCss(html, {extraCss:"",applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});
+            console.log(html);
+            res.send(html);
+        } catch (error) {
+            next(new HttpException(500, messages.authEmailSentError,null));
+
+        }
+    }
 }

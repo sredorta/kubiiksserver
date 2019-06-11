@@ -362,7 +362,7 @@ export class AuthController {
             ]
     }    
     ///////////////////////////////////////////////////////////////////////////
-    // resetPasswordEmail:  Resets the password by sending new one by email
+    // resetPasswordEmail:  Resets the password by sending new one by phone
     ///////////////////////////////////////////////////////////////////////////
     static resetPasswordByMobile = async (req: Request, res: Response, next:NextFunction) => {
         next( new HttpException(400, messages.featureNotAvailable('password reset mobile'), null))
@@ -374,4 +374,7 @@ export class AuthController {
             Middleware.validate()
         ]
     }       
+
+
+
 }

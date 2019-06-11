@@ -46,6 +46,10 @@ export const messages = {
 
     apiRouteNotFound: 'The server could not found the requested action',
 
+    emailSiteAccess : 'GO TO SITE',
+
+
+
     messageSent: 'Your message has been sent',
     saved : 'Your modifications have been saved',
 

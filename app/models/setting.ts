@@ -2,6 +2,7 @@ import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Defa
 import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/Config';
 import { SettingTranslation } from './setting_translation';
+import { Article } from './article';
 
 
 export const SettingN = 'Not a model';
@@ -76,6 +77,7 @@ export class Setting extends Model<Setting> {
     return result;   
 
   }
+
 
   /**Seeds the table initially */
   public static seed() {
@@ -170,10 +172,9 @@ export class Setting extends Model<Setting> {
         });
         mySetting = await Setting.create({
           type: "general",
-          key: "companyPhone.placeholder",
-          value: '0423133212'
+          key: "companyAddress",
+          value: "374, chemin de l'escure; 06610 Le Bar sur Loup;France"
         });
-
 
         mySetting = await Setting.create({
           type: "general",
@@ -193,6 +194,7 @@ export class Setting extends Model<Setting> {
           key: "gmapZoom",
           value: '14',
         });
+
 
     }
     return _seed();

@@ -64,7 +64,7 @@ export class Helper {
             return false
         return true; 
     }
-
+    /*Generates random password*/
     public static generatePassword() : string {
         let password = Helper.generateRandomString(10);
         let i = 0;
@@ -75,9 +75,11 @@ export class Helper {
         return password;
     }
 
+
+
     //Get array of only one field from an array of objects
-    public static pluck<T, K extends keyof T>(objs: T[], key: K): T[K][] {
+/*    public static pluck<T, K extends keyof T>(objs: T[], key: K): T[K][] {
         return objs.map(obj => obj[key]);
-    }
+    }*/
 
 }

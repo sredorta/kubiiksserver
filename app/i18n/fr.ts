@@ -46,6 +46,9 @@ export const messages = {
 
     apiRouteNotFound: "Le serveur n'a pas trouvé la requete demandé",
 
+    emailSiteAccess : 'ALLER AU SITE',
+
+
     messageSent: 'Votre message à bien été envoyé',
     saved : 'Modifications enregistrées correctement',
 

@@ -149,8 +149,8 @@ export class Passport {
             }
             //EQUIVALENT TO LOGIN
             if (myUser) {
-                if (profile._json.first_name) myUser.firstName = profile._json.first_name;
-                if (profile._json.last_name) myUser.lastName = profile._json.last_name;
+                //if (profile._json.first_name) myUser.firstName = profile._json.first_name;
+                //if (profile._json.last_name) myUser.lastName = profile._json.last_name;
                 myUser.facebookToken = accessToken;
                 myUser.passport = "facebook";
                 myUser = await myUser.save();
@@ -230,8 +230,8 @@ export class Passport {
             }
             //EQUIVALENT TO LOGIN
             if (myUser) {
-                if (profile._json.given_name) myUser.firstName = profile._json.given_name;
-                if (profile._json.family_name) myUser.lastName = profile._json.family_name;
+                //if (profile._json.given_name) myUser.firstName = profile._json.given_name;
+                //if (profile._json.family_name) myUser.lastName = profile._json.family_name;
                 //TODO save also language that is in _json.locale
                 myUser.googleToken = accessToken;
                 myUser.passport = "google";
