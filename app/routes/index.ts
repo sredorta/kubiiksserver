@@ -121,15 +121,13 @@ export class Routes {
 
 
     /**Checks that email service is up and running */
-    app.route('/api/settings/email')
+    app.route('/api/email/check')
       .get(EmailController.emailCheck);
 
     /**Sends email to current loggedin user for testing purposes */
-    app.route('/api/settings/email/send')
-    .get(passport.authenticate('jwt',{session: false}),EmailController.emailSend);  
+    app.route('/api/email/send')
+    .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendChecks(),EmailController.send);  
 
-    app.route('/api/show')
-    .get(EmailController.emailShow);  
 
 
     /////////////////////////////////////////////////////////////////

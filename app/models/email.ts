@@ -109,7 +109,7 @@ export class Email extends Model<Email> {
   /**Creates additional css for handling colors */
   createAdditionalCss() {
     let css = "a, {color:"+this.headerColor + "} .header {background:"+this.headerColor+"} .footer {background:"+this.footerColor+"} ";
-    css = css + ".title {color:"+this.titleColor + "} .subtitle {color:"+this.subtitleColor+"} h1,h2,.bodycopy {color:"+this.textColor+"}";
+    css = css + ".kii-email-embedded-title {color:"+this.titleColor + "} .kii-email-embedded-subtitle {color:"+this.subtitleColor+"} h1,h2,.bodycopy {color:"+this.textColor+"}";
     return css;
   }
 

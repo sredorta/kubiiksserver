@@ -102,21 +102,26 @@ export class EmailController {
         ]
     }    
 
-    /**Email testing for now */
-    static emailSend = async (req: Request, res: Response, next:NextFunction) => {
+    /**Sends email */
+    static send = async (req: Request, res: Response, next:NextFunction) => {
         //TODO: Get post parameter of template email, additionalHTML
         try {
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);
-            if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null))
-            let myEmail = await Email.findOne({where:{name:"validate-email"}});
+            let myUser = await User.findByPk(req.user.id);
+            if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null));
+            let myEmail = Email.build(req.body.email, {
+                isNewRecord: false,
+                include: [EmailTranslation]
+             });
             if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
-            let html = await myEmail.getHtml(res.locals.language, '<p>Validate your email by clicking to the following <a href="/test">link</a></p>');
+
+            let html = await myEmail.getHtml(res.locals.language, '<p> -- TEST EMAIL -- </p>');
+            console.log(html);
             if (!html)  return next(new HttpException(500, messages.emailSentError,null));
             const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
             let myEmailT = {
                             from: AppConfig.emailSmtp.sender,
                             to: myUser.email,
-                            subject: messages.authEmailValidateSubject(AppConfig.api.appName),
+                            subject: "TEST EMAIL",
                             text: htmlToText.fromString(html),
                             html: html
             }
@@ -128,38 +133,20 @@ export class EmailController {
             next(new HttpException(500, messages.emailSentError,null));
 
         }
-
-
-        //Generate email html
- /*       try {
-            let myHeader = await Article.getEmailPart("header", res.locals.language);
-            let myFooter = await Article.getEmailPart("footer", res.locals.language);
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);
-            if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null))
-            const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/test";
-            let html = pug.renderFile(path.join(__dirname, "../emails/validation."+ res.locals.language + ".pug"), {title:AppConfig.api.appName,header: myHeader,footer:myFooter,validationLink: link});
-            //CSS must be put inline for better support of all browsers
-            html =  await InlineCss(html, {extraCss:"",applyStyleTags:true,applyLinkTags:true,removeStyleTags:true,removeLinkTags:true,url:"filePath"});
-            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-            let myEmail = {
-                            from: AppConfig.emailSmtp.sender,
-                            to: myUser.email,
-                            subject: messages.authEmailValidateSubject(AppConfig.api.appName),
-                            text: htmlToText.fromString(html),
-                            html: html
-            }
-            console.log(html);
-            console.log("text:");
-            console.log(htmlToText.fromString(html));
-            await transporter.sendMail(myEmail);
-            res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
-
-        } catch (error) {
-            next(new HttpException(500, messages.authEmailSentError,null));
-
-        }*/
     }
-    static emailShow = async (req: Request, res: Response, next:NextFunction) => {
+   /**Parameter validation */
+   static sendChecks() {
+    return [
+        body('email').exists().withMessage('exists'),
+        body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+        body('email.translations').exists().withMessage('exists'),
+        //TODO: Add here all required checks !!!
+
+        Middleware.validate()
+    ]
+    }    
+
+/*    static emailShow = async (req: Request, res: Response, next:NextFunction) => {
         //Generate email html
         try {
             let myEmail = await Email.findOne({where:{name:"validate-email"}});
@@ -171,5 +158,5 @@ export class EmailController {
             next(new HttpException(500, messages.emailSentError,null));
 
         }
-    }
+    }*/
 }
