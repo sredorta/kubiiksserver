@@ -30,12 +30,14 @@ export const messages = {
     authTooManyTrials:  'Demasiados intentos fallados, intentalo de nuevo en unos minutos',
     authAlreadyLoggedIn:  'Usted ya esta connectado',
 
+    oauth2MissingField : (name = 'field') => `Error de autentificacion, impossible de recuperar el campo ${name} `,
     authEmailResetPassword: (name = 'field') => `Un correo electronico con el nuevo password ha sido enviado a : ${name}`,
     authEmailValidate: (name = 'field') => `Un correo electronico de confirmacion a sido enviado a : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Verificacion de la cuenta de correo`,
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
-    authEmailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
-    oauth2MissingField : (name = 'field') => `Error de autentificacion, impossible de recuperar el campo ${name} `,
+    emailSentOk:    (name = 'field') => `Un correo electronico ha sido enviado a : ${name}`,
+    emailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
+    emailSiteAccess : 'IR AL SITIO WEB',
 
     articleContentNotCreate: "Los articulos de la categoria 'content' no se pueden crear",
     articleContentNotDelete: "Los articulos de la categoria 'content' no se pueden borrar",
@@ -46,7 +48,6 @@ export const messages = {
 
     apiRouteNotFound: 'El servidor no encontró la petición',
 
-    emailSiteAccess : 'IR AL SITIO WEB',
 
 
 

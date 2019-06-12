@@ -195,6 +195,18 @@ export class Setting extends Model<Setting> {
           value: '14',
         });
 
+        //Email format part
+        mySetting = await Setting.create({
+          type: "email",
+          key: "headerColor",
+          value: '#ff00ff',
+        });
+        mySetting = await Setting.create({
+          type: "email",
+          key: "footerColor",
+          value: '#ffff00',
+        });                
+
 
     }
     return _seed();

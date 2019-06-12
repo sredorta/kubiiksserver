@@ -14,7 +14,7 @@ html
                     table(class="content", align="center", cellpadding="0", cellspacing="0",border="0") 
                         tr(class="header-button",align="right")
                             td 
-                                a(class="site-link", href=siteUrl) #{siteAccess}                  
+                                a(class="site-link", href=data.siteUrl) #{data.siteAccess}                  
                         tr
                             td(class="header") 
                                 table(width="70",align="left",border="0",cellpadding="0",cellspacing="0")
@@ -97,4 +97,3 @@ html
                                             each val,index in data.social
                                                 a(class="icon-social-link",href=data.social[index].value)
                                                     img(class="icon-social",src=data.social[index].icon,width="40",height="40",border="0",alt="")/
-

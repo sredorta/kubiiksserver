@@ -29,12 +29,15 @@ export const messages = {
     authInvalidCredentials: 'Invalid credentials',
     authTooManyTrials:  'Too many failed trials, please try again in few minutes',
     authAlreadyLoggedIn:  'User already logged in',
+    oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
     authEmailResetPassword: (name = 'field') => `An email with your new password has been sent to : ${name}`,
     authEmailValidate: (name = 'field') => `A validation email has been sent to : ${name}`,
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
-    authEmailSentError: 'An error happened when sending the email, please contact the administrator',
-    oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
+    emailSentOk:    (name = 'field') => `An email has been sent to : ${name}`,
+    emailSentError: 'An error happened when sending the email, please contact the administrator',
+    emailSiteAccess : 'GO TO SITE',
+
 
     articleContentNotCreate: 'Content articles cannot be created',
     articleContentNotDelete: 'Content articles cannot be deleted',
@@ -46,7 +49,6 @@ export const messages = {
 
     apiRouteNotFound: 'The server could not found the requested action',
 
-    emailSiteAccess : 'GO TO SITE',
 
 
 

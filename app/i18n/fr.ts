@@ -34,7 +34,10 @@ export const messages = {
     authEmailValidate: (name = 'field') => `Un courriel de validation de compte à été envoyé à : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nouveau mot de passe`,
-    authEmailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
+    emailSentOk:    (name = 'field') => `Un courriel à éte envoyé à l'adresse : ${name}`,
+    emailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
+    emailSiteAccess : 'ALLER AU SITE',
+
     oauth2MissingField : (name = 'field') => `Erreur penant l'authentifition, impossible de recuperer le champ ${name} `,
 
     articleContentNotCreate: "Les articles de la cathegorie 'content' ne peuvent pas être crees",
@@ -46,7 +49,6 @@ export const messages = {
 
     apiRouteNotFound: "Le serveur n'a pas trouvé la requete demandé",
 
-    emailSiteAccess : 'ALLER AU SITE',
 
 
     messageSent: 'Votre message à bien été envoyé',

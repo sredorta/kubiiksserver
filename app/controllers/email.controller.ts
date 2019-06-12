@@ -40,6 +40,32 @@ export class EmailController {
 
     /**Email testing for now */
     static emailSend = async (req: Request, res: Response, next:NextFunction) => {
+        //TODO: Get post parameter of template email, additionalHTML
+        try {
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);
+            if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null))
+            let myEmail = await Email.findOne({where:{name:"validate-email"}});
+            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
+            let html = await myEmail.getHtml(res.locals.language, '<p>Validate your email by clicking to the following <a href="/test">link</a></p>');
+            if (!html)  return next(new HttpException(500, messages.emailSentError,null));
+            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+            let myEmailT = {
+                            from: AppConfig.emailSmtp.sender,
+                            to: myUser.email,
+                            subject: messages.authEmailValidateSubject(AppConfig.api.appName),
+                            text: htmlToText.fromString(html),
+                            html: html
+            }
+            console.log("text:");
+            console.log(htmlToText.fromString(html));
+            await transporter.sendMail(myEmailT);
+            res.send({message: {show:true, text:messages.emailSentOk(myUser.email)}});  
+        } catch (error) {
+            next(new HttpException(500, messages.emailSentError,null));
+
+        }
+
+
         //Generate email html
  /*       try {
             let myHeader = await Article.getEmailPart("header", res.locals.language);
@@ -71,71 +97,14 @@ export class EmailController {
     }
     static emailShow = async (req: Request, res: Response, next:NextFunction) => {
         //Generate email html
-        res.locals.language = "fr";
         try {
             let myEmail = await Email.findOne({where:{name:"validate-email"}});
-            if (!myEmail) return next(new HttpException(500, messages.authEmailSentError,null));
-            await myEmail.populate();
-            let myData = myEmail.sanitize(res.locals.language);
-            console.log("FOOTER : ");
-            console.log(myData.footer);
-
-            //res.json(JSON.parse(JSON.stringify(myEmail)));
-/*            let content = "<h1>Test of content</h1><p>Try to go to this <a href='test'>nice link</a>";
-
-            let myArticle = await Article.findOne({where:{key:"email-header"}});
-            if (!myArticle) return next(new HttpException(500, messages.authEmailSentError,null));
-            let header = myArticle.sanitize(res.locals.language,"full");
-            header.image = myArticle.getImage();
-            header.backgroundImage = myArticle.getBackgroundImage();
-
-            //Get phone from settings
-            let tmp = await Setting.findOne({where:{key:"companyPhone"}});
-            if (!tmp) return next(new HttpException(500, messages.authEmailSentError,null));
-            let phone = tmp.value;
-            //Get address from settings
-            tmp = await Setting.findOne({where:{key:"companyAddress"}});
-            if (!tmp) return next(new HttpException(500, messages.authEmailSentError,null));
-            let address = tmp.value.split(";");
-            //Get site address
-            tmp = await Setting.findOne({where:{key:"url"}});
-            if (!tmp) return next(new HttpException(500, messages.authEmailSentError,null));
-            let url = tmp.value;
-
-            let icons :any = {};
-            let links: any = {};
-            icons["phone"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/phone.png";
-            icons["address"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/address.png";
-            icons["facebook"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/facebook.png";
-            icons["instagram"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/instagram.png";
-            icons["twitter"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/twitter.png";
-            icons["linkedin"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/linkedin.png";
-            icons["youtube"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/youtube.png";
-            icons["google"] = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/google.png";
-            links["facebook"] = await Setting.findOne({where:{key:"linkFacebook"}});
-            links["instagram"] = await Setting.findOne({where:{key:"linkInstagram"}});
-            links["twitter"] = await Setting.findOne({where:{key:"linkTwitter"}});
-            links["linkedin"] = await Setting.findOne({where:{key:"linkLinkedin"}});
-            links["youtube"] = await Setting.findOne({where:{key:"linkYoutube"}});
-            links["google"] = await Setting.findOne({where:{key:"linkGoogleplus"}});
-            let myValue : string = "";
-            let socialLinks : any = {};
-            Object.keys(links).forEach(key => {
-                if (links[key].value)
-                    myValue = links[key].value;
-                    if (myValue != "") {
-                        socialLinks[key] = links[key].value;
-                    }
-            })
-            */
-            const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/test";
-            let html = pug.renderFile(path.join(__dirname, "../emails/validation."+ res.locals.language + ".pug"), {data:myData,iso:res.locals.language});
-            //CSS must be put inline for better support of all browsers
-            html =  await InlineCss(html, {extraCss:"",applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});
-            //console.log(html);
+            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
+            let html = await myEmail.getHtml(res.locals.language, '<p>Validate your email by clicking to the following <a href="/test">link</a></p>');
+            console.log(html);
             res.send(html);
         } catch (error) {
-            next(new HttpException(500, messages.authEmailSentError,null));
+            next(new HttpException(500, messages.emailSentError,null));
 
         }
     }

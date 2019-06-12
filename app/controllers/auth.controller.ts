@@ -87,7 +87,7 @@ export class AuthController {
                      transporter.sendMail(myEmail).then(result => {
                         res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
                      }).catch(error => {
-                        next(new HttpException(500, messages.authEmailSentError,null));
+                        next(new HttpException(500, messages.emailSentError,null));
                      })
                 }
             }
@@ -349,7 +349,7 @@ export class AuthController {
                 transporter.sendMail(myEmail).then(result => {
                         res.send({message: {show:true,text:messages.authEmailResetPassword(myUser.email)}});  
                 }).catch(error => {
-                        next(new HttpException(500, messages.authEmailSentError,null));
+                        next(new HttpException(500, messages.emailSentError,null));
                 });          
             }
         });

@@ -4,7 +4,10 @@ import {AppConfig} from '../utils/Config';
 import { EmailTranslation } from './email_translation';
 import { Setting } from './setting';
 import { messages } from '../middleware/common';
-
+import pug from 'pug';
+import path from 'path';
+import htmlToText from 'html-to-text';
+import InlineCss from 'inline-css';
 
 export const EmailN = 'Not a model';
 export const NEmail = 'Not a model';
@@ -73,7 +76,20 @@ export class Email extends Model<Email> {
   /**Social data. Not stored in the db, gut initialized by getting on Settings */
   social:FooterData[] = [];
 
+  /**Primary color for header and links */
+  headerColor:string = "#ff0000";
 
+  /**Secondary color for footer */
+  footerColor:string = "#00ff00";
+
+  /**Link to the main site */
+  siteUrl:string = "";
+
+  /**Creates additional css for handling colors */
+  createAdditionalCss() {
+    let css = "a, {color:"+this.headerColor + "} .header {background:"+this.headerColor+"} .footer {background:"+this.footerColor+"}";
+    return css;
+  }
 
   /**Sanitize output by removing all languages except requested one */
   public sanitize(iso:string) {
@@ -85,8 +101,13 @@ export class Email extends Model<Email> {
         result.translations.push(JSON.parse(JSON.stringify(myTranslation)));
       }
     }
+    if (this.backgroundContent == "none") result.backgroundContent="";
+    if (this.backgroundHeader == "none") result.backgroundHeader="";
     result.footer = this.footer;
     result.social = this.social;
+    result.footerColor = this.footerColor;
+    result.headerColor = this.headerColor;
+    result.siteUrl = this.siteUrl;
     return result;
   }  
 
@@ -129,6 +150,14 @@ export class Email extends Model<Email> {
             }
             result.footer.push({icon:urlBase + "address.png",value:tmp.value});
             
+            //Get site url
+            tmp = await Setting.findOne({where:{key:"url"}});
+            if (!tmp) {
+                reject("Could not find Setting 'url'");
+                return;
+            }
+            result.siteUrl = tmp.value;
+
             //Get all socialLinks
             let links: any = {};
             links["facebook"] = await Setting.findOne({where:{key:"linkFacebook"}});
@@ -164,8 +193,27 @@ export class Email extends Model<Email> {
       }
       this.footer = myEmail.footer;
       this.social = myEmail.social;
+      this.siteUrl = myEmail.siteUrl;
   }
 
+  /**Returns the html of the final email */
+  public async getHtml(iso:string, additionalHtml?:string) {
+    try {
+        await this.populate(); //Populate email with all settings that are common for all emails
+        let myData = this.sanitize(iso);
+        myData["siteAccess"] = messages.emailSiteAccess; //Add site Access string
+        //Add extra html if required
+        if (additionalHtml) 
+            myData.translations[0].content = myData.translations[0].content + additionalHtml;
+
+        let html = pug.renderFile(path.join(__dirname, "../emails/emails.pug"), {data:myData,iso: iso});
+        //CSS must be put inline for better support of all browsers
+        html =  await InlineCss(html, {extraCss:this.createAdditionalCss(),applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});
+        return html;
+    } catch (error) {
+        return null;
+    }
+  }
 
 
 
