@@ -86,36 +86,6 @@ export class EmailController {
             myEmail = await myEmail.save();
 
             res.json(myEmail);
-
-/*            let article = await Article.findByPk(req.body.article.id);
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
-            if (article && myUser) {
-                if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
-                    return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
-                }
-                if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
-                    return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
-                }            
-                    //TODO::Update here image if required
-                    article.public = req.body.article.public;
-                    article.backgroundImage = req.body.article.backgroundImage;
-                    article.image = req.body.article.image;
-                    //We don't allow cathegory update as it would be able to change to wrong cathegory
-                    await article.save();
-                    for (let translation of article.translations) {
-                        let data : ArticleTranslation = req.body.article.translations.find( (obj:ArticleTranslation) => obj.iso ==  translation.iso);
-                        if (data) {
-                            if (data.content)
-                                translation.content = data.content;
-                            if (data.title)
-                                translation.title = data.title;
-                            if (data.description)
-                                translation.description = data.description;                                                                
-                            await translation.save();
-                        }
-                    }
-                    res.json(await Article.findByPk(req.body.article.id));
-                }*/
         } catch(error) {
             next(error);
         }

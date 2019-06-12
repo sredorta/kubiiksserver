@@ -69,6 +69,21 @@ export class Email extends Model<Email> {
   @Column(DataTypes.STRING(30))  
   footerColor!:string;
 
+  @AllowNull(true)
+  @Default("#000000")
+  @Column(DataTypes.STRING(30))  
+  titleColor!:string;
+  
+  @AllowNull(true)
+  @Default("#000000")
+  @Column(DataTypes.STRING(30))  
+  subtitleColor!:string;  
+
+  @AllowNull(true)
+  @Default("#153643")
+  @Column(DataTypes.STRING(30))  
+  textColor!:string;    
+
   /**Property that allows user to delete this email. For example, reset-password, email-validate cannot be deleted */
   @AllowNull(false)
   @Default(false) //TODO: CHANGE TO FALSE
@@ -93,7 +108,8 @@ export class Email extends Model<Email> {
 
   /**Creates additional css for handling colors */
   createAdditionalCss() {
-    let css = "a, {color:"+this.headerColor + "} .header {background:"+this.headerColor+"} .footer {background:"+this.footerColor+"}";
+    let css = "a, {color:"+this.headerColor + "} .header {background:"+this.headerColor+"} .footer {background:"+this.footerColor+"} ";
+    css = css + ".title {color:"+this.titleColor + "} .subtitle {color:"+this.subtitleColor+"} h1,h2,.bodycopy {color:"+this.textColor+"}";
     return css;
   }
 
@@ -113,24 +129,13 @@ export class Email extends Model<Email> {
     result.social = this.social;
     result.footerColor = this.footerColor;
     result.headerColor = this.headerColor;
+    result.titleColor = this.titleColor;
+    result.subtitleColor = this.subtitleColor;
+    result.textColor = this.textColor;
     result.siteUrl = this.siteUrl;
     return result;
   }  
 
-  /**Gets well formatted image for emails */
-/*  getImage() {
-    if (!this.image) return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
-    else return this.image;
-  }*/
-
-  /**Gets well formatted bacgkround image for emails */
-/*  getBackgroundImage() {
-    if (!this.backgroundImage) {
-      if (this.backgroundImage == "none") return "none";
-        return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
-    } else 
-        return this.backgroundImage;
-  }*/
 
   /**Populates footer and social data that is stored mainly in settings like company data... */
   public static populate() {
@@ -204,8 +209,6 @@ export class Email extends Model<Email> {
   /**Returns the html of the final email */
   public async getHtml(iso:string, additionalHtml?:string) {
     try {
-        console.log("GETHTML !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        console.log(this);
         await this.populate(); //Populate email with all settings that are common for all emails
         let myData = this.sanitize(iso);
         myData["siteAccess"] = messages.emailSiteAccess; //Add site Access string

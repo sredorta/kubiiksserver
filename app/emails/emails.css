@@ -91,10 +91,11 @@ a.site-link:hover {
 
 .borderbottom {border-bottom: 1px solid #f2eeed;}
 
+.title {font-size: 33px; line-height: 38px; font-weight: bold;}
+.subtitle {font-size: 15px; font-family: sans-serif; letter-spacing: 10px;}
 
-.subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
 .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
-.h1, .h2, .bodycopy {color: #153643; font-family: sans-serif;}
+.h1, .h2, .bodycopy {font-family: sans-serif;}
 .innerpadding {padding: 30px 30px 30px 30px;}
 .innerpadding15 {padding: 15px 15px 15px 15px;}
 
