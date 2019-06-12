@@ -104,6 +104,22 @@ export class Routes {
     app.route('/api/settings/update')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.updateChecks(),SettingController.update);
 
+    //////////////////////////////////////////////////////////////////
+    // Email part
+    //////////////////////////////////////////////////////////////////
+    /**Gets all email templates */
+    app.route('/api/emails')
+      .get(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),EmailController.getAll);
+
+    /**Returns the html of the email template */  
+    app.route('/api/email/preview')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),EmailController.previewChecks(),EmailController.preview);
+
+    /**Returns the html of the email template */  
+    app.route('/api/email/update')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),EmailController.updateChecks(),EmailController.update);
+
+
     /**Checks that email service is up and running */
     app.route('/api/settings/email')
       .get(EmailController.emailCheck);
@@ -228,6 +244,10 @@ export class Routes {
     /**Uploads image to blog folder */
     app.route('/api/upload/editor/blog')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),uploads.blog.single('file'), GalleryController.uploadImageToBlog);
+
+    /**Uploads image to blog folder */
+    app.route('/api/upload/editor/email')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.email.single('file'), GalleryController.uploadImageToEmail);
       
     /////////////////////////////////////////////////////////////////
     // HANDLE BLOG ARTICLES

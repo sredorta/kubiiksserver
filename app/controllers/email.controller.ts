@@ -17,6 +17,7 @@ import htmlToText from 'html-to-text';
 import InlineCss from 'inline-css';
 import { IsPhoneNumber } from 'class-validator';
 import { Email } from '../models/email';
+import { EmailTranslation } from '../models/email_translation';
 
 export class EmailController {
     /**Email transporter check */
@@ -37,6 +38,99 @@ export class EmailController {
             res.send(myResult);
          });
     }
+
+    /**Gets all email templates */
+    public static getAll = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            res.json(await Email.findAll());
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    /**Returns the html of the current email in all languages for previewing*/
+    public static preview = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            //Build an email model without saving so that we can use for preview
+            let result :any = {};
+            let myEmail = Email.build(req.body.email, {
+                isNewRecord: false,
+                include: [EmailTranslation]
+             });
+            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null);           
+            for (let lang of Middleware.languagesSupported()) {
+                result[lang] = await myEmail.getHtml(lang); 
+            }
+            res.json(result);
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static previewChecks() {
+        return [
+            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            Middleware.validate()
+        ]
+    }    
+
+    /**Updates email template */
+    static update = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            console.log(req.body.email);
+            let myEmail = Email.build(req.body.email, {
+                isNewRecord: false,
+                include: [EmailTranslation]
+             });
+             if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null);           
+            myEmail = await myEmail.save();
+
+            res.json(myEmail);
+
+/*            let article = await Article.findByPk(req.body.article.id);
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
+            if (article && myUser) {
+                if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+                }
+                if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+                }            
+                    //TODO::Update here image if required
+                    article.public = req.body.article.public;
+                    article.backgroundImage = req.body.article.backgroundImage;
+                    article.image = req.body.article.image;
+                    //We don't allow cathegory update as it would be able to change to wrong cathegory
+                    await article.save();
+                    for (let translation of article.translations) {
+                        let data : ArticleTranslation = req.body.article.translations.find( (obj:ArticleTranslation) => obj.iso ==  translation.iso);
+                        if (data) {
+                            if (data.content)
+                                translation.content = data.content;
+                            if (data.title)
+                                translation.title = data.title;
+                            if (data.description)
+                                translation.description = data.description;                                                                
+                            await translation.save();
+                        }
+                    }
+                    res.json(await Article.findByPk(req.body.article.id));
+                }*/
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static updateChecks() {
+        return [
+            body('email').exists().withMessage('exists'),
+            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            body('email.translations').exists().withMessage('exists'),
+            //TODO: Add here all required checks !!!
+
+            Middleware.validate()
+        ]
+    }    
 
     /**Email testing for now */
     static emailSend = async (req: Request, res: Response, next:NextFunction) => {

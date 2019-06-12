@@ -193,19 +193,7 @@ export class Setting extends Model<Setting> {
           type: "general",
           key: "gmapZoom",
           value: '14',
-        });
-
-        //Email format part
-        mySetting = await Setting.create({
-          type: "email",
-          key: "headerColor",
-          value: '#ff00ff',
-        });
-        mySetting = await Setting.create({
-          type: "email",
-          key: "footerColor",
-          value: '#ffff00',
-        });                
+        });           
 
 
     }

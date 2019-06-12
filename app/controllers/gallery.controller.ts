@@ -26,18 +26,12 @@ export class GalleryController {
         res.send({imageUrl: "https://localhost:3000/public/images/blog/" + req.file.filename});  
     }
 
-    static test = async (req: Request, res: Response, next:NextFunction) => {
- //       setTimeout(() => {
-           res.send({imageUrl: "https://localhost:3000/public/test.jpg"});  
- //       },20000);
-    }
-    /**Parameter validation */
-    static testChecks() {
-        return [
-            body('email').exists().withMessage('exists').isEmail(),
-            body('subject').exists().withMessage('exists').isString().isLength({min:5}).withMessage("minlength"),
-            body('message').exists().withMessage('exists').isString().isLength({min:5}).withMessage("minlength"),
-            Middleware.validate()
-        ]
-    }
+
+    /**Uploads image to email folder and returns imageUrl for angular-editor*/
+    static uploadImageToEmail = async (req: Request, res: Response, next:NextFunction) => {
+        console.log("We are in email upload !!");
+        console.log(req.body);
+        res.send({imageUrl: "https://localhost:3000/public/images/email/" + req.file.filename});  
+    }    
+
 }        

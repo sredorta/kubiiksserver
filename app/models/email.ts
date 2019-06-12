@@ -57,6 +57,18 @@ export class Email extends Model<Email> {
   @Column(DataTypes.STRING(300))
   backgroundContent!: string;  
 
+  /**Primary color for header and links */
+  @AllowNull(true)
+  @Default("#ffffff")
+  @Column(DataTypes.STRING(30))
+  headerColor!:string;
+
+  /**Secondary color for footer */
+  @AllowNull(true)
+  @Default("#000000")
+  @Column(DataTypes.STRING(30))  
+  footerColor!:string;
+
   /**Property that allows user to delete this email. For example, reset-password, email-validate cannot be deleted */
   @AllowNull(false)
   @Default(false) //TODO: CHANGE TO FALSE
@@ -75,12 +87,6 @@ export class Email extends Model<Email> {
   
   /**Social data. Not stored in the db, gut initialized by getting on Settings */
   social:FooterData[] = [];
-
-  /**Primary color for header and links */
-  headerColor:string = "#ff0000";
-
-  /**Secondary color for footer */
-  footerColor:string = "#00ff00";
 
   /**Link to the main site */
   siteUrl:string = "";
@@ -167,7 +173,6 @@ export class Email extends Model<Email> {
             links["youtube"] = await Setting.findOne({where:{key:"linkYoutube"}});
             links["google"] = await Setting.findOne({where:{key:"linkGoogleplus"}});
             let myValue : string = "";
-            let socialLinks : any = {};
             Object.keys(links).forEach(key => {
                 if (links[key].value)
                     myValue = links[key].value;
@@ -199,6 +204,8 @@ export class Email extends Model<Email> {
   /**Returns the html of the final email */
   public async getHtml(iso:string, additionalHtml?:string) {
     try {
+        console.log("GETHTML !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        console.log(this);
         await this.populate(); //Populate email with all settings that are common for all emails
         let myData = this.sanitize(iso);
         myData["siteAccess"] = messages.emailSiteAccess; //Add site Access string
@@ -222,6 +229,18 @@ export class Email extends Model<Email> {
     async function _seed() {
 
         let myEmail = await Email.create({
+            name: "reference",
+            logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
+            backgroundHeader: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
+            backgroundContent: "none",  
+            isProtected: true  
+        });                    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",title:"Mon titre",subtitle:"Mon soustitre",header:"<h1>Exemple entete email</h1>",content:"<h1>Exemple de contenu</h1>"});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",title:"My title",subtitle:"My subtitle",header:"<h1>Example email Header</h1>",content:"<h1>Content example</h1>"});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",title:"Mi titulo",subtitle:"Mi subtitulo",header:"<h1>Ejemplo de cabecera email</h1>",content:"<h1>Ejemplo de contenido</h1>"});             
+
+
+        myEmail = await Email.create({
             name: "validate-email",
             logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
             backgroundHeader: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",

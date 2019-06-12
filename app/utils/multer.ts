@@ -21,6 +21,16 @@ const storageImagesBlog = multer.diskStorage({
     }
   });
 
+  /**Images of email */
+const storageImagesEmail = multer.diskStorage({    
+  destination: function(req, file, cb) {
+    cb(null, join(process.cwd(), 'app/public/images/email'));
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
+
 /**Images of product */  
 const storageImagesProducts = multer.diskStorage({    
     destination: function(req, file, cb) {
@@ -33,11 +43,14 @@ const storageImagesProducts = multer.diskStorage({
 
 const uploadsImagesContent = multer({ storage: storageImagesContent });
 const uploadsImagesBlog = multer({ storage: storageImagesBlog });
+const uploadsImagesEmail = multer({ storage: storageImagesEmail });
+
 const uploadsImagesProducts = multer({ storage: storageImagesProducts });
 
 const uploads = {
     content :   uploadsImagesContent,
     blog:       uploadsImagesBlog,
+    email:      uploadsImagesEmail,
     products:   uploadsImagesProducts
 }
 

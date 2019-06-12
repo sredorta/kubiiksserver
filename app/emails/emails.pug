@@ -39,8 +39,8 @@ html
             tr
                 td
                 <![endif]-->
-                    table(class="content", align="center", cellpadding="0", cellspacing="0",border="0") 
-                        tr(class="header-image-background", background=data.backgroundHeader)
+                    table(class="content content-header", align="center", cellpadding="0", cellspacing="0",border="0") 
+                        tr(class="image-background", background=data.backgroundHeader)
                             td(class="header-image-content")
                                 table(width="100%",border="0",cellspacing="0",cellpadding="0")
                                     tr
@@ -51,8 +51,8 @@ html
                 td
                 <![endif]-->
                     table(class="content content-main", align="center", cellpadding="0", cellspacing="0",border="0") 
-                        tr
-                            td(class="header-image-content", background=data.backgroundContent)
+                        tr(class="image-background", background=data.backgroundContent)
+                            td(class="header-image-content")
                                 table(width="100%",border="0",cellspacing="0",cellpadding="0")
                                     tr
                                         td(class="bodycopy") !{data.translations[0].content}

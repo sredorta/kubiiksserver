@@ -19,6 +19,9 @@ body {
 .content-main {
     background:white;
 }
+.content-header {
+    background:white;
+}
 
 a.site-link {
     padding:10px;
@@ -44,7 +47,7 @@ a.site-link:hover {
 .header-button {
     height: 60px;
 }
-.header-image-background {
+.image-background {
     background-repeat: no-repeat; 
     background-position: 100% 100%;
     background-size: cover;
