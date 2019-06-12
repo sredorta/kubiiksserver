@@ -29,6 +29,7 @@ import { Product } from '../models/product';
 import {check, validationResult,body} from 'express-validator/check';
 import uploads from '../utils/multer';
 import { InitController } from '../controllers/init.controller';
+import { EmailController } from '../controllers/email.controller';
 
 
 
@@ -105,14 +106,14 @@ export class Routes {
 
     /**Checks that email service is up and running */
     app.route('/api/settings/email')
-      .get(SettingController.emailCheck);
+      .get(EmailController.emailCheck);
 
     /**Sends email to current loggedin user for testing purposes */
     app.route('/api/settings/email/send')
-    .get(passport.authenticate('jwt',{session: false}),SettingController.emailSend);  
+    .get(passport.authenticate('jwt',{session: false}),EmailController.emailSend);  
 
     app.route('/api/show')
-    .get(SettingController.emailShow);  
+    .get(EmailController.emailShow);  
 
 
     /////////////////////////////////////////////////////////////////

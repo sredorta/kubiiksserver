@@ -89,7 +89,7 @@ export class Article extends Model<Article> {
   }
 
   /**Gets email header translated content*/
-  public static getEmailPart(part:"header" | "footer",iso:string) {
+/*  public static getEmailPart(part:"header" | "footer",iso:string) {
     let key = "";
     if (part =="header") key="email-header";
     else key="email-footer";
@@ -114,7 +114,7 @@ export class Article extends Model<Article> {
       _getContent();
     });
     return myPromise;
-  }
+  }*/
 
   /**Seeds the table initially */
   public static seed() {

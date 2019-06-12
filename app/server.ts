@@ -13,6 +13,7 @@ import {AppConfig} from './utils/config';
 import {Response,Request,NextFunction} from 'express';
 import { Product } from "./models/product";
 import { Article } from "./models/article";
+import { Email } from "./models/email";
 
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
@@ -43,6 +44,7 @@ async function startServer() {
     await Role.seed();
     await User.seed();
     await Article.seed();
+    await Email.seed();
 
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");
