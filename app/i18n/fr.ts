@@ -38,6 +38,9 @@ export const messages = {
     emailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
     emailSiteAccess : 'ALLER AU SITE',
     emailDeleteProtected: 'Les modeles de courriel du systeme ne peuvent pas être effacés',
+    emailValidationLink: (name = 'field') => `<p>Merci de valider votre compte en clickant sur ce <a href='${name}'>lien</a></p>`,
+    emailResetPassword: (name = 'field') => `<p>Votre nouveau mot de passe : <span>${name}<span></p>`,
+    emailResetPasswordSubject: (name = 'field') => `${name} : Demande de nouveau mot de passe`,
 
 
     oauth2MissingField : (name = 'field') => `Erreur penant l'authentifition, impossible de recuperer le champ ${name} `,

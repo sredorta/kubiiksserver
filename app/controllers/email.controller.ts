@@ -108,7 +108,7 @@ export class EmailController {
     }    
 
     /**Sends email */
-    static send = async (req: Request, res: Response, next:NextFunction) => {
+    static sendTest = async (req: Request, res: Response, next:NextFunction) => {
         //TODO: Get post parameter of template email, additionalHTML
         try {
             let myUser = await User.findByPk(req.user.id);
@@ -140,7 +140,7 @@ export class EmailController {
         }
     }
    /**Parameter validation */
-   static sendChecks() {
+   static sendTestChecks() {
         return [
             body('email').exists().withMessage('exists'),
             body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
@@ -149,6 +149,55 @@ export class EmailController {
             Middleware.validate()
         ]
     }    
+
+
+    /**Sends email to the required recipients and the additionalHTML and template*/
+    static send = async (req: Request, res: Response, next:NextFunction) => {
+        //TODO: Get post parameter of template email, additionalHTML
+        try {
+            
+            let myUser = await User.findByPk(req.user.id);
+            if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null));
+            let myEmail = Email.build(req.body.email, {
+                isNewRecord: false,
+                include: [EmailTranslation]
+             });
+            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
+
+            let html = await myEmail.getHtml(res.locals.language, '<p> -- TEST EMAIL -- </p>');
+            console.log(html);
+            if (!html)  return next(new HttpException(500, messages.emailSentError,null));
+            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+            let myEmailT = {
+                            from: AppConfig.emailSmtp.sender,
+                            to: req.body.to,
+                            subject: req.body.subject,
+                            text: htmlToText.fromString(html),
+                            html: html
+            }
+            await transporter.sendMail(myEmailT);
+            res.send({message: {show:true, text:messages.emailSentOk(myUser.email)}});  
+        } catch (error) {
+            next(new HttpException(500, messages.emailSentError,null));
+
+        }
+    }
+   /**Parameter validation */
+   static sendChecks() {
+        return [
+            body('to').exists().withMessage('exists').isArray(),
+            body('to.*').isEmail(),
+            body('subject').exists().withMessage('exists').not().isEmpty(),
+
+
+            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            body('email.translations').exists().withMessage('exists'),
+            //TODO: Add here all required checks !!!
+            Middleware.validate()
+        ]
+    }    
+
+
     /**Creates email template based on reference. Admin or content required */
     static create = async (req: Request, res: Response, next:NextFunction) => {
         try {

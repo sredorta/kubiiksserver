@@ -15,6 +15,7 @@ import path from 'path';
 import {Validator} from "class-validator";
 //Data models
 import {User} from '../models/user';
+import { Email } from '../models/email';
 
 /**Payload interface */
 export interface IJwtPayload {
@@ -56,7 +57,6 @@ export class AuthController {
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
                 await myUser.attachRole("admin"); 
             }
-
             //Depending on the validation method we need to authenticate or not
             switch (method) {
                 //Login to the admin account if exists or to the standard if admin does not exist
@@ -67,28 +67,20 @@ export class AuthController {
                 }
                 //Requires mobile phone validation
                 case "mobile": {
-                    next( new HttpException(500, messages.featureNotAvailable("validation_method : mobile"),null))
+                    next( new HttpException(500, messages.featureNotAvailable("validation_method : mobile"),null));
                     break;
                 }
                 //Validation with email is the default
                 default: {
-                    //Generate email html
                     const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/api/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
-                    const html = pug.renderFile(path.join(__dirname, "../emails/validation."+ res.locals.language + ".pug"), {validationLink: link});
-                    const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-                     let myEmail = {
-                        from: AppConfig.emailSmtp.sender,
-                        to: myUser.email,
-                        subject: messages.authEmailValidateSubject(AppConfig.api.appName),
-                        text: 'Voila un bon email',
-                        html: html
-                     }
+                    let html = messages.emailValidationLink(link);
 
-                     transporter.sendMail(myEmail).then(result => {
+                    let recipients = [];
+                    recipients.push(myUser.email);
+                    let result = await Email.send(res.locals.language, 'validate-email', messages.authEmailValidateSubject(AppConfig.api.appName), recipients,html);
+                    if (!result) res.send({message: {show:true, text:messages.emailSentError}});
+                    else
                         res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
-                     }).catch(error => {
-                        next(new HttpException(500, messages.emailSentError,null));
-                     })
                 }
             }
         } catch(error) {
@@ -326,33 +318,24 @@ export class AuthController {
     static resetPasswordByEmail = async (req: Request, res: Response, next:NextFunction) => {
         let query :any =  {};
         query["email"] = req.body.email;
+        try {
+            let myUser = await User.scope("full").findOne({where:{email:req.body.email}});
+            if (!myUser) return next( new HttpException(400, messages.validationNotFound(messages.User),null));
+            const password = Helper.generatePassword();
+            myUser.password = User.hashPassword(password);
+            await myUser.save();
+            //Send the email
+            let html = messages.emailResetPassword(password);
+            let recipients = [];
+            recipients.push(myUser.email);
+            let result = await Email.send(res.locals.language, 'reset-password', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,html);
+            if (!result) res.send({message: {show:true, text:messages.emailSentError}});
+            else
+                res.send({message: {show:true, text:messages.authEmailResetPassword(myUser.email)}});      
         
-        User.scope("withRoles").findOne({where: query}).then(myUser => {
-            if (!myUser)
-                next( new HttpException(400, messages.validationNotFound(messages.User),null));
-            else {
-                //We got here, so reset the password and send email with new password
-                const password = Helper.generatePassword();
-                myUser.password = User.hashPassword(password);
-                myUser.save();
-                //Send email with new password
-                const html = pug.renderFile(path.join(__dirname, "../emails/resetpassword."+ res.locals.language + ".pug"), {password: password});
-                const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-                let myEmail = {
-                        from: AppConfig.emailSmtp.sender,
-                        to: myUser.email,
-                        subject: messages.authEmailResetPasswordSubject(AppConfig.api.appName),
-                        text: 'Voila un bon email',
-                        html: html
-                    }
-
-                transporter.sendMail(myEmail).then(result => {
-                        res.send({message: {show:true,text:messages.authEmailResetPassword(myUser.email)}});  
-                }).catch(error => {
-                        next(new HttpException(500, messages.emailSentError,null));
-                });          
-            }
-        });
+        } catch(error) {
+            next(new HttpException(500, messages.emailSentError,null));
+        };
     }
     /**Parameter validation */
     static resetPasswordByEmailChecks() {

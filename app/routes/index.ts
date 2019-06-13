@@ -124,8 +124,8 @@ export class Routes {
       .get(EmailController.emailCheck);
 
     /**Sends email to current loggedin user for testing purposes */
-    app.route('/api/email/send')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendChecks(),EmailController.send);  
+    app.route('/api/email/send-test')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendTestChecks(),EmailController.sendTest);  
 
     /**Creates a new email template */
     app.route('/api/email/create')
@@ -134,6 +134,19 @@ export class Routes {
     /**Deletes an email template */
     app.route('/api/email/delete')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.deleteChecks(),EmailController.delete);  
+
+    /**Sends email to the given recipients with additional html if any and template */
+    app.route('/api/email/send')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendChecks(),EmailController.send);      
+
+
+    /////////////////////////////////////////////////////////////////
+    // CONTACT CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
+    /** Send email from contact form*/
+    app.route('/api/contact/email')
+      .post(ContactController.sendEmailChecks(), ContactController.sendEmail);  
+
 
 
     /////////////////////////////////////////////////////////////////
@@ -201,12 +214,6 @@ export class Routes {
        .post(Middleware.unregistered(),AuthController.resetPasswordByMobileChecks(), AuthController.resetPasswordByMobile);  
 
     
-    /////////////////////////////////////////////////////////////////
-    // CONTACT CONTROLLER PART
-    ////////////////////////////////////////////////////////////////
-    /** Send email from contact form*/
-    app.route('/api/contact/email')
-      .post(ContactController.sendEmailChecks(), ContactController.sendEmail);  
   
 
 

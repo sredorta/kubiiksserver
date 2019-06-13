@@ -178,7 +178,7 @@ export class Middleware {
                         else throw new HttpException(400, messages.authAlreadyLoggedIn, null);
                         })
                 }
-
+            console.log("UNREGISTERED END !!!!");
             } catch(error) {
                 next(error);
             }

@@ -8,6 +8,7 @@ import pug from 'pug';
 import path from 'path';
 import htmlToText from 'html-to-text';
 import InlineCss from 'inline-css';
+import nodemailer from 'nodemailer';
 
 export const EmailN = 'Not a model';
 export const NEmail = 'Not a model';
@@ -224,6 +225,30 @@ export class Email extends Model<Email> {
     } catch (error) {
         return null;
     }
+  }
+
+  /**Sends email to email recipients with a certain template, additional html if any, subject... */
+  public static async send(iso:string, template:string, subject:string, to:string[], additionalHtml?:string) {
+      try {
+             let myEmail = await Email.findOne({where:{name:template}});
+            if (!myEmail) return null;
+
+            let html = await myEmail.getHtml(iso, additionalHtml);
+            if (!html)  return null;
+            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+            let myEmailT = {
+                            from: AppConfig.emailSmtp.sender,
+                            to: to,
+                            subject: subject,
+                            text: htmlToText.fromString(html),
+                            html: html
+            }
+            console.log("SENDING EMAIL !!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            await transporter.sendMail(myEmailT);
+            return true;
+      } catch (error) {
+            return null;
+      }
   }
 
 

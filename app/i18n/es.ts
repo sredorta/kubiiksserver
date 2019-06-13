@@ -39,6 +39,9 @@ export const messages = {
     emailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
     emailSiteAccess : 'IR AL SITIO WEB',
     emailDeleteProtected: 'Los modelos de correo del systema no se pueden borrar',
+    emailValidationLink: (name = 'field') => `<p>Por favor valida tu cuenta clickando en el siguiente <a href='${name}'>link</a></p>`,
+    emailResetPassword: (name = 'field') => `<p>Su nuevo password : <span>${name}<span></p>`,
+    emailResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
 
 
     articleContentNotCreate: "Los articulos de la categoria 'content' no se pueden crear",

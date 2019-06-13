@@ -32,13 +32,14 @@ export const messages = {
     oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
     authEmailResetPassword: (name = 'field') => `An email with your new password has been sent to : ${name}`,
     authEmailValidate: (name = 'field') => `A validation email has been sent to : ${name}`,
-    authEmailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
     emailSentOk:    (name = 'field') => `An email has been sent to : ${name}`,
     emailSentError: 'An error happened when sending the email, please contact the administrator',
     emailSiteAccess : 'GO TO SITE',
     emailDeleteProtected: 'System email templates cannot be deleted',
-
+    emailValidationLink: (name = 'field') => `<p>Please validate your account by clicking to the foollowing <a href='${name}'>link</a></p>`,
+    emailResetPassword: (name = 'field') => `<p>Your new password : <span>${name}<span></p>`,
+    emailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
 
 
     articleContentNotCreate: 'Content articles cannot be created',
