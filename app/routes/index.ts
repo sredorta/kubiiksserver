@@ -201,9 +201,9 @@ export class Routes {
 
 
 
-    /**Email validation endpoint */
+    /**Email validation endpoint by providing id and key */
     app.route('/api/auth/validate-email')
-      .get(AuthController.emailValidation);
+      .post(Middleware.unregistered(), AuthController.emailValidationChecks(),AuthController.emailValidation);
 
     /** Reset password and send new one by email*/
     app.route('/api/auth/reset-password/email')

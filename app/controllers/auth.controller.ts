@@ -72,7 +72,7 @@ export class AuthController {
                 }
                 //Validation with email is the default
                 default: {
-                    const link = AppConfig.api.host + ":"+ AppConfig.api.port + "/api/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
+                    const link = AppConfig.api.host + ":"+ AppConfig.api.fePort + "/login/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
                     let html = messages.emailValidationLink(link);
 
                     let recipients = [];
@@ -274,43 +274,41 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     //Validate Email when clicking to email link
     ///////////////////////////////////////////////////////////////////////////
-    static emailValidation = async (req: Request, res: Response, next:NextFunction) => {
-        const validator = new Validator();
-        //We do parameters checking here as we got parameters from the query
-        let result : boolean = true;
-        let myUser : User | null;
 
-        if (!req.query.id) result = false;
-        if (result)
-            if (!validator.isNumberString(req.query.id)) result = false;
-        if (!req.query.key) result = false;
-        if (result)
-            if (req.query.key.length!=30) result = false;
-        //Check that we have a matching user with the given id and key
+    //TODO: Regenerate key each time so that we cannot have somebody trying endpoint indefinitely
+    /**Validates email account by providing id and key */
+    static emailValidation = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            if (result) {
-                myUser = await User.scope("full").findOne({
-                    where: {
-                        id: req.query.id,
-                        emailValidationKey: req.query.key 
-                    }
-                });
-                if (!myUser) result=false;
-                else {
-                    myUser.isEmailValidated = true;
-                    myUser.emailValidationKey = Helper.generateRandomString(30);
-                    await myUser.save();
-                }
+            let myUser = await User.scope("full").findByPk(req.body.id);
+            if (!myUser) throw new Error("User not found !");
+            //Check that key matches
+            if (myUser.emailValidationKey != req.body.key) 
+                res.status(400).send({message: messages.authEmailValidateError});
+            else {
+                //Generate new key
+                myUser.isEmailValidated = true;
+                myUser.emailValidationKey = Helper.generateRandomString(30);
+                await myUser.save();
+                //Generate a token
+                const payload : IJwtPayload = {id: req.body.id};
+                let accessTime = AppConfig.auth.accessShort;
+                const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: accessTime });
+                //TODO: GENERATE TOKEN AND SEND AUTH AND TOKEN :Get auth user and send
+                myUser = await User.scope("withRoles").findByPk(req.body.id);
+                res.send({user:myUser,token:token,message: {show:true, text:messages.authEmailValidateSuccess}});
             }
-            //Render now the result view page and return it
-            const html = pug.renderFile(path.join(__dirname, "../views/validation."+res.locals.language+ ".pug"), {result: result});
-            res.send(html);
         } catch(error) {
             next(new HttpException(500, error.message, error.errors));
         }
     }
-    //TODO: Use validation here !!!
-
+    /**Parameter validation */
+    static emailValidationChecks() {
+        return [
+            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(User,'id')),
+            body('key').exists().withMessage('exists').isLength({min:30,max:30}).isAlphanumeric(),
+            Middleware.validate()
+        ]
+}   
 
     ///////////////////////////////////////////////////////////////////////////
     // resetPasswordEmail:  Resets the password by sending new one by email

@@ -33,6 +33,8 @@ export const messages = {
     authEmailResetPassword: (name = 'field') => `An email with your new password has been sent to : ${name}`,
     authEmailValidate: (name = 'field') => `A validation email has been sent to : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
+    authEmailValidateError: 'The account could not be activated, contact the administrator',
+    authEmailValidateSuccess: 'Your account has been activated',
     emailSentOk:    (name = 'field') => `An email has been sent to : ${name}`,
     emailSentError: 'An error happened when sending the email, please contact the administrator',
     emailSiteAccess : 'GO TO SITE',
