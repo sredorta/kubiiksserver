@@ -119,15 +119,17 @@ export class Routes {
     app.route('/api/email/update')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),EmailController.updateChecks(),EmailController.update);
 
-
     /**Checks that email service is up and running */
     app.route('/api/email/check')
       .get(EmailController.emailCheck);
 
     /**Sends email to current loggedin user for testing purposes */
     app.route('/api/email/send')
-    .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendChecks(),EmailController.send);  
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendChecks(),EmailController.send);  
 
+    /**Creates a new email template */
+    app.route('/api/email/create')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.createChecks(),EmailController.create);  
 
 
     /////////////////////////////////////////////////////////////////

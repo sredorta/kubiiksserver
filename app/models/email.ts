@@ -37,8 +37,9 @@ export class Email extends Model<Email> {
 
   /**Name of the template of the email in order for user to select one template */  
   @AllowNull(true)
+  @Unique(true)
   @Column(DataTypes.STRING(50))
-  name!: string;
+  name!: string; 
 
   /**Contains the link to the logo image */
   @AllowNull(true)
@@ -234,27 +235,47 @@ export class Email extends Model<Email> {
         let myEmail = await Email.create({
             name: "reference",
             logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
-            backgroundHeader: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
+            backgroundHeader: "none",
             backgroundContent: "none",  
             isProtected: true  
         });                    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",title:"Mon titre",subtitle:"Mon soustitre",header:"<h1>Exemple entete email</h1>",content:"<h1>Exemple de contenu</h1>"});  
-        await EmailTranslation.create({emailId:myEmail.id, iso:"en",title:"My title",subtitle:"My subtitle",header:"<h1>Example email Header</h1>",content:"<h1>Content example</h1>"});    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"es",title:"Mi titulo",subtitle:"Mi subtitulo",header:"<h1>Ejemplo de cabecera email</h1>",content:"<h1>Ejemplo de contenido</h1>"});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele de courriel de reference pour tous les nouveaux modeles",title:"Mon titre",subtitle:"Mon soustitre",header:"<h1>Exemple entete email</h1>",content:"<h1>Exemple de contenu</h1>"});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Reference email template for all new models",title:"My title",subtitle:"My subtitle",header:"<h1>Example email Header</h1>",content:"<h1>Content example</h1>"});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo de referencia para todos los nuevos modelos",title:"Mi titulo",subtitle:"Mi subtitulo",header:"<h1>Ejemplo de cabecera email</h1>",content:"<h1>Ejemplo de contenido</h1>"});             
 
 
         myEmail = await Email.create({
             name: "validate-email",
             logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
-            backgroundHeader: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
+            backgroundHeader: "none",
             backgroundContent: "none",  
             isProtected: true  
         });                    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
-        await EmailTranslation.create({emailId:myEmail.id, iso:"en",title:"title 1",subtitle:"subtitle en 1",header:"<h1>Email Header</h1>",content:"<h1>content 1</h1>"});    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"es",title:"titulo 1",subtitle:"subititulo es 1",header:"<h1>Cabecera email</h1>",content:"<h1>contenido 1</h1>"});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la validation de compte de courriel client",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer to validate account",title:"title 1",subtitle:"subtitle en 1",header:"<h1>Email Header</h1>",content:"<h1>content 1</h1>"});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes para validar su cuenta de correo",title:"titulo 1",subtitle:"subititulo es 1",header:"<h1>Cabecera email</h1>",content:"<h1>contenido 1</h1>"});             
 
+        myEmail = await Email.create({
+          name: "reset-password",
+          logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
+          backgroundHeader: "none",
+          backgroundContent: "none",  
+          isProtected: true  
+        });                    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la demande de nouveau mot de passe",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer when new password has been asked",title:"title 1",subtitle:"subtitle en 1",header:"<h1>Email Header</h1>",content:"<h1>content 1</h1>"});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes cuando piden un nuevo password",title:"titulo 1",subtitle:"subititulo es 1",header:"<h1>Cabecera email</h1>",content:"<h1>contenido 1</h1>"});             
 
+        myEmail = await Email.create({
+          name: "contact-reply",
+          logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",
+          backgroundHeader: "none",
+          backgroundContent: "none",  
+          isProtected: true  
+        });                    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé comme réponse automatique au formulaire de contact",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer as automatic reply of contact form",title:"title 1",subtitle:"subtitle en 1",header:"<h1>Email Header</h1>",content:"<h1>content 1</h1>"});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes como respuesta automatica al formulario de contacto",title:"titulo 1",subtitle:"subititulo es 1",header:"<h1>Cabecera email</h1>",content:"<h1>contenido 1</h1>"});             
 
     }
     return _seed();

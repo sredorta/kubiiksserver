@@ -27,6 +27,11 @@ export class EmailTranslation extends Model<EmailTranslation> {
   @Column(DataTypes.STRING(10))
   iso!: string;
 
+  /**Short description of the template to show in admin */  
+  @AllowNull(false)
+  @Column(DataTypes.STRING(50))
+  description!: string; 
+
   /**Title of the email. Typically this is the company name */
   @AllowNull(false)
   @Column(DataTypes.STRING(100))

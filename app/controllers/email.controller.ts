@@ -83,7 +83,12 @@ export class EmailController {
                 include: [EmailTranslation]
              });
              if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null);           
-            myEmail = await myEmail.save();
+             console.log(req.body.email);
+             for (let trans of myEmail.translations) {
+                 await trans.save();
+             }
+             myEmail = await myEmail.save();
+             
 
             res.json(myEmail);
         } catch(error) {
@@ -136,27 +141,46 @@ export class EmailController {
     }
    /**Parameter validation */
    static sendChecks() {
-    return [
-        body('email').exists().withMessage('exists'),
-        body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-        body('email.translations').exists().withMessage('exists'),
-        //TODO: Add here all required checks !!!
-
-        Middleware.validate()
-    ]
+        return [
+            body('email').exists().withMessage('exists'),
+            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            body('email.translations').exists().withMessage('exists'),
+            //TODO: Add here all required checks !!!
+            Middleware.validate()
+        ]
     }    
-
-/*    static emailShow = async (req: Request, res: Response, next:NextFunction) => {
-        //Generate email html
+    /**Creates email template based on reference. Admin or content required */
+    static create = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            let myEmail = await Email.findOne({where:{name:"validate-email"}});
-            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
-            let html = await myEmail.getHtml(res.locals.language, '<p>Validate your email by clicking to the following <a href="/test">link</a></p>');
-            console.log(html);
-            res.send(html);
-        } catch (error) {
-            next(new HttpException(500, messages.emailSentError,null));
-
+            let myReferenceEmail = await Email.findOne({where:{name:"reference"}});
+            if (!myReferenceEmail) 
+                return next(new HttpException(500, "Reference email not found", null));
+            //Update the name
+            let myRef =  JSON.parse(JSON.stringify(myReferenceEmail));
+            delete myRef.id;
+            myRef.name = req.body.data.name;
+            let myNewEmail = await Email.create(myRef);
+            for (let trans of myReferenceEmail.translations) {
+                let myTrans = JSON.parse(JSON.stringify(trans));
+                delete myTrans.id;
+                myTrans.emailId = myNewEmail.id;
+                myTrans.description = req.body.data.description[trans.iso];
+                await EmailTranslation.create(myTrans)
+            }
+            res.json(await Email.findByPk(myNewEmail.id));                
+        } catch(error) {
+            next(error);
         }
-    }*/
+    }
+    /**Parameter validation */
+    static createChecks() {
+        return [
+            body('data').exists().withMessage('exists'),
+            body('data.name').exists().withMessage('exists').isLength({min:5}),
+            body('data.name').exists().withMessage('exists').custom(CustomValidators.dBMissing(Email,'name')),
+            body('data.description').exists().withMessage('exists'),
+            body('data.description.*').isLength({min:5,max:200}),
+            Middleware.validate()
+        ]
+    }
 }
