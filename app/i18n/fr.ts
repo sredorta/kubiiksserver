@@ -37,6 +37,8 @@ export const messages = {
     emailSentOk:    (name = 'field') => `Un courriel à éte envoyé à l'adresse : ${name}`,
     emailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
     emailSiteAccess : 'ALLER AU SITE',
+    emailDeleteProtected: 'Les modeles de courriel du systeme ne peuvent pas être effacés',
+
 
     oauth2MissingField : (name = 'field') => `Erreur penant l'authentifition, impossible de recuperer le champ ${name} `,
 

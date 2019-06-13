@@ -158,6 +158,9 @@ export class EmailController {
             //Update the name
             let myRef =  JSON.parse(JSON.stringify(myReferenceEmail));
             delete myRef.id;
+            delete myRef.createdAt;
+            delete myRef.updatedAt;
+            myRef.isProtected = false;
             myRef.name = req.body.data.name;
             let myNewEmail = await Email.create(myRef);
             for (let trans of myReferenceEmail.translations) {
@@ -183,4 +186,28 @@ export class EmailController {
             Middleware.validate()
         ]
     }
+
+    /**Deletes email template by id with all translations. Admin or content required */
+    static delete = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let email = await Email.findByPk(req.body.id);
+            if (!email) 
+                return next(new HttpException(500, "Email template could not be found", null));
+            if (email.isProtected == true)
+                return next(new HttpException(400, messages.emailDeleteProtected, null));
+            await email.destroy();
+            res.send({message: "success"}); 
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static deleteChecks() {
+        return [
+            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            Middleware.validate()
+        ]
+    }    
+
+
 }

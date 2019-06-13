@@ -37,6 +37,8 @@ export const messages = {
     emailSentOk:    (name = 'field') => `An email has been sent to : ${name}`,
     emailSentError: 'An error happened when sending the email, please contact the administrator',
     emailSiteAccess : 'GO TO SITE',
+    emailDeleteProtected: 'System email templates cannot be deleted',
+
 
 
     articleContentNotCreate: 'Content articles cannot be created',

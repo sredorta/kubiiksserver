@@ -38,6 +38,8 @@ export const messages = {
     emailSentOk:    (name = 'field') => `Un correo electronico ha sido enviado a : ${name}`,
     emailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
     emailSiteAccess : 'IR AL SITIO WEB',
+    emailDeleteProtected: 'Los modelos de correo del systema no se pueden borrar',
+
 
     articleContentNotCreate: "Los articulos de la categoria 'content' no se pueden crear",
     articleContentNotDelete: "Los articulos de la categoria 'content' no se pueden borrar",

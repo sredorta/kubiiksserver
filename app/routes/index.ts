@@ -131,6 +131,10 @@ export class Routes {
     app.route('/api/email/create')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.createChecks(),EmailController.create);  
 
+    /**Deletes an email template */
+    app.route('/api/email/delete')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.deleteChecks(),EmailController.delete);  
+
 
     /////////////////////////////////////////////////////////////////
     // AUTH CONTROLLER PART
