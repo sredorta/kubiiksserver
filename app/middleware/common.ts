@@ -185,6 +185,23 @@ export class Middleware {
         }
     } 
 
+    /** Checks that the registered userhas kubiiks rights if not errors */     
+    public static hasKubiiksRights() {
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            try {
+                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                if (myUser) {
+                    if (myUser.roles.findIndex(obj => obj.name == 'kubiiks') >= 0)
+                        next();
+                    else
+                        next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
+                } else
+                    next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
+            } catch(error) {
+                next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
+            }
+        }
+    }
 
     /** Checks that the registered user is an administrator if not errors */     
     public static hasAdminRights() {
@@ -265,18 +282,5 @@ export class Middleware {
         }
     }
 
-    /**Multer for file uploads */
-/*    public static multer() {
-        const storage = multer.diskStorage({
-            destination: function(req, file, cb) {
-              cb(null, "uploads/");
-            },
-            filename: function(req, file, cb) {
-              cb(null, file.originalname);
-            }
-          });
-          
-          const uploads = multer({ storage: storage });
-    }*/
 
 }

@@ -79,31 +79,4 @@ export class UserController {
 
 
 
-    /////////////////////////////////////////////////////////////////////////////////////
-    //TESTING PARAMS
-
-    static test = async (req: Request, res: Response, next: NextFunction) => {
-        console.log(JSON.parse(JSON.stringify("Hello")));
-        console.log(JSON.parse(JSON.stringify({"test":"test","hello":"world"})));
-
-        res.json("SUCCESS !!!");
-    }
-    /**Parameter validation */
-    static testchecks() {
-        return [
-            body('firstName').custom(CustomValidators.nameValidator('firstName')),
-            body('lastName').custom(CustomValidators.nameValidator('lastName')),
-            body('email').exists().withMessage('exists').isEmail(),
-            body('phone').custom(CustomValidators.phone('phone')),
-            body('mobile').custom(CustomValidators.mobile('mobile')),
-            body('password').exists().withMessage('exists').custom(CustomValidators.password()),
-            body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
-            body('terms').custom(CustomValidators.dBuserNotPresent(User)),
-            Middleware.validate()
-        ]
-    }    
-    static conditional() {
-
-    }
-
 }

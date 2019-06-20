@@ -45,9 +45,10 @@ export class Role extends Model<Role> {
         async function _seed() {
             try {
               await Role.create({name:"admin"});
-              await Role.create({name:"content"});
-              await Role.create({name:"blog"});
-              await Role.create({name:"users"});
+              await Role.create({name:"kubiiks"});  //Role that cannot be modified allows to modify the content of the site
+              await Role.create({name:"content"});   //Allows to modify content, like posts that are not blog...
+              await Role.create({name:"blog"});      //Allows to modify content of blog
+              await Role.create({name:"users"});     //Allows access to users
               await Role.create({name:"chat"});
 
             } catch(err) {

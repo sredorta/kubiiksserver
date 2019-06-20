@@ -37,15 +37,16 @@ const sequelize = new Sequelize({
   //Create all models
   sequelize.addModels([__dirname + '/models']);
 
-async function startServer() {    
-    await sequelize.sync({force:true});
+async function startServer() {  
+   if (true) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
+    await sequelize.sync({force:true});  
     //Seeding part
     await Setting.seed(); //Seed settings from the config.json for FE sharing
     await Role.seed();
     await User.seed();
     await Article.seed();
     await Email.seed();
-
+   }
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");
         console.error(err.stack);

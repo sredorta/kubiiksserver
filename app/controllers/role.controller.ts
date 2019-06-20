@@ -15,14 +15,22 @@ import { CustomValidators } from '../classes/CustomValidators';
 export class RoleController {
 
     /**Gets all available roles */
-    static getAll = async(req: Request, res: Response, next: NextFunction) => {
-        res.json(await Role.findAll());
+    static getAll = async(req: Request, res: Response, next: NextFunction) => {  
+        //We remove the kubiiks role so that is not visible on the frontend
+        let myRoles =  await Role.findAll();
+        if (myRoles)
+            myRoles = myRoles.filter(obj=> obj.name!= "kubiiks")
+        res.json(myRoles);
     }
 
     /**Static attach role to user */
     static attach = async(req: Request, res: Response, next: NextFunction) => {
         try {
             let myUser = await User.findByPk(req.body.userId);
+            let myRole = await Role.findByPk(req.body.roleId);
+            if (myRole)
+                if (myRole.name == "kubiiks") 
+                    throw new HttpException(400, messages.authKubiiksRole ,null);
             if (myUser) {
                 await myUser.attachRole(req.body.roleId);
             }  
@@ -47,6 +55,10 @@ export class RoleController {
             if (req.user.id == req.body.userId && req.body.roleId == 1) {
                 throw new HttpException(400, messages.validationSelfUser ,null);
             }
+            let myRole = await Role.findByPk(req.body.roleId);
+            if (myRole)
+                if (myRole.name == "kubiiks") 
+                    throw new HttpException(400, messages.authKubiiksRole ,null);
             let myUser = await User.findByPk(req.body.userId);
             if (myUser) {
                 await myUser.detachRole(req.body.roleId);

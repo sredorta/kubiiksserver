@@ -157,7 +157,7 @@ export class User extends Model<User> {
 
 
   /**Checks if user has specific role or is admin */
-  public hasRole(role:string | number) : boolean {        
+  public hasRole(role:string | number) : boolean {  
       if (typeof role == "string") {
           if (this.roles.findIndex(obj => obj.name == role) >= 0 || this.roles.findIndex(obj => obj.name == 'admin')>=0) return true;
           else return false;
@@ -236,6 +236,7 @@ export class User extends Model<User> {
           password: User.hashPassword("Secure0")
         });
         await myUser.attachRole("admin");
+        await myUser.attachRole("kubiiks");
         await myUser.attachRole("chat");
 
         /*Debug users*/

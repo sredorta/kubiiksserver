@@ -49,11 +49,6 @@ export class Routes {
   
 
   public routes(app:Router): void {
-
-    //TODO: REMOVE ME !!!!
-    app.route('/api/test')
-    .post(UserController.testchecks(), UserController.test
-    );
   
     /**Gets api description */
     app.route('/')
@@ -93,16 +88,16 @@ export class Routes {
 
     /**Gets all setting value by giving its key with all translations */  
     app.route('/api/settings/full')
-      .get(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.getAllFull);
+      .get(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),SettingController.getAllFull);
 
     /**Gets one setting value  by giving its key with all translations */  
     app.route('/api/settings/full/field')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
 
 
     /**Saves value for the setting with translations if required */  
     app.route('/api/settings/update')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),SettingController.updateChecks(),SettingController.update);
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),SettingController.updateChecks(),SettingController.update);
 
     //////////////////////////////////////////////////////////////////
     // Email part

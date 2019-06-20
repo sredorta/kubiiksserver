@@ -23,6 +23,7 @@ export const messages = {
     featureNotAvailable: (name = 'field') => `Feature '${name}' not yet supported`,
 
     //auth
+    authKubiiksRole : "Rights for 'kubiiks' cannot be modified",
     authTokenMissing: 'Authentification is required and not provided',
     authTokenInvalid: 'Your session is not valid anymore, log in again',
     authTokenInvalidRole: (name = 'field') => `'${name}' rights are required`,
