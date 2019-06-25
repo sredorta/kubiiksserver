@@ -36,12 +36,14 @@ export class NotificationController {
             console.log(`Subscription received`);
             console.log(subscription);
             res.status(200).json(subscription);
+            //TODO: Each user will have to store the endpoint and keys so that we can recover later and send him a notif
+
             //Test of sending back notif
             const payload = JSON.stringify({
                 notification: {
                   title: 'Test de notification',
                   body: 'Ça cest un test de notifications through Angular with this article!',
-                  icon: 'https://www.shareicon.net/data/256x256/2015/10/02/110808_blog_512x512.png',
+                  icon: 'https://localhost:3000/public/images/defaults/logo.png',
                   vibrate: [100, 50, 100],
                   action:"test",
                   data: {
@@ -59,8 +61,7 @@ export class NotificationController {
     static getChecks() {
         return [
             body('notification').exists().withMessage('exists'),
-            body('notification.endpoint').exists().withMessage('exists').isURL().contains('https://fcm.googleapis.com/fcm/send'),
-            body('notification.expirationTime').exists().withMessage('exists'),
+            body('notification.endpoint').exists().withMessage('exists').isURL(),
             body('notification.keys').exists().withMessage('exists'),
             body('notification.keys.p256dh').exists().withMessage('exists').isLength({min:80}),
             body('notification.keys.auth').exists().withMessage('exists').isLength({min:15}),
