@@ -44,6 +44,10 @@ import * as dotenv from "dotenv";
             }
         },
         "auth": {
+            "onPush" : {
+                "public"  : <string>process.env.VAPID_PUBLIC,
+                "private" : <string>process.env.VAPID_PRIVATE,
+            },
             "jwtSecret": <string>process.env.AUTH_JWT_SECRET,
             "accessShort": <string>process.env.AUTH_ACCESS_SHORT,
             "accessLong": <string>process.env.AUTH_ACCESS_LONG,

@@ -30,6 +30,7 @@ import {check, validationResult,body} from 'express-validator/check';
 import uploads from '../utils/multer';
 import { InitController } from '../controllers/init.controller';
 import { EmailController } from '../controllers/email.controller';
+import { NotificationController } from '../controllers/notification.controller';
 
 
 
@@ -70,6 +71,14 @@ export class Routes {
     //  /api/<plural>/create     POST    : add  (returns the new record)
     //  /api/<plural>/delete     DELETE  : remove (by Id)
 
+    
+    /////////////////////////////////////////////////////////////////
+    // ON PUSH NOTIFICATIONS
+    ////////////////////////////////////////////////////////////////
+    //When browser accepts notification sends his data
+    app.route('/api/notifications')
+    .post(NotificationController.getChecks(), NotificationController.get);
+
     /////////////////////////////////////////////////////////////////
     // INIT CONTROLLER PART
     ////////////////////////////////////////////////////////////////
@@ -83,20 +92,20 @@ export class Routes {
     ////////////////////////////////////////////////////////////////
 
     /**Gets all setting values with current language translated value*/
-    app.route('/api/settings/all')
+    app.route('/api/setting/all')
       .get(SettingController.getAll);
 
     /**Gets all setting value by giving its key with all translations */  
-    app.route('/api/settings/full')
+    app.route('/api/setting/full')
       .get(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),SettingController.getAllFull);
 
     /**Gets one setting value  by giving its key with all translations */  
-    app.route('/api/settings/full/field')
+    app.route('/api/setting/full/field')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),SettingController.getFieldFullChecks(), SettingController.getFieldFull);
 
 
     /**Saves value for the setting with translations if required */  
-    app.route('/api/settings/update')
+    app.route('/api/setting/update')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),SettingController.updateChecks(),SettingController.update);
 
     //////////////////////////////////////////////////////////////////

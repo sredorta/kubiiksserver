@@ -17,6 +17,7 @@ import {check, validationResult,body} from 'express-validator/check';
 import {ValidationException} from '../classes/ValidationException';
 import { User } from '../models/user';
 import passportJWT from "passport-jwt";
+import webPush from 'web-push';
 
 export let messages = en; //Set default language and export messages
 
@@ -39,6 +40,16 @@ export class Middleware {
             next();
         }
     }
+
+    /**Sets the onPush vapid notifications details */
+    public static onPush() {
+        console.log("OnPUSH enabled !!!");
+        return function (req:express.Request, res:express.Response, next:express.NextFunction) {
+            webPush.setVapidDetails('https://www.kubiiks.com', AppConfig.auth.onPush.public,AppConfig.auth.onPush.private);
+            next();
+        }
+    }
+
 
     //Set language based on headers and supported languages in req.language
     public static language() {

@@ -37,6 +37,7 @@ class App {
         //this.app.use(express.json());        //Use JSON post parameters format 
         this.app.use(Middleware.cors());     //Enable cors
         this.app.use(Middleware.language()); //Parses headers and determines language
+        this.app.use(Middleware.onPush());
         this.app.use(ExpressValidator());
 
         //Declare all available passports   
