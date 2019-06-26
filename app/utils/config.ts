@@ -61,16 +61,11 @@ import * as dotenv from "dotenv";
             }
         },
         "sharedSettings" : [
-            {"key": "signup_firstName", "value":"include"},
-            {"key": "signup_lastName", "value":"include"},
-            {"key": "signup_phone", "value":"exclude"},
-            {"key": "signup_mobile", "value":"optional"},
             {"key": "profile_firstName", "value":"include"},
             {"key": "profile_lastName", "value":"include"},
             {"key": "profile_phone", "value":"optional"},
             {"key": "profile_mobile", "value":"optional"},            
-            {"key": "validation_method", "value":"email"}, //email,phone or no_validation
-            {"key": "login_username", "value":"email"},
+            {"key": "validation_method", "value":"no_validation"}, //email or no_validation
             {"key": "mode", "value":"production"}, //Put 'demo' for direct admin access
             {"key": "article_cathegories", "value":"content,blog,prix,realisations"}, //Article cathegories
         ],

@@ -43,8 +43,6 @@ export class AuthController {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 email: req.body.email,
-                phone:req.body.phone,
-                mobile:req.body.mobile,
                 language: req.user.language,
                 passport: "local",
                 terms:req.body.terms,
@@ -57,17 +55,16 @@ export class AuthController {
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
                 await myUser.attachRole("admin"); 
             }
+            //Attach kubiiks role on first user
+            if (myUser.id ==1)
+                await myUser.attachRole("kubiiks"); 
+
+
             //Depending on the validation method we need to authenticate or not
             switch (method) {
-                //Login to the admin account if exists or to the standard if admin does not exist
                 case "no_validation": {
-                    const token = myUser.createToken("short");  
-                    res.send({token: token});  
-                    break;
-                }
-                //Requires mobile phone validation
-                case "mobile": {
-                    next( new HttpException(500, messages.featureNotAvailable("validation_method : mobile"),null));
+                    const token = myUser.createToken("short");
+                    res.send({token: token, user:myUser});  
                     break;
                 }
                 //Validation with email is the default
@@ -94,8 +91,6 @@ export class AuthController {
                 body('firstName').custom(CustomValidators.nameValidator('firstName')),
                 body('lastName').custom(CustomValidators.nameValidator('lastName')),
                 body('email').exists().withMessage('exists').isEmail(),
-                body('phone').custom(CustomValidators.phone('phone')),
-                body('mobile').custom(CustomValidators.mobile('mobile')),
                 body('password').exists().withMessage('exists').custom(CustomValidators.password()),
                 body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
                 body('dummy').custom(CustomValidators.dBuserNotPresent(User)),
@@ -108,28 +103,23 @@ export class AuthController {
     // login
     ///////////////////////////////////////////////////////////////////////////
     /**Login using local passport */
-    static login =  (req:Request, res:Response,next:NextFunction) => {
+    static login = async (req:Request, res:Response,next:NextFunction) => {
         //Thanks to passports we have the user in req.user if we get here credentials are valid
-            const payload : IJwtPayload = {id: req.user.id};
-            let accessTime : string;    
+        try {
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);
+            if (!myUser) return next( new HttpException(400, messages.validationNotFound(messages.User), null));
+            let token : string = "";
             if (!req.body.keepconnected)
-                accessTime = AppConfig.auth.accessShort;
+                token = myUser.createToken("short");
             else
-                accessTime = AppConfig.auth.accessLong;
-            //We just need to create a token and provide it
-            const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: accessTime });
-            res.json({token: token});              
+                token = myUser.createToken("long");
+            res.json({token: token, user:myUser});   
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));
+        }              
     }
     /**Parameter validation */
     static loginChecks() {
-        if (Helper.isSharedSettingMatch("login_mobile", "include")) 
-            return [
-                body('username').custom(CustomValidators.mobile('mobile')),
-                body('password').exists().withMessage('exists').custom(CustomValidators.password()),
-                body('keepconnected').exists().withMessage('exists').isBoolean(),
-                Middleware.validate()
-            ]
-        else
             return [
                 body('username').exists().withMessage({type:'exists',field:'email'}).isEmail(),
                 body('password').exists().withMessage('exists').custom(CustomValidators.password()),

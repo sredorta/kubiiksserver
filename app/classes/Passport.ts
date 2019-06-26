@@ -40,12 +40,8 @@ export class Passport {
         function (username, password, cb)  {
             //Find that we have an user matching username and passport
             async function _work() {
-                let field = Helper.getSharedSetting("login_username"); 
-                if (!field ){
-                    return cb(new HttpException(500, "Invalid 'login_username' config field : " + field  ,null), false);
-                }
                 let query :any =  {};
-                query[field] = username;
+                query['email'] = username;
                 let myUser = await User.scope("full").findOne({where: query});
                 if (!myUser) {
                     return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
