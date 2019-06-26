@@ -152,6 +152,7 @@ export class AuthController {
     static oauth2ValidateFields =  async (req:Request, res:Response,next:NextFunction) => {
         try {
             let myUser = User.build(JSON.parse(JSON.stringify(req.user)), {isNewRecord:false});
+            
             //If terms are not validated we need to show signup completion form, if not we can move directly to loggedIn area
             if (myUser.terms == false) {
                 res.json({complete:false, user:myUser});
@@ -243,7 +244,6 @@ export class AuthController {
             body('phone').optional().custom(CustomValidators.phone('phone')),
             body('mobile').optional().custom(CustomValidators.mobile('mobile')),
             body('password').optional().custom(CustomValidators.passwordUpdate()),
-
             body('dummy').custom(CustomValidators.dBuserNotPresentExceptMe(User)),
             Middleware.validate()
         ]
@@ -280,10 +280,7 @@ export class AuthController {
                 myUser.emailValidationKey = Helper.generateRandomString(30);
                 await myUser.save();
                 //Generate a token
-                const payload : IJwtPayload = {id: req.body.id};
-                let accessTime = AppConfig.auth.accessShort;
-                const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: accessTime });
-                //TODO: GENERATE TOKEN AND SEND AUTH AND TOKEN :Get auth user and send
+                let token = myUser.createToken("short");
                 myUser = await User.scope("withRoles").findByPk(req.body.id);
                 res.send({user:myUser,token:token,message: {show:true, text:messages.authEmailValidateSuccess}});
             }
