@@ -17,11 +17,11 @@ export const NUser = 'Not a model';
 
 //Default scope only contains the public data
 @DefaultScope({
-  attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language', 'terms','createdAt','updatedAt']
+  attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','isEmailValidated', 'terms','createdAt','updatedAt']
 })
 @Scopes({
   withRoles: {
-    attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','createdAt','updatedAt'],
+    attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','isEmailValidated','createdAt','updatedAt'],
     include: [() => Role]
   },
   full: {

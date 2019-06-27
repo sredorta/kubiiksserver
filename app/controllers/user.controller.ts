@@ -48,6 +48,47 @@ export class UserController {
         ]
     }      
 
+    /**Update value with translations if required, we expect object with id,default, fr,en... */
+    static update = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            console.log(req.body.user);
+            let myUser = await User.findByPk(req.body.user.id);
+            if (!myUser) throw new Error("User not found with id: " + req.body.user.id);
+            if (req.body.firstName)
+                myUser.firstName = req.body.user.firstName;
+            if (req.body.lastName)
+                myUser.lastName = req.body.user.lastName;
+            if (req.body.email)
+                myUser.email = req.body.user.email;
+            if (req.body.phone)
+                myUser.phone = req.body.user.phone;            
+            if (req.body.mobile)
+                myUser.mobile = req.body.user.mobile;    
+            if (req.body.user.isEmailValidated)
+                myUser.isEmailValidated = req.body.user.isEmailValidated;    
+            await myUser.save();
+            res.json(myUser);
+
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));    
+        }
+
+    }
+    //We expect following format
+    //  {lang:<SettingId>, value:<SettingValue>
+    /**Update checks */
+    static updateChecks() {
+        return [
+            body('user.id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(User,'id')),
+            body('firstName').optional().custom(CustomValidators.nameValidator('firstName')),
+            body('lastName').optional().custom(CustomValidators.nameValidator('lastName')),
+            body('email').optional().isEmail(),
+            body('phone').optional().custom(CustomValidators.phone('phone')),
+            body('mobile').optional().custom(CustomValidators.mobile('mobile')),
+            body('isEmailValidated').optional().isBoolean(),
+            Middleware.validate()
+        ]
+    }
 
 
 

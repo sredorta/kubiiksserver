@@ -36,6 +36,7 @@ export const messages = {
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
     authEmailValidateError: 'The account could not be activated, contact the administrator',
     authEmailValidateSuccess: 'Your account has been activated',
+    authAccountNotActive: 'You need to validate your email account before getting access',
     emailSentOk:    (name = 'field') => `An email has been sent to : ${name}`,
     emailSentError: 'An error happened when sending the email, please contact the administrator',
     emailSiteAccess : 'GO TO SITE',

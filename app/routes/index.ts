@@ -217,28 +217,34 @@ export class Routes {
     ////////////////////////////////////////////////////////////////
 
     /**Get all user details. Admin or 'users' required */
-    app.route("/api/users/all")
+    app.route("/api/user/all")
         .get(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),UserController.getAll);
 
+    /** Removes specific user. Admin or 'users' required  */    
+    app.route('/api/user/delete')
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),UserController.deleteChecks(),UserController.delete)           
+
+    /** Updates specific user. Admin or 'users' required */    
+    app.route('/api/user/update')
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),UserController.updateChecks(),UserController.update)           
+
+
     /**Get user details by id. Admin or 'users' required */
-    app.route('/api/users/get/id')
+    app.route('/api/user/get/id')
         .post(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),UserController.getUserByIdChecks(),UserController.getOneById);
 
     /**Get all available roles. Admin or 'users' required */
-    app.route("/api/roles/all")
+    app.route("/api/role/all")
         .get(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),RoleController.getAll);        
 
     /** Attaches a role to a specific user. Admin required */   
-    app.route('/api/roles/attach')
+    app.route('/api/role/attach')
         .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),RoleController.attachChecks(),RoleController.attach)
 
     /** Detaches a role from specific user. Admin required */    
-    app.route('/api/roles/detach')
+    app.route('/api/role/detach')
         .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),RoleController.detachChecks(),RoleController.detach)   
         
-    /** Detaches a role from specific user. Admin required */    
-    app.route('/api/users/delete')
-        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),UserController.deleteChecks(),UserController.delete)           
 
     /////////////////////////////////////////////////////////////////
     // HANDLE GALLERY

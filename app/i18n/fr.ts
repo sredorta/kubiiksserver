@@ -36,6 +36,8 @@ export const messages = {
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,
     authEmailValidateError: "Le compte n'a pas pu etre active, contactez l'administrateur du site",
     authEmailValidateSuccess: 'Votre compte est desormais activé',
+    authAccountNotActive: 'Vous devez confirmer votre addresse de courriel avant de pouvoir accéder',
+
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nouveau mot de passe`,
     emailSentOk:    (name = 'field') => `Un courriel à éte envoyé à l'adresse : ${name}`,
     emailSentError: "Le courriel n'a pas pu etre envoyé, contactez l'administrateur",
