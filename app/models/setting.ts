@@ -39,6 +39,13 @@ export class Setting extends Model<Setting> {
   @HasMany(() => SettingTranslation)
   translations!: SettingTranslation[];  
 
+  /**Return if setting has translations or not */
+  hasTranslations() {
+    if (this.translations)
+      if (this.translations.length>0)
+        return true;
+    return false;    
+  }
 
   /**From array of settings we get the value of the one that matches they given key*/
   public static getValueFromArray(array:Setting[], key:string) : string | null {
