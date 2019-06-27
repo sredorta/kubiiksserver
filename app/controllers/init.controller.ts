@@ -32,7 +32,7 @@ export class InitController {
             let articles = await Article.findAll({order: [sequelize.literal('id DESC')]});
             result["articles"] = [];
             for (let article of articles) 
-                result["articles"].push(article.sanitize(res.locals.language,"full"));
+                result["articles"].push(article.sanitize(res.locals.language));
             if (req.user)    
                 result["user"] = await User.scope("withRoles").findByPk(req.user.id);
             else    

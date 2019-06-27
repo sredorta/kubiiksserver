@@ -55,8 +55,7 @@ export class Setting extends Model<Setting> {
   }
 
   /**Sanitize output by replacing translated value */
-  public sanitize(iso:string, scope:"default" | "full" = "default") {
-    let result : any;
+  public sanitize(iso:string) {
     let myValue : string = this.value;
     let myTranslatedSetting : SettingTranslation | undefined;
 
@@ -67,21 +66,10 @@ export class Setting extends Model<Setting> {
         myValue = myTranslatedSetting.value==null?this.value: myTranslatedSetting.value;
       }
     }
-    switch(scope) {
-      case "full":  //Do not translate default value and provide translations
-        result = {id:this.id,
-                    key:this.key,
-                    type:this.type,
-                    value:myValue, 
-                    translations:this.translations};
-      break;
-      default:  //Translate default value and do not provide translations, neither label,hint,placeholder
-        result = {id:this.id,
+    return {id:this.id,
           key:this.key,
           type:this.type,
           value:myValue};
-    }
-    return result;   
 
   }
 

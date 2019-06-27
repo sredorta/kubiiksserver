@@ -50,25 +50,23 @@ export class Article extends Model<Article> {
     hooks: true})
   translations!: ArticleTranslation[];  
 
+
+
+
   /**Sanitize output by removing all languages except requested one */
-  public sanitize(iso:string,scope:"summary" | "full") {
-    let result : any = JSON.parse(JSON.stringify(this));  
+  public sanitize(iso:string) {
+    let myTrans : ArticleTranslation | undefined;
+    let result = JSON.parse(JSON.stringify(this));
+    delete result.translations;
+
+    //Replace value of Setting with current language
     if (this.translations.length>0) {
-      let myTranslation = this.translations.find(obj => obj.iso == iso);
-      if (myTranslation) {
-        result.translations = [];
-        result.translations.push(JSON.parse(JSON.stringify(myTranslation)));
+      myTrans = this.translations.find(obj => obj.iso == iso);
+      if (myTrans) {
+        result.title = myTrans.title;
+        result.description = myTrans.description;
+        result.content = myTrans.content;
       }
-    }
-    switch (scope) {
-        case "summary":
-            let index : number =0;
-            for (let translation of result.translations) {
-                delete translation.content;
-                index = index+1;
-            }
-            break;
-        default: {}        
     }
     return result;
   }  
@@ -174,6 +172,28 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Se connecter: Contenu lateral",description:"Contenu lateral de la page de connexion. Ce contenu aparait seulement sur ecrans de grande taille et non sur mobiles",content:"<h1>contenu 2 cote</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Signup: Side content",description:"Only appears in large screens",content:"<h1>content 2 content</h1>"});    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Conectarse: Contenido lateral",description:"Solo aparece en pantallas grandes",content:"<h1>conteido 2 content</h1>"});             
+
+
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "profile-side",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Mon compte: Contenu lateral",description:"Contenu lateral de la page de mon compte. Ce contenu aparait seulement sur ecrans de grande taille et non sur mobiles",content:"<h1>Voila un example</h1><p>De contenu latéral</p>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Profile: Side content",description:"Only appears in large screens",content:"<h1>Lateral content</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Mi cuenta: Contenido lateral",description:"Solo aparece en pantallas grandes",content:"<h1>Contenido lateral</h1>"});             
+
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "forgot-side",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Mot de passe oublié: Contenu lateral",description:"Contenu lateral de la page mot de passe oublié. Ce contenu aparait seulement sur ecrans de grande taille et non sur mobiles",content:"<h1>Ça arrive à tous</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Forgot password: Side content",description:"Only appears in large screens",content:"<h1>It can happen to anyone</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Password olbidado: Contenido lateral",description:"Solo aparece en pantallas grandes",content:"<h1>Vaya vaya</h1>"});             
+
 
         //CONTACT
         myArticle = await Article.create({

@@ -23,13 +23,19 @@ export class ArticleController {
         try {
             let result = [];
             let articles = await Article.findAll({order: [sequelize.literal('id DESC')]});
-            for (let article of articles) result.push(article.sanitize(res.locals.language,"full"));
+            for (let article of articles) result.push(article.sanitize(res.locals.language));
             res.json(result);
         } catch(error) {
             next(error);
         }
     }
 
+
+
+
+
+
+    
     /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static getByIdFull = async (req: Request, res: Response, next:NextFunction) => {
         try {
