@@ -35,7 +35,7 @@ export class ArticleController {
 
 
 
-    
+
     /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static getByIdFull = async (req: Request, res: Response, next:NextFunction) => {
         try {
@@ -131,36 +131,35 @@ export class ArticleController {
     /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static update = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            console.log(req.body);
             let article = await Article.findByPk(req.body.article.id);
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
-            if (article && myUser) {
+            if (!article) return new Error("Could not find article with id : " + req.body.article.id);
+            let trans = article.translations.find(obj => obj.iso == res.locals.language);
+            if (!trans) return new Error("Could not find article translation with iso : " + res.locals.language);
+            let myUser = await User.scope("withRoles").findByPk(req.user.id);   
+            if (!myUser) return new Error("Could not find current user !");    
+            //Protection rights     
                 if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
                 }
                 if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
-                }            
-                    //TODO::Update here image if required
-                    article.public = req.body.article.public;
-                    article.backgroundImage = req.body.article.backgroundImage;
-                    article.image = req.body.article.image;
-                    //We don't allow cathegory update as it would be able to change to wrong cathegory
-                    await article.save();
-                    for (let translation of article.translations) {
-                        let data : ArticleTranslation = req.body.article.translations.find( (obj:ArticleTranslation) => obj.iso ==  translation.iso);
-                        if (data) {
-                            if (data.content)
-                                translation.content = data.content;
-                            if (data.title)
-                                translation.title = data.title;
-                            if (data.description)
-                                translation.description = data.description;                                                                
-                            await translation.save();
-                        }
-                    }
-                    res.json(await Article.findByPk(req.body.article.id));
                 }
+                if (article.cathegory=="content" && !myUser.hasRole("kubiiks")) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
+                }
+            //update part    
+                article.public = req.body.article.public;
+                article.backgroundImage = req.body.article.backgroundImage;
+                article.image = req.body.article.image;
+                await article.save();
+                trans.title = req.body.article.title;
+                trans.description = req.body.article.description;
+                trans.content = req.body.article.content;
+                await trans.save();
+                article = await Article.findByPk(req.body.article.id);
+                if (!article) return new Error("Unexpected error !");
+                res.json(article.sanitize(res.locals.language));
+
         } catch(error) {
             next(error);
         }
@@ -170,7 +169,13 @@ export class ArticleController {
         return [
             body('article').exists().withMessage('exists'),
             body('article.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
-            body('article.translations').exists().withMessage('exists'),
+            body('article.content').exists().withMessage('exists'),
+            body('article.title').exists().withMessage('exists'),
+            body('article.description').exists().withMessage('exists'),
+            body('article.image').exists().withMessage('exists'),
+            body('article.backgroundImage').exists().withMessage('exists'),
+            body('article.public').exists().withMessage('exists').isBoolean(),
+
             //TODO: Add here all required checks !!!
 
             Middleware.validate()
