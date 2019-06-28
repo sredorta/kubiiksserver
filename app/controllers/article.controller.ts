@@ -138,27 +138,27 @@ export class ArticleController {
             let myUser = await User.scope("withRoles").findByPk(req.user.id);   
             if (!myUser) return new Error("Could not find current user !");    
             //Protection rights     
-                if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
-                    return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
-                }
-                if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
-                    return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
-                }
-                if (article.cathegory=="content" && !myUser.hasRole("kubiiks")) {
-                    return next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
-                }
+            if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+            }
+            if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+            }
+            if (article.cathegory=="content" && !myUser.hasRole("kubiiks")) {
+                return next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
+            }
             //update part    
-                article.public = req.body.article.public;
-                article.backgroundImage = req.body.article.backgroundImage;
-                article.image = req.body.article.image;
-                await article.save();
-                trans.title = req.body.article.title;
-                trans.description = req.body.article.description;
-                trans.content = req.body.article.content;
-                await trans.save();
-                article = await Article.findByPk(req.body.article.id);
-                if (!article) return new Error("Unexpected error !");
-                res.json(article.sanitize(res.locals.language));
+            article.public = req.body.article.public;
+            article.backgroundImage = req.body.article.backgroundImage;
+            article.image = req.body.article.image;
+            await article.save();
+            trans.title = req.body.article.title;
+            trans.description = req.body.article.description;
+            trans.content = req.body.article.content;
+            await trans.save();
+            article = await Article.findByPk(req.body.article.id);
+            if (!article) return new Error("Unexpected error !");
+            res.json(article.sanitize(res.locals.language));
 
         } catch(error) {
             next(error);

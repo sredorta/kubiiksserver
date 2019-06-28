@@ -15,7 +15,8 @@ export class GalleryController {
 
     /**Uploads image to content folder and returns imageUrl for angular-editor*/
     static uploadImageToContent = async (req: Request, res: Response, next:NextFunction) => {
-        console.log(req.body);
+        console.log("WE ARE HERE !!!!!!!!");
+        console.log(req.file.filename);
         res.send({imageUrl: "https://localhost:3000/public/images/content/" + req.file.filename});  
     }
 
