@@ -220,7 +220,6 @@ export class Email extends Model<Email> {
         if (additionalHtml) {
             myData.content = myData.content + additionalHtml;
         }
-        console.log("getHtml", myData );
         let html = pug.renderFile(path.join(__dirname, "../emails/emails.pug"), {data:myData,iso:iso});
         //CSS must be put inline for better support of all browsers
         html =  await InlineCss(html, {extraCss:this.createAdditionalCss(),applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});

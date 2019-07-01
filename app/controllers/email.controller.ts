@@ -92,20 +92,21 @@ export class EmailController {
     /**Updates email template */
     static update = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            console.log(req.body.email);
             let myEmail = Email.build(req.body.email, {
                 isNewRecord: false,
                 include: [EmailTranslation]
              });
              if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null);           
-             console.log(req.body.email);
-             for (let trans of myEmail.translations) {
-                 await trans.save();
-             }
-             myEmail = await myEmail.save();
-             
+             let myTrans = await EmailTranslation.findOne({where:{emailId:myEmail.id,iso:res.locals.language}});
+             if (!myTrans) throw new Error("Translation not found !!");
+             myTrans.header = req.body.email.header;
+             myTrans.content = req.body.email.content;
+            await myTrans.save();
 
-            res.json(myEmail);
+            await myEmail.save();
+            let result = await Email.findByPk(myEmail.id);
+            if (!result) throw new Error("Could not generate result !");
+            res.json(result.sanitize(res.locals.language));
         } catch(error) {
             next(error);
         }
@@ -115,7 +116,9 @@ export class EmailController {
         return [
             body('email').exists().withMessage('exists'),
             body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            body('email.translations').exists().withMessage('exists'),
+            body('email.header').exists().withMessage('exists'),
+            body('email.content').exists().withMessage('exists'),
+
             //TODO: Add here all required checks !!!
 
             Middleware.validate()
