@@ -103,7 +103,7 @@ export class Routes {
     // Email part
     //////////////////////////////////////////////////////////////////
     /**Gets all email templates */
-    app.route('/api/emails')
+    app.route('/api/email/all')
       .get(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),EmailController.getAll);
 
     /**Returns the html of the email template */  
@@ -266,14 +266,10 @@ export class Routes {
     //////////////////////////////////////////////////////////////// 
 
     /**Gets all articles */
-    app.route('/api/articles')
+    app.route('/api/article/all')
       .get(ArticleController.getAll);
-
-    /**Gets content article by id with all the translations, you need to see admin or content to access here*/ 
-    app.route('/api/article/full')
-      .post(passport.authenticate('jwt',{session: false}),ArticleController.getByIdFullChecks(), ArticleController.getByIdFull);
-    
-      /**Deletes article by id with all the translations, you need to see admin or content or blog to access here*/ 
+   
+    /**Deletes article by id with all the translations, you need to see admin or content or blog to access here*/ 
     app.route('/api/article/delete')
       .post(passport.authenticate('jwt',{session: false}),ArticleController.deleteChecks(), ArticleController.delete);
 

@@ -2,6 +2,7 @@ import {Request, Response, NextFunction} from 'express';
 import {Setting} from '../models/setting';
 import {HttpException} from '../classes/HttpException';
 import {messages} from '../middleware/common';
+import sequelize from 'sequelize';
 
 import { Middleware } from '../middleware/common';
 import nodemailer from 'nodemailer';
@@ -42,7 +43,10 @@ export class EmailController {
     /**Gets all email templates */
     public static getAll = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            res.json(await Email.findAll());
+            let result = [];
+            let emails = await Email.findAll({order: [sequelize.literal('id DESC')]});
+            for (let article of emails) result.push(article.sanitize(res.locals.language));
+            res.json(result);
         } catch(error) {
             next(error);
         }
@@ -52,15 +56,26 @@ export class EmailController {
     public static preview = async (req: Request, res: Response, next:NextFunction) => {
         try {
             //Build an email model without saving so that we can use for preview
-            let result :any = {};
             let myEmail = Email.build(req.body.email, {
                 isNewRecord: false,
                 include: [EmailTranslation]
              });
-            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null);           
-            for (let lang of Middleware.languagesSupported()) {
-                result[lang] = await myEmail.getHtml(lang); 
-            }
+            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
+            //Create translation[0] with current data
+            let myTrans = await EmailTranslation.build({
+                id: 1000,
+                emailId: myEmail.id,
+                iso: res.locals.language,
+                title: req.body.email.title,
+                subtitle:req.body.email.subtitle,
+                description:req.body.email.description,
+                content:req.body.email.content,
+                header:req.body.email.header
+            });
+            if (!myTrans) throw new HttpException(500, messages.validationDBMissing('email'),null);
+            myEmail.translations = [];
+            myEmail.translations.push(myTrans);     
+            let result = await myEmail.getHtml(res.locals.language);
             res.json(result);
         } catch(error) {
             next(error);
@@ -210,16 +225,18 @@ export class EmailController {
             delete myRef.createdAt;
             delete myRef.updatedAt;
             myRef.isProtected = false;
-            myRef.name = req.body.data.name;
+            myRef.name = req.body.name;
             let myNewEmail = await Email.create(myRef);
             for (let trans of myReferenceEmail.translations) {
                 let myTrans = JSON.parse(JSON.stringify(trans));
                 delete myTrans.id;
                 myTrans.emailId = myNewEmail.id;
-                myTrans.description = req.body.data.description[trans.iso];
+                myTrans.description = req.body.description;
                 await EmailTranslation.create(myTrans)
             }
-            res.json(await Email.findByPk(myNewEmail.id));                
+            let result = await Email.findByPk(myNewEmail.id);
+            if (!result) return next(new HttpException(500, "Result not found", null));
+            res.json(result.sanitize(res.locals.language));                
         } catch(error) {
             next(error);
         }
@@ -227,11 +244,9 @@ export class EmailController {
     /**Parameter validation */
     static createChecks() {
         return [
-            body('data').exists().withMessage('exists'),
-            body('data.name').exists().withMessage('exists').isLength({min:5}),
-            body('data.name').exists().withMessage('exists').custom(CustomValidators.dBMissing(Email,'name')),
-            body('data.description').exists().withMessage('exists'),
-            body('data.description.*').isLength({min:5,max:200}),
+            body('name').exists().withMessage('exists').isLength({min:5}),
+            body('name').exists().withMessage('exists').custom(CustomValidators.dBMissing(Email,'name')),
+            body('description').exists().withMessage('exists').isLength({min:5,max:200}),
             Middleware.validate()
         ]
     }

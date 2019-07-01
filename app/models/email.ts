@@ -117,26 +117,24 @@ export class Email extends Model<Email> {
 
   /**Sanitize output by removing all languages except requested one */
   public sanitize(iso:string) {
-    let result : any = JSON.parse(JSON.stringify(this));  
+    let myTrans : EmailTranslation | undefined;
+    let result = JSON.parse(JSON.stringify(this));
+    delete result.translations;
+
+    //Replace value of Setting with current language
     if (this.translations.length>0) {
-      let myTranslation = this.translations.find(obj => obj.iso == iso);
-      if (myTranslation) {
-        result.translations = [];
-        result.translations.push(JSON.parse(JSON.stringify(myTranslation)));
+      myTrans = this.translations.find(obj => obj.iso == iso);
+      if (myTrans) {
+        result.title = myTrans.title;
+        result.subtitle=myTrans.subtitle;
+        result.description = myTrans.description;
+        result.content = myTrans.content;
+        result.header = myTrans.header;
       }
     }
-    if (this.backgroundContent == "none") result.backgroundContent="";
-    if (this.backgroundHeader == "none") result.backgroundHeader="";
-    result.footer = this.footer;
-    result.social = this.social;
-    result.footerColor = this.footerColor;
-    result.headerColor = this.headerColor;
-    result.titleColor = this.titleColor;
-    result.subtitleColor = this.subtitleColor;
-    result.textColor = this.textColor;
-    result.siteUrl = this.siteUrl;
     return result;
   }  
+
 
 
   /**Populates footer and social data that is stored mainly in settings like company data... */
@@ -201,7 +199,7 @@ export class Email extends Model<Email> {
   public async populate() {
       let myEmail = await Email.populate();
       if (!myEmail) {
-          return "this";
+          return this;
       }
       this.footer = myEmail.footer;
       this.social = myEmail.social;
@@ -212,17 +210,23 @@ export class Email extends Model<Email> {
   public async getHtml(iso:string, additionalHtml?:string) {
     try {
         await this.populate(); //Populate email with all settings that are common for all emails
-        let myData = this.sanitize(iso);
+        let myData = JSON.parse(JSON.stringify(this));
+        myData.translations = JSON.parse(JSON.stringify(this.translations));
+        myData.footer = JSON.parse(JSON.stringify(this.footer));
+        myData.social = JSON.parse(JSON.stringify(this.social));
+        //let myData = this;//.sanitize(iso);
         myData["siteAccess"] = messages.emailSiteAccess; //Add site Access string
         //Add extra html if required
-        if (additionalHtml) 
-            myData.translations[0].content = myData.translations[0].content + additionalHtml;
-
-        let html = pug.renderFile(path.join(__dirname, "../emails/emails.pug"), {data:myData,iso: iso});
+        if (additionalHtml) {
+            myData.content = myData.content + additionalHtml;
+        }
+        console.log("getHtml", myData );
+        let html = pug.renderFile(path.join(__dirname, "../emails/emails.pug"), {data:myData,iso:iso});
         //CSS must be put inline for better support of all browsers
         html =  await InlineCss(html, {extraCss:this.createAdditionalCss(),applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});
         return html;
     } catch (error) {
+        console.log(error);
         return null;
     }
   }

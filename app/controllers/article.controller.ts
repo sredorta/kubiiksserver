@@ -32,30 +32,6 @@ export class ArticleController {
 
 
 
-
-
-
-
-    /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
-    static getByIdFull = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let result = [];
-            let article = await Article.findByPk(req.body.id);
-            if (article) 
-                    res.json(article);
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static getByIdFullChecks() {
-        return [
-            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
-            Middleware.validate()
-        ]
-    }
-
-
     /**Deletes article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static delete = async (req: Request, res: Response, next:NextFunction) => {
         try {
@@ -114,7 +90,9 @@ export class ArticleController {
                         });
                     } 
                 }
-                res.json(await Article.findByPk(myArticle.id));                
+                let article = await Article.findByPk(myArticle.id);
+                if (!article) throw new Error("Could not find 'article'");
+                res.json(article.sanitize(res.locals.language));                
             }
         } catch(error) {
             next(error);
@@ -157,6 +135,7 @@ export class ArticleController {
             trans.content = req.body.article.content;
             await trans.save();
             article = await Article.findByPk(req.body.article.id);
+
             if (!article) return new Error("Unexpected error !");
             res.json(article.sanitize(res.locals.language));
 
