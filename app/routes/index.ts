@@ -260,7 +260,11 @@ export class Routes {
     /**Uploads image to blog folder */
     app.route('/api/upload/editor/email')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.email.single('file'), GalleryController.uploadImageToEmail);
-      
+
+    /**Uploads image to blog folder */
+    app.route('/api/upload/editor/defaults')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),uploads.defaults.single('file'), GalleryController.uploadImageToDefaults);
+       
     /////////////////////////////////////////////////////////////////
     // HANDLE BLOG ARTICLES
     //////////////////////////////////////////////////////////////// 

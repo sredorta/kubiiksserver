@@ -35,4 +35,11 @@ export class GalleryController {
         res.send({imageUrl: "https://localhost:3000/public/images/email/" + req.file.filename});  
     }    
 
+    /**Uploads image to email folder and returns imageUrl for angular-editor*/
+    static uploadImageToDefaults = async (req: Request, res: Response, next:NextFunction) => {
+            console.log("We are in defaults upload !!");
+            console.log(req.body);
+            res.send({imageUrl: "https://localhost:3000/public/images/defaults/" + req.file.filename});  
+    }    
+
 }        

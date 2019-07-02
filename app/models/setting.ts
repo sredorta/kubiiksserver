@@ -149,7 +149,7 @@ export class Setting extends Model<Setting> {
         mySetting = await Setting.create({
             type: "seo",
             key: "url_image",
-            value: 'https://www.kubiiks.com/api/my-image.jpg'
+            value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/logo.jpg"
         });
 
 
@@ -160,6 +160,12 @@ export class Setting extends Model<Setting> {
         });
 
         //General part
+        mySetting = await Setting.create({
+          type: "general",
+          key: "favicon",
+          value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/favicon.jpg"
+        });
+
         mySetting = await Setting.create({
           type: "general",
           key: "companyPhone",
