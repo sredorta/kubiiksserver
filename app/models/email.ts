@@ -168,6 +168,7 @@ export class Email extends Model<Email> {
                 return;
             }
             result.siteUrl = tmp.value;
+            console.log("SETTING siteUrl to : ", tmp.value);
 
             //Get all socialLinks
             let links: any = {};
@@ -211,16 +212,23 @@ export class Email extends Model<Email> {
     try {
         await this.populate(); //Populate email with all settings that are common for all emails
         let myData = JSON.parse(JSON.stringify(this));
-
         myData.translations = JSON.parse(JSON.stringify(this.translations));
         myData.footer = JSON.parse(JSON.stringify(this.footer));
         myData.social = JSON.parse(JSON.stringify(this.social));
-        //let myData = this;//.sanitize(iso);
-        myData["siteAccess"] = messages.emailSiteAccess; //Add site Access string
+        myData.siteUrl = this.siteUrl;
+        myData.siteAccess = messages.emailSiteAccess; //Add site Access string
+        let myTrans = myData.translations.find((obj:any) => obj.iso == iso);
+        myData.translations = [];
+        myData.translations.push(myTrans);
+        if(!myData.translations[0].content) myData.translations[0].content = "";
+        if(!myData.translations[0].header) myData.translations[0].header = "";
+
         //Add extra html if required
         if (additionalHtml) {
-            myData.content = myData.content + additionalHtml;
+            myData.translations[0].content = myData.translations[0].content + additionalHtml;
         }
+
+        console.log(myData);
         let html = pug.renderFile(path.join(__dirname, "../emails/emails.pug"), {data:myData,iso:iso});
         //CSS must be put inline for better support of all browsers
         html =  await InlineCss(html, {extraCss:this.createAdditionalCss(),applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});

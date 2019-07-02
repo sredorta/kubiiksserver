@@ -71,6 +71,8 @@ export class AuthController {
                 default: {
                     const link = AppConfig.api.host + ":"+ AppConfig.api.fePort + "/login/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
                     let html = messages.emailValidationLink(link);
+                    console.log("Additional html is", html);
+                    console.log("Language", res.locals.language);
 
                     let recipients = [];
                     recipients.push(myUser.email);

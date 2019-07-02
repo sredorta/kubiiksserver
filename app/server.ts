@@ -38,7 +38,7 @@ const sequelize = new Sequelize({
   sequelize.addModels([__dirname + '/models']);
 
 async function startServer() {  
-   if (true) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
+   if (false) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
     await sequelize.sync({force:true});  
     //Seeding part
     await Setting.seed(); //Seed settings from the config.json for FE sharing
