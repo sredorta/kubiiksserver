@@ -80,8 +80,9 @@ export class Article extends Model<Article> {
   /**Gets well formatted bacgkround image for emails */
   getBackgroundImage() {
     if (!this.backgroundImage) {
-      if (this.backgroundImage == "none") return "none";
-        return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
+      return "none";
+      //if (this.backgroundImage == "none") return "none";
+      //  return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
     } else 
         return this.backgroundImage;
   }

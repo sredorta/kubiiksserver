@@ -101,6 +101,8 @@ export class EmailController {
              if (!myTrans) throw new Error("Translation not found !!");
              myTrans.header = req.body.email.header;
              myTrans.content = req.body.email.content;
+             myTrans.title =req.body.email.title;
+             myTrans.subtitle=req.body.email.subtitle;
             await myTrans.save();
 
             await myEmail.save();
@@ -137,6 +139,18 @@ export class EmailController {
              });
             if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
 
+            let myTrans = EmailTranslation.build({
+                id: 1000,
+                emailId: myEmail.id,
+                iso: res.locals.language,
+                title: req.body.email.title,
+                subtitle: req.body.email.subtitle,
+                header: req.body.email.header,
+                content: req.body.email.content
+            }, {isNewRecord:false});
+            myEmail.translations = [];
+            myEmail.translations.push(myTrans);
+
             let html = await myEmail.getHtml(res.locals.language, '<p> -- TEST EMAIL -- </p>');
             console.log(html);
             if (!html)  return next(new HttpException(500, messages.emailSentError,null));
@@ -162,7 +176,9 @@ export class EmailController {
         return [
             body('email').exists().withMessage('exists'),
             body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            body('email.translations').exists().withMessage('exists'),
+            body('email.title').exists().withMessage('exists'),
+            body('email.subtitle').exists().withMessage('exists'),
+
             //TODO: Add here all required checks !!!
             Middleware.validate()
         ]

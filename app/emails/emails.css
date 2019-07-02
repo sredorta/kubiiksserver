@@ -5,65 +5,65 @@ body {
 }
 
 @media only screen and (min-width: 601px) {
-    .content {width: 600px !important;}
-    .col425 {
+    .kii-email  .content {width: 600px !important;}
+    .kii-email  .col425 {
         width: 425px!important;
     }
-    .col245 {width: 245px!important;}
+    .kii-email .col245 {width: 245px!important;}
 }
 
-.content {
+.kii-email .content {
     width: 100%; 
     max-width: 600px;
 } 
-.content-main {
+.kii-email .content-main {
     background:white;
 }
-.content-header {
+.kii-email .content-header {
     background:white;
 }
 
-a.site-link {
+.kii-email a.site-link {
     padding:10px;
     text-decoration: none;
     font-family: sans-serif;
     border:1px solid;
 }
-a.site-link:hover {
+.kii-email a.site-link:hover {
     border:2px solid !important;
 }
 
-.content-main a {
+.kii-email .content-main a {
     text-decoration: none;
     font-weight: bold;
 }
-.content-main a:hover {
+.kii-email .content-main a:hover {
     opacity: 0.5;
 }
 
-.header {
+.kii-email .header {
     padding: 20px 30px 20px 30px;
 }
-.header-button {
+.kii-email .header-button {
     height: 60px;
 }
-.image-background {
+.kii-email .image-background {
     background-repeat: no-repeat; 
     background-position: 100% 100%;
     background-size: cover;
 }
 
-.header-image-content {
+.kii-email .header-image-content {
     padding: 40px 30px 20px 30px;
 }
-.footer {
+.kii-email .footer {
     padding: 20px 30px 20px 30px;
 }
-.icon {
+.kii-email .icon {
     margin-bottom:20px;
     opacity: 0.9;
 }
-.phone {
+.kii-email .phone {
     margin:5px;
     font-size: 20px;
     font-weight: bold;
@@ -71,7 +71,7 @@ a.site-link:hover {
     color: white !important;
     opacity:0.6;
 }
-.address {
+.kii-email .address {
     margin:5px;
     font-size: 16px;
     font-family: sans-serif;
@@ -79,30 +79,30 @@ a.site-link:hover {
     opacity:0.6;
 }
 
-.icon-social {
+.kii-email .icon-social {
     padding:5px;
     opacity:0.6;
     transition:all 0.2s ease-in-out;
 }
-.icon-social:hover {
+.kii-email .icon-social:hover {
     transform:scale(1.2);
     opacity:0.8 !important;
 }
 
-.borderbottom {border-bottom: 1px solid #f2eeed;}
+.kii-email .borderbottom {border-bottom: 1px solid #f2eeed;}
 
-.kii-email-embedded-title {font-size: 33px; line-height: 38px; font-weight: bold;}
-.kii-email-embedded-subtitle {font-size: 20px; font-family: sans-serif; letter-spacing: 5px;}
+.kii-email .kii-email-embedded-title {font-size: 33px; line-height: 38px; font-weight: bold;}
+.kii-email .kii-email-embedded-subtitle {font-size: 20px; font-family: sans-serif; letter-spacing: 5px;}
 
-.h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
-.h1, .h2, .bodycopy {font-family: sans-serif;}
-.innerpadding {padding: 30px 30px 30px 30px;}
-.innerpadding15 {padding: 15px 15px 15px 15px;}
+.kii-email .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
+.kii-email .h1, .h2, .bodycopy {font-family: sans-serif;}
+.kii-email .innerpadding {padding: 30px 30px 30px 30px;}
+.kii-email .innerpadding15 {padding: 15px 15px 15px 15px;}
 
-.borderbottom {border-bottom: 1px solid #f2eeed;}
-.h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
-.bodycopy {font-size: 16px; line-height: 22px;}
-.bodycopy img {
+.kii-email .borderbottom {border-bottom: 1px solid #f2eeed;}
+.kii-email .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
+.kii-email .bodycopy {font-size: 16px; line-height: 22px;}
+.kii-email .bodycopy img {
     width:100%;
 }
 

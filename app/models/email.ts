@@ -211,6 +211,7 @@ export class Email extends Model<Email> {
     try {
         await this.populate(); //Populate email with all settings that are common for all emails
         let myData = JSON.parse(JSON.stringify(this));
+
         myData.translations = JSON.parse(JSON.stringify(this.translations));
         myData.footer = JSON.parse(JSON.stringify(this.footer));
         myData.social = JSON.parse(JSON.stringify(this.social));
