@@ -222,6 +222,8 @@ export class Email extends Model<Email> {
         myData.translations.push(myTrans);
         if(!myData.translations[0].content) myData.translations[0].content = "";
         if(!myData.translations[0].header) myData.translations[0].header = "";
+        
+        console.log("HEADER BACKGROUND : " , myData.backgroundHeader);
 
         //Add extra html if required
         if (additionalHtml) {
