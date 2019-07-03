@@ -32,7 +32,7 @@ export class ContactController {
             recipients.push(req.body.email);
 
             //Now we send and email to thank the contact
-            let result = await Email.send(res.locals.language, 'contact-reply', 'RE:' + req.body.subject, recipients);
+            let result = await Email.send(res.locals.language, 'contact-reply', 'RE:' + req.body.subject, recipients, req.body.message);
             console.log("RESULT IS EMAIL.SEND !!!!!!!!!!!!!!!!!!!!!!!!!!!");
             console.log(result);
         } catch(error) {
