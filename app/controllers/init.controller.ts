@@ -34,7 +34,7 @@ export class InitController {
             for (let article of articles) 
                 result["articles"].push(article.sanitize(res.locals.language));
             if (req.user)    
-                result["user"] = await User.scope("withRoles").findByPk(req.user.id);
+                result["user"] = await User.scope("details").findByPk(req.user.id);
             else    
                 result["user"] = null;    
             res.json(result);

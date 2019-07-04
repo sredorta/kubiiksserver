@@ -14,6 +14,8 @@ import {Response,Request,NextFunction} from 'express';
 import { Product } from "./models/product";
 import { Article } from "./models/article";
 import { Email } from "./models/email";
+import { ArticleTranslation } from "./models/article_translation";
+import { Alert } from "./models/alert";
 
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
@@ -38,7 +40,8 @@ const sequelize = new Sequelize({
   sequelize.addModels([__dirname + '/models']);
 
 async function startServer() {  
-   if (false) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
+   //await sequelize.sync();
+   if (true) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
     await sequelize.sync({force:true});  
     //Seeding part
     await Setting.seed(); //Seed settings from the config.json for FE sharing
@@ -46,6 +49,7 @@ async function startServer() {
     await User.seed();
     await Article.seed();
     await Email.seed();
+    await Alert.seed();
    }
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");

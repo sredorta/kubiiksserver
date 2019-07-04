@@ -1,4 +1,4 @@
-import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany, Is} from 'sequelize-typescript';
+import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany,HasMany, Is} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import jwt from "jsonwebtoken";
 import {AppConfig} from '../utils/Config';
@@ -8,6 +8,7 @@ import {Role} from './role';
 import {UserRole} from './user_role';
 import { IJwtPayload } from '../controllers/auth.controller';
 import { Helper } from '../classes/Helper';
+import { Alert } from './alert';
 
 
 
@@ -20,26 +21,23 @@ export const NUser = 'Not a model';
   attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','isEmailValidated', 'terms','createdAt','updatedAt']
 })
 @Scopes({
-  withRoles: {
+  details: {
     attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','isEmailValidated','createdAt','updatedAt'],
-    include: [() => Role]
+    include: [() => Role, () => Alert]
   },
   full: {
     attributes: {exclude : []}
   },
-  fullWithRoles: {
+  fulldetails: {
     attributes: {exclude : []},
-    include: [() => Role],
+    include: [() => Role, () => Alert],
   }
 })
 
 @Table({})
 export class User extends Model<User> {
 
-  @PrimaryKey
-  @AutoIncrement
-  @Column(DataTypes.INTEGER().UNSIGNED)
-  id!:number;
+
 
   @AllowNull(true)
   @Column(DataTypes.STRING(50))
@@ -128,7 +126,11 @@ export class User extends Model<User> {
   @BelongsToMany(() => Role, () => UserRole)
   roles!: Role[];
 
-
+  @HasMany(() => Alert, {
+    onUpdate: "CASCADE",
+    onDelete: "CASCADE",
+    hooks: true})
+  alerts!: Alert[];  
 
   /**Hashes a password to store in db */
   public static hashPassword(unencrypted:string) : string {

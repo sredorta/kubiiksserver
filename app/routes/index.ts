@@ -31,6 +31,7 @@ import uploads from '../utils/multer';
 import { InitController } from '../controllers/init.controller';
 import { EmailController } from '../controllers/email.controller';
 import { NotificationController } from '../controllers/notification.controller';
+import { AlertController } from '../controllers/alert.controller';
 
 
 
@@ -245,6 +246,16 @@ export class Routes {
     app.route('/api/role/detach')
         .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),RoleController.detachChecks(),RoleController.detach)   
         
+    /////////////////////////////////////////////////////////////////
+    // ALERT PART
+    ////////////////////////////////////////////////////////////////  
+    /**Get all user details. Admin or 'users' required */
+    app.route("/api/alert/all")
+        .get(passport.authenticate('jwt',{session: false}),AlertController.getAll);
+    /** Updates alert of user */    
+    app.route('/api/alert/update')
+        .post(passport.authenticate('jwt',{session: false}),AlertController.updateChecks(),AlertController.update)           
+
 
     /////////////////////////////////////////////////////////////////
     // HANDLE GALLERY

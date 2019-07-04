@@ -7,6 +7,9 @@ import {body} from 'express-validator/check';
 import {AppConfig} from '../utils/Config';
 import {messages} from '../middleware/common';
 import { Email } from '../models/email';
+import { Alert } from '../models/alert';
+import { User } from '../models/user';
+import { Role } from '../models/role';
 
 
 
@@ -27,14 +30,25 @@ export class ContactController {
             }
                          
             await transporter.sendMail(myEmail);
-            res.send({message: {show:true, text:messages.messageSent}});
             let recipients = [];
             recipients.push(req.body.email);
+
+            //We add element in the alerts table and we send onPush to admins
+            //Find all admin users and add alert
+            let myUsers = await User.scope("details").findAll({include: [{model:Role, where: {name: "admin"}}]});
+            for (let myUser of myUsers) {
+                let myAlert = await Alert.create({userId:myUser.id, type:"email",from:req.body.email, title:messages.notificationContactEmail,  message:req.body.subject + '\n' + req.body.message, isRead:false});
+                if (!myAlert) throw Error("Could not create alert");
+                //TODO: Send push notif to all admins !!!
+            }
+
 
             //Now we send and email to thank the contact
             let result = await Email.send(res.locals.language, 'contact-reply', 'RE:' + req.body.subject, recipients, req.body.message);
             console.log("RESULT IS EMAIL.SEND !!!!!!!!!!!!!!!!!!!!!!!!!!!");
             console.log(result);
+            res.send({message: {show:true, text:messages.messageSent}});
+
         } catch(error) {
             next(new HttpException(500, messages.emailSentError,null));
         }        

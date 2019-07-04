@@ -31,6 +31,7 @@ export const messages = {
     authTooManyTrials:  'Trop d\'essais invalides, essaye a nouveau dans quelques minutes',
     authAlreadyLoggedIn:  'Utilisateur déjà connecté',
 
+    oauth2MissingField : (name = 'field') => `Erreur pendant l'authentification, impossible de recuperer le champ ${name} `,
     authEmailResetPassword: (name = 'field') => `Un courriel avec le nouvea mot de passe à été envoyé à : ${name}`,
     authEmailValidate: (name = 'field') => `Un courriel de validation de compte à été envoyé à : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre addresse de courriel`,
@@ -47,8 +48,9 @@ export const messages = {
     emailResetPassword: (name = 'field') => `<p>Votre nouveau mot de passe : <span>${name}<span></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Demande de nouveau mot de passe`,
 
+    //notifications titles
+    notificationContactEmail: 'Reçu un nouveau email de contact',    
 
-    oauth2MissingField : (name = 'field') => `Erreur penant l'authentifition, impossible de recuperer le champ ${name} `,
 
     articleContentNotCreate: "Les articles de la cathegorie 'content' ne peuvent pas être crees",
     articleContentNotDelete: "Les articles de la cathegorie 'content' ne peuvent pas être efaces",

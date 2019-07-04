@@ -200,7 +200,7 @@ export class Middleware {
     public static hasKubiiksRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
-                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (myUser.roles.findIndex(obj => obj.name == 'kubiiks') >= 0)
                         next();
@@ -218,7 +218,7 @@ export class Middleware {
     public static hasAdminRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
-                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (myUser.hasRole("admin"))
                         next();
@@ -236,7 +236,7 @@ export class Middleware {
     public static hasContentRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
-                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("content") )
                         next();
@@ -254,7 +254,7 @@ export class Middleware {
     public static hasBlogRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
-                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("blog") )
                         next();
@@ -272,7 +272,7 @@ export class Middleware {
     public static hasUsersRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
-                let myUser = await User.scope("withRoles").findByPk(req.user.id);
+                let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("users") )
                         next();

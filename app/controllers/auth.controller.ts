@@ -108,7 +108,7 @@ export class AuthController {
     static login = async (req:Request, res:Response,next:NextFunction) => {
         //Thanks to passports we have the user in req.user if we get here credentials are valid
         try {
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);
+            let myUser = await User.scope("details").findByPk(req.user.id);
             if (!myUser) return next( new HttpException(400, messages.validationNotFound(messages.User), null));
             let token : string = "";
             if (!req.body.keepconnected)
@@ -160,7 +160,7 @@ export class AuthController {
                 res.json({complete:false, user:myUser});
             } else {
                 //Return user with roles as token is already available (equivalent to getAuthUser)
-                let myUserFull = await User.scope("withRoles").findByPk(myUser.id);
+                let myUserFull = await User.scope("details").findByPk(myUser.id);
                 res.json({complete:true, user:myUserFull});
             }
         } catch(error) {
@@ -177,7 +177,7 @@ export class AuthController {
             next( new HttpException(400, messages.validationNotFound(messages.User), null))
         } else {
             await myUser.update(req.body);
-            let result = await User.scope("withRoles").findByPk(req.user.id);
+            let result = await User.scope("details").findByPk(req.user.id);
             res.json(result);
         }
     }
@@ -201,7 +201,7 @@ export class AuthController {
     static getAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //Sending back user
         try {
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);
+            let myUser = await User.scope("details").findByPk(req.user.id);
             res.json(myUser);
         } catch(error) {
             next(new HttpException(500, error.message, error.errors));
@@ -212,7 +212,7 @@ export class AuthController {
     static updateAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //Sending back user
         try {
-            let myUser = await User.scope("fullWithRoles").findByPk(req.user.id);
+            let myUser = await User.scope("fulldetails").findByPk(req.user.id);
             if (!myUser) throw new Error("User not found !"); 
             if (req.body.firstName)
                 myUser.firstName = req.body.firstName;
@@ -231,7 +231,7 @@ export class AuthController {
                     myUser.password = User.hashPassword(req.body.password);   
             }
             myUser = await myUser.save();  
-            myUser = await User.scope("withRoles").findByPk(req.user.id);  
+            myUser = await User.scope("details").findByPk(req.user.id);  
             res.json(myUser);
         } catch(error) {
             next(new HttpException(500, error.message, error.errors));
@@ -283,7 +283,7 @@ export class AuthController {
                 await myUser.save();
                 //Generate a token
                 let token = myUser.createToken("short");
-                myUser = await User.scope("withRoles").findByPk(req.body.id);
+                myUser = await User.scope("details").findByPk(req.body.id);
                 res.send({user:myUser,token:token,message: {show:true, text:messages.authEmailValidateSuccess}});
             }
         } catch(error) {

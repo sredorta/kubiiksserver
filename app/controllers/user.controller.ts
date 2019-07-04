@@ -18,7 +18,7 @@ export class UserController {
     /**Gets all user with their roles */
     static getAll = async(req: Request, res: Response, next: NextFunction) => {
         try {
-            res.json(await User.scope("withRoles").findAll());
+            res.json(await User.scope("details").findAll());
         } catch(error) {
             next(error);
         }        

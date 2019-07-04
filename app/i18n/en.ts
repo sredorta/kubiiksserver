@@ -45,6 +45,10 @@ export const messages = {
     emailResetPassword: (name = 'field') => `<p>Your new password : <span>${name}<span></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
 
+    //notifications titles
+    notificationContactEmail: 'New contact email recieved',
+
+
 
     articleContentNotCreate: 'Content articles cannot be created',
     articleContentNotDelete: 'Content articles cannot be deleted',

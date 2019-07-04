@@ -36,7 +36,7 @@ export class ArticleController {
     static delete = async (req: Request, res: Response, next:NextFunction) => {
         try {
             let article = await Article.findByPk(req.body.id);
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
+            let myUser = await User.scope("details").findByPk(req.user.id);            
             if (article && myUser) {
                 if (article.cathegory=="content") {
                     return next(new HttpException(403, messages.articleContentNotDelete, null));
@@ -65,7 +65,7 @@ export class ArticleController {
     /**Creates article content on the given cathegory. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static create = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);            
+            let myUser = await User.scope("details").findByPk(req.user.id);            
             if (myUser) {
                 if (req.body.cathegory=="content") {
                     return next(new HttpException(403, messages.articleContentNotCreate, null));
@@ -113,7 +113,7 @@ export class ArticleController {
             if (!article) return new Error("Could not find article with id : " + req.body.article.id);
             let trans = article.translations.find(obj => obj.iso == res.locals.language);
             if (!trans) return new Error("Could not find article translation with iso : " + res.locals.language);
-            let myUser = await User.scope("withRoles").findByPk(req.user.id);   
+            let myUser = await User.scope("details").findByPk(req.user.id);   
             if (!myUser) return new Error("Could not find current user !");    
             //Protection rights     
             if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {

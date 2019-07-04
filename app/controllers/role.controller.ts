@@ -34,7 +34,7 @@ export class RoleController {
             if (myUser) {
                 await myUser.attachRole(req.body.roleId);
             }  
-            res.json(await User.scope("withRoles").findByPk(req.body.userId));
+            res.json(await User.scope("details").findByPk(req.body.userId));
         } catch(error) {
             next(error);
         }
@@ -63,7 +63,7 @@ export class RoleController {
             if (myUser) {
                 await myUser.detachRole(req.body.roleId);
             }  
-            res.json(await User.scope("withRoles").findByPk(req.body.userId));
+            res.json(await User.scope("details").findByPk(req.body.userId));
         } catch(error) {
             next(error);
         }

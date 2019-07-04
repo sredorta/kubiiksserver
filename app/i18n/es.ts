@@ -48,6 +48,8 @@ export const messages = {
     emailResetPassword: (name = 'field') => `<p>Su nuevo password : <span>${name}<span></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
 
+    //notifications titles
+    notificationContactEmail: 'Recivido un nuevo email de contacto',    
 
     articleContentNotCreate: "Los articulos de la categoria 'content' no se pueden crear",
     articleContentNotDelete: "Los articulos de la categoria 'content' no se pueden borrar",
