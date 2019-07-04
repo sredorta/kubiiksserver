@@ -25,7 +25,7 @@ export class AlertController {
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
         try {
             let result = [];
-            let myAlerts = await Alert.findAll({where:{userId:req.user.id}});
+            let myAlerts = await Alert.findAll({order: [sequelize.literal('id DESC')],where:{userId:req.user.id}});
             res.json(myAlerts);
             //let alerts = await Alert.findAll({order: [sequelize.literal('id DESC')]});
             //for (let alert of alerts) result.push(alert.sanitize(res.locals.language));
@@ -42,16 +42,15 @@ export class AlertController {
             let alert = await Alert.findByPk(req.body.alert.id);
             if (!alert) throw new Error("Could not find alert with id : " + req.body.article.id);
             //Check that alert is owned by current user
-            if (alert.id != req.user.id) 
+            if (alert.userId != req.user.id) 
                 throw new Error("Cannot modify alert that you don't own !");
             //Do the update
             alert.isRead = req.body.alert.isRead;
-            await alert.save();
-            let myAlert = await Alert.findByPk(req.body.alert.id);
+            let myAlert = await alert.save();
+            //let myAlert = await Alert.findByPk(req.body.alert.id);
             if (!myAlert) {
                 throw new Error("Cannot modify alert that you don't own !");
             }
-            console.log(myAlert);
             res.json(myAlert);
         } catch(error) {
             next(error);
@@ -66,4 +65,29 @@ export class AlertController {
             Middleware.validate()
         ]
     }
+
+    /**Deletes notification */
+    static delete = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let alert = await Alert.findByPk(req.body.id);
+            if (!alert) throw new Error("Could not find alert with id : " + req.body.article.id);
+            //Check that alert is owned by current user
+            if (alert.userId != req.user.id) 
+                throw new Error("Cannot modify alert that you don't own !");
+            await alert.destroy();
+            res.json("done"); 
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static deleteChecks() {
+        return [
+            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Alert,'id')),
+            Middleware.validate()
+        ]
+    }    
+
 }        
+
+

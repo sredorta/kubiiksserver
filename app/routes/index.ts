@@ -255,6 +255,9 @@ export class Routes {
     /** Updates alert of user */    
     app.route('/api/alert/update')
         .post(passport.authenticate('jwt',{session: false}),AlertController.updateChecks(),AlertController.update)           
+    /** Removes specific alert.  */    
+    app.route('/api/alert/delete')
+        .post(passport.authenticate('jwt',{session: false}), AlertController.deleteChecks(),AlertController.delete)           
 
 
     /////////////////////////////////////////////////////////////////
