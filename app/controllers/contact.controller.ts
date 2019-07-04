@@ -35,11 +35,14 @@ export class ContactController {
 
             //We add element in the alerts table and we send onPush to admins
             //Find all admin users and add alert
-            let myUsers = await User.scope("details").findAll({include: [{model:Role, where: {name: "admin"}}]});
+            let myUsers = await User.scope("fulldetails").findAll({include: [{model:Role, where: {name: "admin"}}]});
             for (let myUser of myUsers) {
                 let myAlert = await Alert.create({userId:myUser.id, type:"email",from:req.body.email, title:messages.notificationContactEmail,  message:req.body.subject + '\n' + req.body.message, isRead:false});
                 if (!myAlert) throw Error("Could not create alert");
+
                 //TODO: Send push notif to all admins !!!
+                console.log("BEFORE MYUSER.NOTIFY !!!");
+                await myUser.notify("Test de notification", "Voila un test qui tue");
             }
 
 

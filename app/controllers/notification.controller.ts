@@ -29,8 +29,34 @@ export class NotificationController {
           auth: 'V5ppfPw6EsP6t7cxcVpr8A' } }
           */
 
+    /**Gets the onPush notification settings and stores it in the user */
+    static settings  = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            console.log("IN NOTIFICATIONS SETTINGS !!! -----------------------");
+            let myUser = await User.scope("full").findByPk(req.user.id);
+            if (!myUser) throw new Error("Cannot find auth user !");
+            myUser.onPush = JSON.stringify(req.body.onPush);
+            console.log(req.body.onPush);
+            await myUser.save();
+            res.json(true);
+        } catch(error) {
+            next(error);
+        }
+    }
+    /** Role attach parameter validation */
+    static settingsChecks() {
+        return [
+            body('onPush.endpoint').exists().withMessage('exists').isURL(),
+            body('onPush.keys').exists().withMessage('exists'),
+            body('onPush.keys.p256dh').exists().withMessage('exists').isString().isLength({min:80}),
+            body('onPush.keys.auth').exists().withMessage('exists').isString().isLength({min:15}),
+            Middleware.validate()
+        ]
+    } 
+
+
     /**Gets all data required for app initialization in one shot */
-    static get = async (req: Request, res: Response, next:NextFunction) => {
+ /*   static get = async (req: Request, res: Response, next:NextFunction) => {
         try {
             const subscription = req.body.notification;
             console.log(`Subscription received`);
@@ -56,9 +82,9 @@ export class NotificationController {
         } catch(error) {
             next(error);
         }
-    }
+    }*/
     /** Role attach parameter validation */
-    static getChecks() {
+ /*   static getChecks() {
         return [
             body('notification').exists().withMessage('exists'),
             body('notification.endpoint').exists().withMessage('exists').isURL(),
@@ -67,6 +93,6 @@ export class NotificationController {
             body('notification.keys.auth').exists().withMessage('exists').isLength({min:15}),
             Middleware.validate()
         ]
-    }    
+    }    */
 
 }

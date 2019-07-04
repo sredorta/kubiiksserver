@@ -9,6 +9,9 @@ import {UserRole} from './user_role';
 import { IJwtPayload } from '../controllers/auth.controller';
 import { Helper } from '../classes/Helper';
 import { Alert } from './alert';
+import  webPush from 'web-push';
+import { isNamedExports } from 'typescript';
+import { Setting } from './setting';
 
 
 
@@ -122,6 +125,11 @@ export class User extends Model<User> {
   @Column(DataTypes.STRING(255))
   googleToken!:string;  
 
+  /**Stores all onPush data for onPush notifications */
+  @AllowNull(true)
+  @Column(DataTypes.STRING(2000))
+  onPush!:string;   
+
   //Relations
   @BelongsToMany(() => Role, () => UserRole)
   roles!: Role[];
@@ -131,6 +139,55 @@ export class User extends Model<User> {
     onDelete: "CASCADE",
     hooks: true})
   alerts!: Alert[];  
+
+  /**Sends onPush notification to user if any subscription */
+  public async notify(title:string,body:string) {
+
+    let myPromise : Promise<boolean>;
+    let myObj = this;
+    myPromise =  new Promise<boolean>((resolve,reject) => {
+      async function _getData(title:string,body:string) {
+        try {
+          console.log("IN GET_DATA !!!!!!!!!!!!!!!");
+          if (myObj.onPush) {
+            //Get logo from settings
+            let siteUrl = await Setting.findOne({where:{key:"url"}});
+            if (!siteUrl) {
+                throw new Error("Could not find siteUrl");
+            }
+            let urlBase = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/";
+            //Get baseURL from settings
+
+
+            const subscription = JSON.parse(myObj.onPush);
+            const payload = JSON.stringify({
+              notification: {
+                title: title,
+                body: body,
+                icon: urlBase + 'logo.jpg',
+                vibrate: [100, 50, 100],
+                action:"test",
+                data: {
+                  url: siteUrl.value
+                }
+              }
+            });
+            webPush.sendNotification(subscription,payload);
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+
+        } catch(error) {
+          resolve(false);
+       }
+     }
+     _getData(title,body);
+   });
+   return myPromise;
+  }
+
+
 
   /**Hashes a password to store in db */
   public static hashPassword(unencrypted:string) : string {
