@@ -20,6 +20,7 @@ import passportJWT from "passport-jwt";
 import webPush from 'web-push';
 
 export let messages = en; //Set default language and export messages
+export let messagesAll : string[] = [];
 
 
 
@@ -72,6 +73,10 @@ export class Middleware {
             next();
         }
     }
+
+
+
+
 
     public static languagesSupported() {
         return glob.sync(`${__dirname}/../i18n/*.ts`)

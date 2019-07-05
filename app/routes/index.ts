@@ -37,18 +37,7 @@ import { AlertController } from '../controllers/alert.controller';
 
 
 export class Routes {    
-  //Call all controllers required here  
-
-  /*
-  agentOptions = {
-    host: '127.0.0.1'
-    , port: '3000'
-    , path: '/'
-    , rejectUnauthorized: false
-  };
-  agent = https()*/
-
-  
+  public io:any;
 
   public routes(app:Router): void {
   

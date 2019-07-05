@@ -6,8 +6,11 @@ import { Routes } from "./routes/index";
 import {Middleware} from "./middleware/common";
 import {Passport} from "./classes/Passport";
 import ExpressValidator from "express-validator";
+import { Server } from 'http';
 
 class App {
+
+
 
     public app: express.Application;
     public routePrv: Routes = new Routes();

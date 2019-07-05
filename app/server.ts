@@ -1,7 +1,6 @@
 import app from "./app";
 import express from 'express';
-import {Sequelize} from 'sequelize-typescript';
-//import {Sequelize as SequelizeOrig} from 'sequelize';
+import {Sequelize, addHook} from 'sequelize-typescript';
 import fs from 'fs';
 import https from 'https';
 import {Setting} from './models/setting';
@@ -16,6 +15,7 @@ import { Article } from "./models/article";
 import { Email } from "./models/email";
 import { ArticleTranslation } from "./models/article_translation";
 import { Alert } from "./models/alert";
+import { Routes } from "./routes";
 
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
@@ -54,7 +54,7 @@ async function startServer() {
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");
         console.error(err.stack);
-      });
+    });
 
     //Serve static files   
     app.use('/public', express.static(__dirname + '/public', { maxAge: '1y' }));
@@ -65,10 +65,23 @@ async function startServer() {
     if (!AppConfig.api.ssl)
         app.listen(AppConfig.api.port, () => {});
     else {
-        https.createServer({
+        const server = https.createServer({
             key: privateKey,
             cert: certificate
-        }, app).listen(AppConfig.api.port);
+        }, app);
+        //SocketIO part
+/*        const io = socketio(server);
+
+        io.on("connection", function(socket:any) {
+          console.log("CONNECTED TO SOCKET : " + socket.id);
+          socket.emit('chat-new-message',"ONLY FOR CLIENT CONNECTED");
+          io.emit('chat-new-message', 'IO EMIT FOR EVERYBODY')
+          socket.on('chat-new-message', (message:any) => {
+            console.log("Recieved alert message :",message)
+          })
+        });*/
+        //CRUD Listener
+        server.listen(AppConfig.api.port);
     }
 }
 startServer();

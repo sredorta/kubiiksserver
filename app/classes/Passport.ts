@@ -66,10 +66,12 @@ export class Passport {
                         return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                     }
                     //Check that account has validated email
-                    if (AppConfig.sharedSettings.find(obj=> obj.key=="validation_method").value != "no_validation") {
-                        if (myUser.isEmailValidated!= true)
-                            return cb(new HttpException(401, messages.authAccountNotActive ,null), false);
-                    }
+                    let tmp = AppConfig.sharedSettings.find(obj=> obj.key=="validation_method");
+                    if (tmp)
+                        if (tmp.value != "no_validation") {
+                            if (myUser.isEmailValidated!= true)
+                                return cb(new HttpException(401, messages.authAccountNotActive ,null), false);
+                        }
                 }
                 myUser.passport = "local";
                 myUser.failCount=0;

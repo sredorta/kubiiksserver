@@ -5,6 +5,8 @@ import {User} from '../models/user';
 import {Model} from 'sequelize';
 import {validate, ValidationError } from 'class-validator';
 import {AppConfig} from '../utils/Config';
+import * as path from 'path';
+import * as glob  from 'glob';
 
 export class Helper {
     
@@ -75,7 +77,17 @@ export class Helper {
         return password;
     }
 
-
+    /**Gets all translations in a variable */
+    public static translations() {
+        const acceptableLanguages = glob.sync(`${__dirname}/../i18n/*.ts`)
+            .map((file:any) => path.basename(file, '.ts'))
+            .filter((language:string) => language !== 'index');
+        let result : any = [];
+        for (let lang of acceptableLanguages) {
+            result[lang] = require(`../i18n/${lang}`).messages;
+        }
+        return result;
+    }
 
     //Get array of only one field from an array of objects
 /*    public static pluck<T, K extends keyof T>(objs: T[], key: K): T[K][] {

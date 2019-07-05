@@ -151,10 +151,10 @@ export class User extends Model<User> {
           console.log("IN GET_DATA !!!!!!!!!!!!!!!");
           if (myObj.onPush) {
             //Get logo from settings
-            let siteUrl = await Setting.findOne({where:{key:"url"}});
+            /*let siteUrl = await Setting.findOne({where:{key:"url"}});
             if (!siteUrl) {
                 throw new Error("Could not find siteUrl");
-            }
+            }*/
             let urlBase = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/";
             //Get baseURL from settings
 
@@ -166,9 +166,10 @@ export class User extends Model<User> {
                 body: body,
                 icon: urlBase + 'logo.jpg',
                 vibrate: [100, 50, 100],
-                action:"test",
+                action:"reload-user",
                 data: {
-                  url: siteUrl.value
+                  url: AppConfig.api.host +":"+ AppConfig.api.fePort,
+                  user: await User.scope("details").findByPk(myObj.id)
                 }
               }
             });
@@ -179,6 +180,7 @@ export class User extends Model<User> {
           }
 
         } catch(error) {
+          console.log("Got error:", error);
           resolve(false);
        }
      }
