@@ -48,6 +48,10 @@ export const messages = {
     emailResetPassword: (name = 'field') => `<p>Votre nouveau mot de passe : <span>${name}<span></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Demande de nouveau mot de passe`,
 
+    //chat part
+    chatWelcome: "BOT: Bienvenu a notre chat",
+    chatLanguageSwitch: "BOT: Vous pouvez nous parler en francais si vous preferez",
+
     //notifications titles
     notificationContactEmail: 'Reçu un nouveau email de contact',    
 
