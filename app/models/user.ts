@@ -173,7 +173,7 @@ export class User extends Model<User> {
                 }
               }
             });
-            webPush.sendNotification(subscription,payload);
+            await webPush.sendNotification(subscription,payload);
             resolve(true);
           } else {
             resolve(false);

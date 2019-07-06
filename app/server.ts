@@ -16,7 +16,7 @@ import { Email } from "./models/email";
 import { ArticleTranslation } from "./models/article_translation";
 import { Alert } from "./models/alert";
 import { Routes } from "./routes";
-
+import socketio from 'socket.io';
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
 const privateKey = fs.readFileSync('server.key');
@@ -70,16 +70,17 @@ async function startServer() {
             cert: certificate
         }, app);
         //SocketIO part
-/*        const io = socketio(server);
+        const io = socketio(server);
 
         io.on("connection", function(socket:any) {
           console.log("CONNECTED TO SOCKET : " + socket.id);
-          socket.emit('chat-new-message',"ONLY FOR CLIENT CONNECTED");
-          io.emit('chat-new-message', 'IO EMIT FOR EVERYBODY')
-          socket.on('chat-new-message', (message:any) => {
-            console.log("Recieved alert message :",message)
+          //Chat echo part
+          socket.emit('chat-echo',"BOT: WELLCOME TO THE CHAT !");
+          socket.on('chat-echo', (message:any) => {
+            socket.emit('chat-echo', message);
           })
-        });*/
+        });
+
         //CRUD Listener
         server.listen(AppConfig.api.port);
     }
