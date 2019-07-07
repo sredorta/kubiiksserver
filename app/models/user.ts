@@ -21,11 +21,11 @@ export const NUser = 'Not a model';
 
 //Default scope only contains the public data
 @DefaultScope({
-  attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','isEmailValidated', 'terms','createdAt','updatedAt']
+  attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','avatar','isEmailValidated', 'terms','createdAt','updatedAt']
 })
 @Scopes({
   details: {
-    attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','isEmailValidated','createdAt','updatedAt'],
+    attributes:  ['id','firstName','lastName','email', 'phone', 'mobile','language','avatar','isEmailValidated','createdAt','updatedAt'],
     include: [() => Role, () => Alert]
   },
   full: {
@@ -66,6 +66,10 @@ export class User extends Model<User> {
   @AllowNull(false)
   @Column(DataTypes.STRING(56))
   language!:string;
+
+  @AllowNull(true)
+  @Column(DataTypes.STRING(300))
+  avatar!: string;
 
   @AllowNull(false)
   @Default(false)
@@ -219,6 +223,7 @@ export class User extends Model<User> {
 
   /**Checks if user has specific role or is admin */
   public hasRole(role:string | number) : boolean {  
+      if (!this.roles) return false;
       if (typeof role == "string") {
           if (this.roles.findIndex(obj => obj.name == role) >= 0 || this.roles.findIndex(obj => obj.name == 'admin')>=0) return true;
           else return false;
@@ -314,6 +319,7 @@ export class User extends Model<User> {
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
         });
+        await myUser.attachRole("chat");
         myUser = await User.scope("full").create({
           firstName: "Laia",
           lastName: "Redorta",
@@ -327,6 +333,7 @@ export class User extends Model<User> {
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
         });
+        await myUser.attachRole("chat");
         myUser = await User.scope("full").create({
           firstName: "Jana",
           lastName: "Redorta",

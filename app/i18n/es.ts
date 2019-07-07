@@ -51,6 +51,8 @@ export const messages = {
     //chat part
     chatWelcome: "BOT: Bienvenido a nuestro chat",
     chatLanguageSwitch: "BOT: Nos puedes hablar en español si prefieres",
+    chatJoinRoom: (name = '') => `${name} : Ha entrado en el chat`,
+    chatLeaveRoom: (name = '') => `${name} : Se fue del chat`,
 
     //notifications titles
     notificationContactEmail: 'Recivido un nuevo email de contacto',    

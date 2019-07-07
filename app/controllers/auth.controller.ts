@@ -223,7 +223,9 @@ export class AuthController {
             if (req.body.phone)
                 myUser.phone = req.body.phone;            
             if (req.body.mobile)
-                myUser.mobile = req.body.mobile;            
+                myUser.mobile = req.body.mobile;    
+            if (req.body.avatar)
+                myUser.avatar = req.body.avatar;                          
             if (req.body.passwordOld) {
                 if (!myUser.checkPassword(req.body.passwordOld))
                     next (new HttpException(400, messages.authInvalidCredentials, null)); 
@@ -246,6 +248,8 @@ export class AuthController {
             body('phone').optional().custom(CustomValidators.phone('phone')),
             body('mobile').optional().custom(CustomValidators.mobile('mobile')),
             body('password').optional().custom(CustomValidators.passwordUpdate()),
+            body('password').optional().custom(CustomValidators.passwordUpdate()),
+            body('avatar').optional().isString(),            
             body('dummy').custom(CustomValidators.dBuserNotPresentExceptMe(User)),
             Middleware.validate()
         ]

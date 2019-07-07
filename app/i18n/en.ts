@@ -49,6 +49,9 @@ export const messages = {
     //chat part
     chatWelcome: "BOT: Welcome to our chat",
     chatLanguageSwitch: "BOT: You can talk to us in english if you prefer",
+    chatJoinRoom: (name = '') => `${name} : Joined the chat`,
+    chatLeaveRoom: (name = '') => `${name} : Leaved the chat`,
+
 
 
     //notifications titles

@@ -66,6 +66,8 @@ export class UserController {
                 myUser.mobile = req.body.user.mobile;    
             if (req.body.user.isEmailValidated)
                 myUser.isEmailValidated = req.body.user.isEmailValidated;    
+            if (req.body.user.avatar)
+                myUser.avatar = req.body.user.avatar;      
             await myUser.save();
             res.json(myUser);
 
@@ -86,6 +88,7 @@ export class UserController {
             body('phone').optional().custom(CustomValidators.phone('phone')),
             body('mobile').optional().custom(CustomValidators.mobile('mobile')),
             body('isEmailValidated').optional().isBoolean(),
+            body('avatar').optional().isURL(),
             Middleware.validate()
         ]
     }
