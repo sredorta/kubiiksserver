@@ -22,6 +22,7 @@ export enum SocketEvents {
     CHAT_JOIN = "chat-join",
     CHAT_LEAVE = "chat-leave",
     CHAT_ECHO = "chat-echo",
+    CHAT_BOT_MESSAGE= "chat-bot-message",
     CHAT_MESSAGE = "chat-message",
     CHAT_WRITTING = "chat-writting"
 }
@@ -220,36 +221,6 @@ export class SocketHandler  {
         socket.to(room).emit(SocketEvents.LEAVE_ROOM, this.messagesAll[this.getConnectionLanguage(socket)].chatLeaveRoom(this.getConnectionFirstName(socket)));
     }    
 
-    /**Emits updates of the status of the admins when there are changes*/
-    private chatAdminsChange(socket:socketio.Socket) {
-      let result :IChatUser[] = [];
-      for (let user of this.chatAdmins) {
-         let newUser = JSON.parse(JSON.stringify(user));
-         let connection = this.findConnectionByUserId(user.userId);
-         if (connection) newUser.connected = true;
-         else newUser.connected = false;
-         result.push(newUser);
-      }
-      if (JSON.stringify(result) != JSON.stringify(this.chatAdmins))
-        socket.broadcast.emit(SocketEvents.CHAT_ADMINS_DATA,result);
-      this.chatAdmins = result;  
-    }
-
-    /**Updates chat admin status */
-  /*  private updateChatAdminsStatus() {
-      //Find if chatUsers have a connection and update status
-      let index = 0;
-      for (let user of this.chatAdminUsers) {
-          let connection = this.findConnectionByUserId(user.userId);
-          if (connection)
-            user.connected = true;
-          else
-            user.connected = false;  
-          this.chatAdminUsers[index].connected = user.connected;
-          index = index + 1;
-      }
-      console.log('updateChatAdminsStatus', this.chatAdminUsers);
-    }*/
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -296,13 +267,31 @@ export class SocketHandler  {
 
         });
     }
+
+    ////////////////////////////////////////////////////////////////////////
+    //CHAT PART
+    ////////////////////////////////////////////////////////////////////////
+    /**Emits updates of the status of the admins when there are changes*/
+    private chatAdminsChange(socket:socketio.Socket) {
+      let result :IChatUser[] = [];
+      for (let user of this.chatAdmins) {
+         let newUser = JSON.parse(JSON.stringify(user));
+         let connection = this.findConnectionByUserId(user.userId);
+         if (connection) newUser.connected = true;
+         else newUser.connected = false;
+         result.push(newUser);
+      }
+      if (JSON.stringify(result) != JSON.stringify(this.chatAdmins))
+        socket.broadcast.emit(SocketEvents.CHAT_ADMINS_DATA,result);
+      this.chatAdmins = result;  
+    }
+
     /**On chat start we send BOT message, then we send to client the chat admins user list and ask admins to join room ! */
     private loadOnChatStart(socket:socketio.Socket) {
         socket.on(SocketEvents.CHAT_START, () => {
             //Find all chat admins users and answer with them and if they are connected or not
             console.log("RECIEVED CHAT START !!!!");
             User.findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
-                console.log(users);
                 let myUsers : IChatUser[] = [];
                 for (let user of users) {
                     myUsers.push({userId:user.id,firstName:user.firstName,avatar:user.avatar,connected:this.isUserConnected(user.id)})
@@ -310,7 +299,7 @@ export class SocketHandler  {
                 this.chatAdmins = myUsers;
                 socket.emit(SocketEvents.CHAT_ADMINS_DATA, this.chatAdmins);
             });
-            socket.emit(SocketEvents.CHAT_MESSAGE, this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome);
+            socket.emit(SocketEvents.CHAT_BOT_MESSAGE, this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome);
         });
     }
 
@@ -327,7 +316,7 @@ export class SocketHandler  {
             let connection = this.findConnectionBySocket(socket);
             if (connection) {
                 connection.language = data.language;
-                socket.emit(SocketEvents.CHAT_MESSAGE, this.messagesAll[this.getConnectionLanguage(socket)].chatLanguageSwitch);
+                socket.emit(SocketEvents.CHAT_BOT_MESSAGE, this.messagesAll[this.getConnectionLanguage(socket)].chatLanguageSwitch);
             }
         });      
     }
