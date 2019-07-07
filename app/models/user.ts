@@ -347,6 +347,8 @@ export class User extends Model<User> {
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
         });
+        await myUser.attachRole("chat");
+
         myUser = await User.scope("full").create({
           firstName: "Anna",
           lastName: "Soldevila",
@@ -360,6 +362,8 @@ export class User extends Model<User> {
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
         });      
+        await myUser.attachRole("chat");
+
         myUser = await User.scope("full").create({
           firstName: "Julien",
           lastName: "Vert",

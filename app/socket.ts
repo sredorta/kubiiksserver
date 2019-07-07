@@ -5,9 +5,8 @@ import { IJwtPayload } from "./controllers/auth.controller";
 import { Helper } from './classes/Helper';
 import { AppConfig } from './utils/Config';
 import { User } from './models/user';
-import { Socket } from 'dgram';
 import { Role } from './models/role';
-import { isObject } from 'util';
+import onChange from 'on-change';
 
 /**Enumerator with all socket events*/
 export enum SocketEvents {
@@ -32,7 +31,7 @@ export enum SocketRooms {
     /**Contains all administrators */
     ADMIN = "admin-room",   
     /**Contains all chat administrators */
-    CHAT_ADMIN = "chat-admin-room",
+    CHAT_ADMIN = "chat-admin-room",    
 }
 
 //Socket required parts
@@ -88,6 +87,11 @@ export class SocketHandler  {
     /**Contains all current connections */
     private connections : ISocketConnection[] = [];
 
+    /**Contains chat admins */
+    chatAdmins : IChatUser[] = [];
+
+
+
     constructor(server:https.Server,) {
         this.io = socketio(server);
     }
@@ -97,8 +101,6 @@ export class SocketHandler  {
         this.io.on(SocketEvents.CONNECT, (socket) => {
             this.addConnection({socket:socket,user:new User(),language:AppConfig.api.defaultLanguage});
             this.loadOnDisconnect(socket);
-            //Ask for authentication
-            socket.emit(SocketEvents.AUTHENTICATE);
 
             //Handle all events
             this.loadOnAuthenticate(socket);
@@ -106,41 +108,40 @@ export class SocketHandler  {
             this.loadOnChatEcho(socket);
             this.loadOnChatLanguageChange(socket);
         })
+
     }
 
     ////////////////////////////////////////////////////////////////////////
     //Functions for handling all connections
     ////////////////////////////////////////////////////////////////////////
 
+    /**Emits all necessary events when there are changes on the connections,logins... */
+    private handleConnectionChanges(socket: socketio.Socket) {
+      this.chatAdminsChange(socket);
+    }
+
+
     /**Adds connection to the list */
     private addConnection(connection:ISocketConnection) {
         this.connections.push(connection);
-        /*if (connection.user.hasRole('chat')) {
-          this.io.emit(SocketEvents.CHAT_ADMINS_DATA,this.connections.find(obj=> obj.user.hasRole('chat')==true));
-        }*/
         console.log("Socket connection :", connection.socket.id)
+        this.handleConnectionChanges(connection.socket);
+
     }
 
     /**Removes connection from the list */
     private removeConnection(socket:socketio.Socket) {
-        //Check if we have to do any notification
-        let connection = this.connections.find(obj=> obj.socket.id == socket.id);
-        /*if (connection)
-          if (connection.user)
-            if (connection.user.hasRole('chat')) 
-                this.io.emit(SocketEvents.CHAT_ADMINS_DATA,this.connections.find(obj=> obj.user.hasRole('chat')==true));
-        */
         let index = this.connections.findIndex(obj=> obj.socket.id == socket.id);
         if (index>=0) {
             this.connections.splice(index,1);
         }
-        
         console.log("Socket disconnected : " + socket.id);
+        this.handleConnectionChanges(socket);
     }
 
     /**Updates connection values */
     private updateConnection(connection:ISocketConnection) {
-        let myConnection = this.findConnection(connection.socket);
+        let myConnection = this.findConnectionBySocket(connection.socket);
         const index = this.connections.findIndex(obj => obj.socket.id == connection.socket.id);
         if (myConnection) {
             myConnection.language = connection.language;
@@ -148,18 +149,35 @@ export class SocketHandler  {
         }
         if (index>=0 && myConnection) {
             this.connections[index] = myConnection;
-            /*if (myConnection.user.hasRole('chat')) {
-              this.io.emit(SocketEvents.CHAT_ADMINS_DATA,this.connections.find(obj=> obj.user.hasRole('chat')==true));
-            }*/
         }
+        let result :any[] = [];
+        for (let connection of this.connections) {
+            result.push({userId:connection.user.id});
+        }
+        console.log(result);
+        this.handleConnectionChanges(connection.socket);
+
     }
     
     /**Returns the associated connection from a socket */
-    private findConnection(socket:socketio.Socket) {
+    private findConnectionBySocket(socket:socketio.Socket) {
         const connection = this.connections.find(obj=> obj.socket.id == socket.id);
         if (connection) return connection;
         return null;
     }
+    /**Returns the associated connection from a user */
+    private findConnectionByUser(user: User) {
+      const connection = this.connections.find(obj=> obj.user.id == user.id);
+      if (connection) return connection;
+      return null;
+    }
+    /**Returns the associated connection from a userId*/
+    private findConnectionByUserId(userId: number) {
+      const connection = this.connections.find(obj=> obj.user.id == userId);
+      if (connection) return connection;
+      return null;
+    }
+
 
     /**Returns if there is a connection with specified userId */
     private isUserConnected(userId:number|null) {
@@ -171,20 +189,20 @@ export class SocketHandler  {
     
     /**Finds userId of an associated connection if is identified */
     private getConnectionUser(socket:socketio.Socket) {
-        const connection = this.findConnection(socket);
+        const connection = this.findConnectionBySocket(socket);
         if (connection) return connection.user.id;
         return null;
     }
     /**Gets nickname of the connection */
     private getConnectionFirstName(socket:socketio.Socket) {
-        const connection = this.findConnection(socket);
+        const connection = this.findConnectionBySocket(socket);
         if (connection) return connection.user.firstName;
         return null;
     }
 
     /**Returns the current language of the connection */
     private getConnectionLanguage(socket:socketio.Socket) {
-        const connection = this.findConnection(socket);
+        const connection = this.findConnectionBySocket(socket);
         if (connection) return connection.language;
         return AppConfig.api.defaultLanguage;
     }
@@ -202,7 +220,36 @@ export class SocketHandler  {
         socket.to(room).emit(SocketEvents.LEAVE_ROOM, this.messagesAll[this.getConnectionLanguage(socket)].chatLeaveRoom(this.getConnectionFirstName(socket)));
     }    
 
+    /**Emits updates of the status of the admins when there are changes*/
+    private chatAdminsChange(socket:socketio.Socket) {
+      let result :IChatUser[] = [];
+      for (let user of this.chatAdmins) {
+         let newUser = JSON.parse(JSON.stringify(user));
+         let connection = this.findConnectionByUserId(user.userId);
+         if (connection) newUser.connected = true;
+         else newUser.connected = false;
+         result.push(newUser);
+      }
+      if (JSON.stringify(result) != JSON.stringify(this.chatAdmins))
+        socket.broadcast.emit(SocketEvents.CHAT_ADMINS_DATA,result);
+      this.chatAdmins = result;  
+    }
 
+    /**Updates chat admin status */
+  /*  private updateChatAdminsStatus() {
+      //Find if chatUsers have a connection and update status
+      let index = 0;
+      for (let user of this.chatAdminUsers) {
+          let connection = this.findConnectionByUserId(user.userId);
+          if (connection)
+            user.connected = true;
+          else
+            user.connected = false;  
+          this.chatAdminUsers[index].connected = user.connected;
+          index = index + 1;
+      }
+      console.log('updateChatAdminsStatus', this.chatAdminUsers);
+    }*/
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -219,7 +266,7 @@ export class SocketHandler  {
     /**Authenticates the user if he has a token */
     private loadOnAuthenticate(socket:socketio.Socket) {
         socket.on(SocketEvents.AUTHENTICATE,(data:ISocketAuth) => {
-            let userId = null;
+            let userId : null | number = null;
             try {
                 const payload = <IJwtPayload>jwt.verify(data.token,AppConfig.auth.jwtSecret);
                 userId = payload.id;  
@@ -229,8 +276,9 @@ export class SocketHandler  {
                 user: new User(),
                 language:data.language
             }
+            console.log("FROM PAYLOAD", userId)
             if (userId)
-                User.scope("fulldetails").findByPk(userId).then(user => {
+                User.scope("details").findByPk(userId).then(user => {
                     if (user) {
                         connection.user = user;
                         if(user.hasRole('chat')) {
@@ -239,11 +287,12 @@ export class SocketHandler  {
                         if (user.hasRole('admin')) {
                             this.joinToRoom(socket, SocketRooms.ADMIN);
                         }
-                        this.updateConnection(connection);
+                        this.updateConnection(connection);    
                     }
                 });
-            else 
-                this.updateConnection(connection);    
+            else  {  
+              this.updateConnection(connection);    
+            }
 
         });
     }
@@ -258,7 +307,8 @@ export class SocketHandler  {
                 for (let user of users) {
                     myUsers.push({userId:user.id,firstName:user.firstName,avatar:user.avatar,connected:this.isUserConnected(user.id)})
                 }
-                socket.emit(SocketEvents.CHAT_ADMINS_DATA, myUsers);
+                this.chatAdmins = myUsers;
+                socket.emit(SocketEvents.CHAT_ADMINS_DATA, this.chatAdmins);
             });
             socket.emit(SocketEvents.CHAT_MESSAGE, this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome);
         });
@@ -274,7 +324,7 @@ export class SocketHandler  {
     /**Updates connection language */
     private loadOnChatLanguageChange(socket:socketio.Socket) {
         socket.on(SocketEvents.LANGUAGE, (data:ISocketLanguage) => {
-            let connection = this.findConnection(socket);
+            let connection = this.findConnectionBySocket(socket);
             if (connection) {
                 connection.language = data.language;
                 socket.emit(SocketEvents.CHAT_MESSAGE, this.messagesAll[this.getConnectionLanguage(socket)].chatLanguageSwitch);
