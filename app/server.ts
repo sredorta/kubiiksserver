@@ -26,6 +26,7 @@ import { SocketHandler } from "./socket";
 const privateKey = fs.readFileSync('server.key');
 const certificate = fs.readFileSync('server.crt');
 
+export let sockets :SocketHandler;
 
 
 const sequelize = new Sequelize({
@@ -75,8 +76,8 @@ async function startServer() {
             cert: certificate
         }, app);
         //SocketIO part
-        const mySocket = new SocketHandler(server);
-        mySocket.listen();
+        sockets = new SocketHandler(server);
+        sockets.listen();
         //CRUD Listener
         server.listen(AppConfig.api.port);
     }

@@ -56,6 +56,7 @@ export const messages = {
 
     //notifications titles
     notificationContactEmail: 'Reçu un nouveau email de contact',    
+    notificationNewChat: 'Un nouveau chat vient de demarrer',
 
 
     articleContentNotCreate: "Les articles de la cathegorie 'content' ne peuvent pas être crees",

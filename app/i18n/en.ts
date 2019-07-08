@@ -56,6 +56,7 @@ export const messages = {
 
     //notifications titles
     notificationContactEmail: 'New contact email recieved',
+    notificationNewChat: 'New chat started',
 
 
 

@@ -10,7 +10,7 @@ import { IJwtPayload } from '../controllers/auth.controller';
 import { Helper } from '../classes/Helper';
 import { Alert } from './alert';
 import  webPush from 'web-push';
-import { isNamedExports } from 'typescript';
+import { isNamedExports, visitLexicalEnvironment } from 'typescript';
 import { Setting } from './setting';
 
 
@@ -152,7 +152,6 @@ export class User extends Model<User> {
     myPromise =  new Promise<boolean>((resolve,reject) => {
       async function _getData(title:string,body:string) {
         try {
-          console.log("IN GET_DATA !!!!!!!!!!!!!!!");
           if (myObj.onPush) {
             //Get logo from settings
             /*let siteUrl = await Setting.findOne({where:{key:"url"}});
@@ -161,8 +160,6 @@ export class User extends Model<User> {
             }*/
             let urlBase = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/";
             //Get baseURL from settings
-
-
             const subscription = JSON.parse(myObj.onPush);
             const payload = JSON.stringify({
               notification: {
@@ -170,10 +167,9 @@ export class User extends Model<User> {
                 body: body,
                 icon: urlBase + 'logo.jpg',
                 vibrate: [100, 50, 100],
-                action:"reload-user",
+                action:"",
                 data: {
                   url: AppConfig.api.host +":"+ AppConfig.api.fePort,
-                  user: await User.scope("details").findByPk(myObj.id)
                 }
               }
             });
@@ -192,7 +188,6 @@ export class User extends Model<User> {
    });
    return myPromise;
   }
-
 
 
   /**Hashes a password to store in db */

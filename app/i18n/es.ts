@@ -56,6 +56,7 @@ export const messages = {
 
     //notifications titles
     notificationContactEmail: 'Recivido un nuevo email de contacto',    
+    notificationNewChat: 'Un nuevo chat viene de empezar',
 
     articleContentNotCreate: "Los articulos de la categoria 'content' no se pueden crear",
     articleContentNotDelete: "Los articulos de la categoria 'content' no se pueden borrar",

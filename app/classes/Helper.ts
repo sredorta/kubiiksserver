@@ -89,9 +89,5 @@ export class Helper {
         return result;
     }
 
-    //Get array of only one field from an array of objects
-/*    public static pluck<T, K extends keyof T>(objs: T[], key: K): T[K][] {
-        return objs.map(obj => obj[key]);
-    }*/
 
 }

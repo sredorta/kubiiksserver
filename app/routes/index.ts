@@ -65,12 +65,10 @@ export class Routes {
     /////////////////////////////////////////////////////////////////
     // ON PUSH NOTIFICATIONS
     ////////////////////////////////////////////////////////////////
-    //When browser accepts notification sends his data and save on user
+    /**Stores onPush notification data to user if accepted */
     app.route('/api/notification/settings')
     .post(passport.authenticate('jwt',{session: false}),NotificationController.settingsChecks(), NotificationController.settings);
-
-    /*app.route('/api/notification/send')
-    .post(NotificationController.getChecks(), NotificationController.get);*/
+    
 
 
 

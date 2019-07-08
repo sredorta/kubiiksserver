@@ -7,18 +7,23 @@ import { AppConfig } from './utils/Config';
 import { User } from './models/user';
 import { Role } from './models/role';
 import onChange from 'on-change';
+import { messagesAll } from './middleware/common';
+import { Alert } from './models/alert';
 
 /**Enumerator with all socket events*/
 export enum SocketEvents {
     CONNECT = "connect",
     DISCONNECT = "disconnect",
     AUTHENTICATE = "authenticate",
+    UPDATE_USER = "update-user-data",
     JOIN_ROOM = "join-room",
     LEAVE_ROOM = "leave-room",
     LANGUAGE = "update-language",
     //TOKEN = "update-token",
     CHAT_START = "chat-start",
     CHAT_ADMINS_DATA = "chat-admins",
+    CHAT_NEW_NOTIFY ="chat-new-notify",
+    CHAT_ROOM_UPDATE ="chat-room-update",
     CHAT_JOIN = "chat-join",
     CHAT_LEAVE = "chat-leave",
     CHAT_ECHO = "chat-echo",
@@ -63,6 +68,11 @@ export interface ISocketToken {
       connected:boolean;
   }
 
+  interface IChatRoom {
+      id:string;
+      date:Date;
+  }
+
   /**Contains all messages with all translations */
   //const messagesAll = Helper.translations();
   
@@ -91,6 +101,9 @@ export class SocketHandler  {
     /**Contains chat admins */
     chatAdmins : IChatUser[] = [];
 
+    /**Contains active chat rooms */
+    chatRooms : IChatRoom[] = [];
+
 
 
     constructor(server:https.Server,) {
@@ -106,6 +119,8 @@ export class SocketHandler  {
             //Handle all events
             this.loadOnAuthenticate(socket);
             this.loadOnChatStart(socket);
+            this.loadOnChatNewNotify(socket);
+
             this.loadOnChatEcho(socket);
             this.loadOnChatLanguageChange(socket);
         })
@@ -159,21 +174,21 @@ export class SocketHandler  {
         this.handleConnectionChanges(connection.socket);
 
     }
-    
+
     /**Returns the associated connection from a socket */
-    private findConnectionBySocket(socket:socketio.Socket) {
+    public findConnectionBySocket(socket:socketio.Socket) {
         const connection = this.connections.find(obj=> obj.socket.id == socket.id);
         if (connection) return connection;
         return null;
     }
     /**Returns the associated connection from a user */
-    private findConnectionByUser(user: User) {
+    public findConnectionByUser(user: User) {
       const connection = this.connections.find(obj=> obj.user.id == user.id);
       if (connection) return connection;
       return null;
     }
     /**Returns the associated connection from a userId*/
-    private findConnectionByUserId(userId: number) {
+    public findConnectionByUserId(userId: number) {
       const connection = this.connections.find(obj=> obj.user.id == userId);
       if (connection) return connection;
       return null;
@@ -221,6 +236,22 @@ export class SocketHandler  {
         socket.to(room).emit(SocketEvents.LEAVE_ROOM, this.messagesAll[this.getConnectionLanguage(socket)].chatLeaveRoom(this.getConnectionFirstName(socket)));
     }    
 
+    //PUBLIC FUNCTIONS
+
+    /**Emits to the specified user the current database data */
+    public updateAuth(userId:number) {
+        console.log("UPDATING USER", userId);
+        if (userId) {
+          const connection = this.findConnectionByUserId(userId); 
+          if (connection)
+            if (connection.socket) {
+              User.scope("details").findByPk(userId).then(user => {
+                console.log("SENDING EVENT USER-UPDATE !!!");
+                connection.socket.emit(SocketEvents.UPDATE_USER,user);
+              })
+            }
+        }
+    }
 
 
     ////////////////////////////////////////////////////////////////////////
@@ -271,6 +302,17 @@ export class SocketHandler  {
     ////////////////////////////////////////////////////////////////////////
     //CHAT PART
     ////////////////////////////////////////////////////////////////////////
+    /**Creates a new chat room */
+    private createChatRoom() : IChatRoom {
+      const myRoom = {
+        id: "chat-room-" + Helper.generateRandomString(10),
+        date: new Date()
+      }
+      this.chatRooms.push(myRoom);
+      return myRoom;
+    }
+
+
     /**Emits updates of the status of the admins when there are changes*/
     private chatAdminsChange(socket:socketio.Socket) {
       let result :IChatUser[] = [];
@@ -302,6 +344,36 @@ export class SocketHandler  {
             socket.emit(SocketEvents.CHAT_BOT_MESSAGE, this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome);
         });
     }
+
+    /**When client starts a chat and sends first message, then we notify all chat admins with onPush and update chats */
+    private loadOnChatNewNotify(socket:socketio.Socket) {
+      socket.on(SocketEvents.CHAT_NEW_NOTIFY, (msg:string) => {
+
+          //Create a new chat room and add requesting socket to it
+          const myChatRoom = this.createChatRoom();
+          socket.join(myChatRoom.id);
+
+          //Find all chat admins users, do onPush notification and send them Room update
+          User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
+              for (let user of users) {
+                user.notify(this.messagesAll[user.language].notificationNewChat,msg);
+                //Add alert and send update to user
+                Alert.create({userId:user.id,type:"chat",title:this.messagesAll[user.language].notificationNewChat,message:msg}).then(res => {
+                  User.scope("details").findByPk(user.id).then(userChatAdmin => {
+                    console.log("SENDING EVENT USER-UPDATE !!!");
+                    if (userChatAdmin) {
+                      let connection = this.findConnectionByUserId(userChatAdmin.id);
+                      if (connection)
+                        connection.socket.emit(SocketEvents.UPDATE_USER,userChatAdmin);
+                    }
+                  })
+                })
+              }
+              socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOM_UPDATE, this.chatRooms);
+          });
+      });
+  }
+
 
     /**Chat echo function */
     private loadOnChatEcho(socket:socketio.Socket) {

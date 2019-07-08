@@ -12,6 +12,7 @@ import { User } from '../models/user';
 import { Role } from '../models/role';
 import { Helper } from '../classes/Helper';
 
+import {sockets} from '../server';
 
 
 export class ContactController {
@@ -42,8 +43,9 @@ export class ContactController {
                 let myAlert = await Alert.create({userId:myUser.id, type:"email", title:messagesAll[myUser.language].notificationContactEmail,  message:req.body.subject + '\n' + req.body.message, isRead:false});
                 if (!myAlert) throw Error("Could not create alert");
 
-                //TODO: Send push notif to all admins !!!
-                console.log("BEFORE MYUSER.NOTIFY !!!");
+                //Send through socket the updated user with the new alerts so that FE can update
+                sockets.updateAuth(myUser.id);
+                //Send push notif to all admins !!!
                 await myUser.notify(messagesAll[myUser.language].notificationContactEmail, req.body.subject + '\n' + req.body.message);
             }
 
