@@ -17,14 +17,15 @@ export enum SocketEvents {
     DISCONNECT = "disconnect",
     AUTHENTICATE = "authenticate",
     UPDATE_USER = "update-user-data",
-    //JOIN_ROOM = "join-room",
-    //LEAVE_ROOM = "leave-room",
-    LANGUAGE = "update-language",
-    //TOKEN = "update-token",
+    CHAT_LANGUAGE = "chat-update-language",  //Defines the language of the chat room
+
+
     CHAT_START = "chat-start",
     CHAT_ADMINS_DATA = "chat-admins",
     CHAT_NEW_NOTIFY ="chat-new-notify",
-    CHAT_ROOM_UPDATE ="chat-room-update",
+    CHAT_ROOM_ASSIGN ="chat-room-assign",  //Current chat room assigned
+    CHAT_ROOMS_UPDATE ="chat-rooms-update", //Only for admins when changes on rooms
+
     CHAT_ROOM_DELETE ="chat-room-delete",
     CHAT_ROOM_CLOSE ="chat-room-close",
     CHAT_JOIN = "chat-join",
@@ -74,31 +75,16 @@ export interface ISocketToken {
   interface IChatMessage {
     message:string;
     date:Date;  
-    iAmSender:boolean;
-    isBot:boolean;
+    sender:string;
+    room:string;
   }
 
   interface IChatRoom {
       id:string;
-      messages:IChatMessage[];
       participants:number;
       date:Date;
+      language:string;
   }
-
-
-
-  /**Contains all messages with all translations */
-  //const messagesAll = Helper.translations();
-  
-  /**Contains array with all active sockets with user if identified... */
-  //let sockets : ISocket[] = [];
-  
-  /**Contains the socket server globally */
-  //let io : socketio.Server;
-
-
-
-
 
 
 export class SocketHandler  {
@@ -114,8 +100,12 @@ export class SocketHandler  {
     /**Contains chat admins */
     chatAdmins : IChatUser[] = [];
 
-    /**Contains active chat rooms */
+    /**Contains active chat rooms with messages stored*/
     chatRooms : IChatRoom[] = [];
+
+    /**Contains all current chat messages */
+    chatMessages : IChatMessage[] = [];
+
 
 
 
@@ -132,9 +122,8 @@ export class SocketHandler  {
             this.loadOnChatStart(socket);
             this.loadOnChatNewNotify(socket);
             this.loadOnChatLanguageChange(socket);
-
-
             this.loadOnGetChatRooms(socket);
+            this.loadOnGetMessage(socket);
             /*this.loadOnJoinRoom(socket);
             this.loadOnLeaveRoom(socket);
             this.loadOnDeleteRoom(socket);
@@ -310,58 +299,50 @@ export class SocketHandler  {
     ////////////////////////////////////////////////////////////////////////
     //Functions for handling CHAT PART
     ////////////////////////////////////////////////////////////////////////
-    private newBotMessage(msg:string) : IChatMessage {
-        return {message:msg,date:new Date(), iAmSender:false,isBot:true}
-    }
-
-
-    /**Joins connection to specific room  */
-    private joinChatRoom(socket:socketio.Socket, room:IChatRoom|null, newRoom:boolean) {
-      let myRoom! :IChatRoom | undefined;
-      if (newRoom) {
-        myRoom = {
+    /**Creates a chat room and stores first message in the room, this is only triggered by customers*/
+    private createChatRoom(socket:socketio.Socket) {
+        let myRoom : IChatRoom = {
           id: "chat-room-" + Helper.generateRandomString(10),
           participants:1,
-          messages: [],
-          date: new Date()
+          date: new Date(),
+          language: this.getConnectionLanguage(socket)
         }
+        let myMessage : IChatMessage = {
+          message:this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome,
+          date: new Date(),  
+          sender: "bot",
+          room: myRoom.id
+        }
+        this.chatMessages.push(myMessage);
         this.chatRooms.push(myRoom);
         socket.join(myRoom.id);
-        socket.to(myRoom.id).emit(SocketEvents.CHAT_MESSAGE, this.newBotMessage(this.messagesAll[this.getConnectionLanguage(socket)].chatJoinRoom(this.getConnectionFirstName(socket))));
-      } else {
-        if (room) {
-          const myRoomIndex = this.chatRooms.findIndex(obj => obj.id == room.id);
-          if (myRoomIndex>=0) {
-              this.chatRooms[myRoomIndex].participants = this.chatRooms[myRoomIndex].participants+1;
-              socket.join(this.chatRooms[myRoomIndex].id);
-              socket.to(this.chatRooms[myRoomIndex].id).emit(SocketEvents.CHAT_MESSAGE, this.newBotMessage(this.messagesAll[this.getConnectionLanguage(socket)].chatJoinRoom(this.getConnectionFirstName(socket))));
-          }
-        }
-      }
-      //Notify admins that there are changes on the chatRooms
-      socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOM_UPDATE, this.chatRooms);
+        socket.emit(SocketEvents.CHAT_ROOM_ASSIGN, myRoom);
+        socket.emit(SocketEvents.CHAT_MESSAGE,myMessage);
+
+        //Notify admins that there are changes on the chatRooms
+        console.log("SENDING TO CHAT ADMINS", this.chatRooms);
+        socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOMS_UPDATE, this.chatRooms);
+        return myRoom;
     }
 
     /**Leaves room from a specific connection */
-    private leaveChatRoom(socket:socketio.Socket, room:IChatRoom) {
+    /*private leaveChatRoom(socket:socketio.Socket, room:IChatRoom) {
       const myRoomIndex = this.chatRooms.findIndex(obj => obj.id == room.id);
       if (myRoomIndex>=0) {
         this.chatRooms[myRoomIndex].participants = this.chatRooms[myRoomIndex].participants-1;
         socket.leave(this.chatRooms[myRoomIndex].id);
-        socket.to(this.chatRooms[myRoomIndex].id).emit(SocketEvents.CHAT_MESSAGE, this.newBotMessage(this.messagesAll[this.getConnectionLanguage(socket)].chatLeaveRoom(this.getConnectionFirstName(socket))));
+        socket.to(this.chatRooms[myRoomIndex].id).emit(SocketEvents.CHAT_MESSAGE, this.newBotMessage(this.messagesAll[this.getConnectionLanguage(socket)].chatLeaveRoom(this.getConnectionFirstName(socket)),this.chatRooms[myRoomIndex].id));
       }
       //Notify admins that there are changes on the chatRooms
       socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOM_UPDATE, this.chatRooms);
-    }    
+    } */   
 
     /**When the client starts a chat. We create a room and send BOT message, then we send to client the chat admins user list and ask admins to join room ! */
     private loadOnChatStart(socket:socketio.Socket) {
       socket.on(SocketEvents.CHAT_START, () => {
           //Create a new chat room and add requesting socket to it
-          this.joinChatRoom(socket,null,true);
-
+          this.createChatRoom(socket);
           //Find all chat admins users and answer with them and if they are connected or not
-          console.log("RECIEVED CHAT START !!!!");
           User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
               let myUsers : IChatUser[] = [];
               for (let user of users) {
@@ -370,19 +351,18 @@ export class SocketHandler  {
               this.chatAdmins = myUsers;
               socket.emit(SocketEvents.CHAT_ADMINS_DATA, this.chatAdmins);
           });
-          socket.emit(SocketEvents.CHAT_MESSAGE, this.newBotMessage(this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome));
       });
     }
 
   /**When client sends first message, then we notify all chat admins with onPush and update chats */
   private loadOnChatNewNotify(socket:socketio.Socket) {
-    socket.on(SocketEvents.CHAT_NEW_NOTIFY, (msg:string) => {
+    socket.on(SocketEvents.CHAT_NEW_NOTIFY, (msg:IChatMessage) => {
         //Find all chat admins users, do onPush notification and send them Room update
         User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
             for (let user of users) {
-              user.notify(this.messagesAll[user.language].notificationNewChat,msg);
+              user.notify(this.messagesAll[user.language].notificationNewChat,msg.message);
               //Add alert and send update to user
-              Alert.create({userId:user.id,type:"chat",title:this.messagesAll[user.language].notificationNewChat,message:msg}).then(res => {
+              Alert.create({userId:user.id,type:"chat",title:this.messagesAll[user.language].notificationNewChat,message:msg.message}).then(res => {
                 User.scope("details").findByPk(user.id).then(userChatAdmin => {
                   console.log("SENDING EVENT USER-UPDATE !!!");
                   if (userChatAdmin) {
@@ -393,22 +373,40 @@ export class SocketHandler  {
                 })
               })
             }
-            socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOM_UPDATE, this.chatRooms);
         });
     });
   }
+  /**When we get a message we store it in the current chat room */
+  private loadOnGetMessage(socket:socketio.Socket) {
+    socket.on(SocketEvents.CHAT_MESSAGE, (message:IChatMessage) => {
+      console.log("Recieved message, storing in chat room",message);
+      //Store message to the room
+      this.chatMessages.push(message);
+      //Redistribute message
+      socket.broadcast.to(message.room).emit(SocketEvents.CHAT_MESSAGE,message);
+      //Notify new message to all admins
+      socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_MESSAGE, message);
+    });
+  }
+
+
+
+
+
+
+
 
   /**Chat echo function */
   private loadOnChatEcho(socket:socketio.Socket) {
       socket.on(SocketEvents.CHAT_ECHO, (message:IChatMessage) => {
-          message.iAmSender = false;
+          //message.iAmSender = false;
           socket.emit(SocketEvents.CHAT_MESSAGE, message);
       });
   }
 
   /**Updates connection language */
   private loadOnChatLanguageChange(socket:socketio.Socket) {
-      socket.on(SocketEvents.LANGUAGE, (data:ISocketLanguage) => {
+      socket.on(SocketEvents.CHAT_LANGUAGE, (data:ISocketLanguage) => {
           let connection = this.findConnectionBySocket(socket);
           if (connection) {
               connection.language = data.language;
@@ -421,11 +419,12 @@ export class SocketHandler  {
 
   /**When admin wants to know chat rooms currently opened */
   private loadOnGetChatRooms(socket:socketio.Socket) {
-    socket.on(SocketEvents.CHAT_ROOM_UPDATE, () => {
+    socket.on(SocketEvents.CHAT_ROOMS_UPDATE, () => {
       console.log("Sending current chatRooms", this.chatRooms);
-      socket.emit(SocketEvents.CHAT_ROOM_UPDATE, this.chatRooms);
+      socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOMS_UPDATE, this.chatRooms);
     });
   }
+
 
 
 
