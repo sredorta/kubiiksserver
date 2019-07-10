@@ -183,6 +183,7 @@ export class SocketHandler  {
     /**Returns all clients of a roomId */
     private findClientsSocketByRoomId(roomId:string) {
       let res = [];
+      if(!this.io.sockets.adapter.rooms[roomId]) return [];
       let room = this.io.sockets.adapter.rooms[roomId].sockets;
       if (room) {
           for (var id in room) {
@@ -443,13 +444,18 @@ export class SocketHandler  {
           case ChatDataType.LeaveRoom: 
             Object.keys(socket.adapter.rooms).forEach( (key) => {
               if (key.includes('chat-room-')) {
-                  console.log("LEEEAVVING : ", key);
-                  socket.leave(key);
+              let myMessage = {
+                message:this.messagesAll[AppConfig.api.defaultLanguage].chatLeaveRoom(this.getConnectionFirstName(socket)),
+                room: key,
+                isBot:true
+              }
+              socket.leave(key);
+              socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Message, object:{message:myMessage}});
+              this.io.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Participants, object:{participants:this.findClientCountSocketByRoomId(key)}});
+              let myRoomsNow2 : IChatRoom[] = this.getChatRooms();
+              this.io.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRoomsNow2}});
   
-                }
-                let myRoomsNow : IChatRoom[] = this.getChatRooms();
-                console.log("LEFT ROOMS: ", myRoomsNow);
-                this.io.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRoomsNow}});
+            }
             });
             break;
           default:
