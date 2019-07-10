@@ -64,6 +64,7 @@ export interface ISocketToken {
     sender:string;
     room:string | null;
     isBot:boolean;
+    senderName:string | null;
   }
 
   /**Room structure */
