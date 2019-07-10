@@ -15,30 +15,22 @@ export class GalleryController {
 
     /**Uploads image to content folder and returns imageUrl for angular-editor*/
     static uploadImageToContent = async (req: Request, res: Response, next:NextFunction) => {
-        console.log("WE ARE HERE !!!!!!!!");
-        console.log(req.file.filename);
         res.send({imageUrl: "https://localhost:3000/public/images/content/" + req.file.filename});  
     }
 
     /**Uploads image to blog folder and returns imageUrl for angular-editor*/
     static uploadImageToBlog = async (req: Request, res: Response, next:NextFunction) => {
-        console.log("We are in blog upload !!");
-        console.log(req.body);
         res.send({imageUrl: "https://localhost:3000/public/images/blog/" + req.file.filename});  
     }
 
 
     /**Uploads image to email folder and returns imageUrl for angular-editor*/
     static uploadImageToEmail = async (req: Request, res: Response, next:NextFunction) => {
-        console.log("We are in email upload !!");
-        console.log(req.body);
         res.send({imageUrl: "https://localhost:3000/public/images/email/" + req.file.filename});  
     }    
 
     /**Uploads image to email folder and returns imageUrl for angular-editor*/
     static uploadImageToDefaults = async (req: Request, res: Response, next:NextFunction) => {
-            console.log("We are in defaults upload !!");
-            console.log(req.body);
             res.send({imageUrl: "https://localhost:3000/public/images/defaults/" + req.file.filename});  
     }    
 

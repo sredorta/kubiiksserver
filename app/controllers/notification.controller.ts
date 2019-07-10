@@ -36,7 +36,6 @@ export class NotificationController {
             let myUser = await User.scope("full").findByPk(req.user.id);
             if (!myUser) throw new Error("Cannot find auth user !");
             myUser.onPush = JSON.stringify(req.body.onPush);
-            console.log(req.body.onPush);
             await myUser.save();
             res.json(true);
         } catch(error) {
@@ -53,46 +52,5 @@ export class NotificationController {
             Middleware.validate()
         ]
     } 
-
-
-    /**Gets all data required for app initialization in one shot */
- /*   static get = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            const subscription = req.body.notification;
-            console.log(`Subscription received`);
-            console.log(subscription);
-            res.status(200).json(subscription);
-            //TODO: Each user will have to store the endpoint and keys so that we can recover later and send him a notif
-
-            //Test of sending back notif
-            const payload = JSON.stringify({
-                notification: {
-                  title: 'Test de notification',
-                  body: 'Ça cest un test de notifications through Angular with this article!',
-                  icon: 'https://localhost:3000/public/images/defaults/logo.png',
-                  vibrate: [100, 50, 100],
-                  action:"test",
-                  data: {
-                    url: 'https://medium.com/@arjenbrandenburgh/angulars-pwa-swpush-and-swupdate-15a7e5c154ac'
-                  }
-                }
-              });
-            webPush.sendNotification(subscription,payload);
-
-        } catch(error) {
-            next(error);
-        }
-    }*/
-    /** Role attach parameter validation */
- /*   static getChecks() {
-        return [
-            body('notification').exists().withMessage('exists'),
-            body('notification.endpoint').exists().withMessage('exists').isURL(),
-            body('notification.keys').exists().withMessage('exists'),
-            body('notification.keys.p256dh').exists().withMessage('exists').isLength({min:80}),
-            body('notification.keys.auth').exists().withMessage('exists').isLength({min:15}),
-            Middleware.validate()
-        ]
-    }    */
 
 }

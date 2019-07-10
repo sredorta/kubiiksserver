@@ -152,7 +152,6 @@ export class EmailController {
             myEmail.translations.push(myTrans);
 
             let html = await myEmail.getHtml(res.locals.language, '<p> -- TEST EMAIL -- </p>');
-            console.log(html);
             if (!html)  return next(new HttpException(500, messages.emailSentError,null));
             const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
             let myEmailT = {
@@ -162,8 +161,6 @@ export class EmailController {
                             text: htmlToText.fromString(html),
                             html: html
             }
-            console.log("text:");
-            console.log(htmlToText.fromString(html));
             await transporter.sendMail(myEmailT);
             res.send({message: {show:true, text:messages.emailSentOk(myUser.email)}});  
         } catch (error) {
@@ -199,7 +196,6 @@ export class EmailController {
             if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
 
             let html = await myEmail.getHtml(res.locals.language, '<p> -- TEST EMAIL -- </p>');
-            console.log(html);
             if (!html)  return next(new HttpException(500, messages.emailSentError,null));
             const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
             let myEmailT = {

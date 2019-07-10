@@ -36,7 +36,6 @@ export class SettingController {
     /**Update value with translations if required, we expect object with id,default, fr,en... */
     static update = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            console.log(req.body.setting);
             let mySetting = await Setting.scope("full").findByPk(req.body.setting.id);
             if (!mySetting) throw new Error("Setting not found");
             if (!mySetting.hasTranslations()) {
