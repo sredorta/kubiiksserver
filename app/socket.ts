@@ -8,6 +8,8 @@ import { User } from './models/user';
 import { Role } from './models/role';
 import { messagesAll } from './middleware/common';
 import { Alert } from './models/alert';
+import { Socket } from 'dgram';
+import { breakStatement } from 'babel-types';
 
 /**Enumerator with all socket events*/
 export enum SocketEvents {
@@ -15,11 +17,8 @@ export enum SocketEvents {
     DISCONNECT = "disconnect",
     AUTHENTICATE = "authenticate",
     UPDATE_USER = "update-user-data",
-
-    CHAT_ADMIN_ROOMS="chat-admin-rooms", //Detects rooms and assigns
-    CHAT_DATA="chat-data", //Sends data related to chat room
+    CHAT_DATA="chat-data",               //Sends all related to chat room once assigned
     CHAT_ADMINS_DATA = "chat-admins",
-    CHAT_NEW_NOTIFY ="chat-new-notify",
 }
 
 /**Enumerator containing all socket rooms */
@@ -64,6 +63,7 @@ export interface ISocketToken {
     date:Date;  
     sender:string;
     room:string | null;
+    isBot:boolean;
   }
 
   /**Room structure */
@@ -81,8 +81,17 @@ export interface ISocketToken {
     object:any;
   }
   enum ChatDataType {
+     CreateRoom = "create-room",
+     FirstMessage = "first-message",
+     WaitingRooms = "waiting-rooms",
+     StoredMessagesRequest = "stored-messages-request",
+     StoredMessagesResponse = "stored-messages-response",
+     Participants = "room-participants",
+     JoinRoom = "join-room",
      Message = "message",
      Room = "room",
+     Admins = "admins",
+     Writting = "writting",
   }
 
 export class SocketHandler  {
@@ -115,9 +124,7 @@ export class SocketHandler  {
             this.addConnection({socket:socket,user:new User(),language:AppConfig.api.defaultLanguage});
             this.loadOnDisconnect(socket);            //Disconnection
             this.loadOnAuthenticate(socket);          //Identify connected user
-            this.loadOnChatNewNotify(socket);         //Notify chat admins new chat entry
             this.loadOnChatAdmins(socket);            //Returns current status of admins, who they are and if connected or not
-            this.loadOnChatAdminStart(socket);
             this.loadOnChatData(socket);
         })
 
@@ -155,11 +162,53 @@ export class SocketHandler  {
     }
     
     /**Finds userId of an associated connection if is identified */
-    private getConnectionUser(socket:socketio.Socket) {
+    private getConnectionUser(socket:socketio.Socket) : User | null {
         const connection = this.findConnectionBySocket(socket);
-        if (connection) return connection.user.id;
+        if (connection) return connection.user;
         return null;
     }
+
+    /**Checks if the socket connection is a chat admin */
+    private isChatAdminUser(socket:socketio.Socket) : boolean {
+      let myUser = this.getConnectionUser(socket);
+      if (myUser) {
+         if (myUser.hasRole('chat')) 
+              return true;
+      }
+      return false;
+    }
+
+    /**Returns all clients of a roomId */
+    private findClientsSocketByRoomId(roomId:string) {
+      let res = [];
+      let room = this.io.sockets.adapter.rooms[roomId].sockets;
+      if (room) {
+          for (var id in room) {
+            res.push(this.io.sockets.adapter.nsp.connected[id]);
+          }
+      }
+      return res;
+    }
+    /**Returns clientCount of roomId */
+    private findClientCountSocketByRoomId(roomId:string) {
+      return this.findClientsSocketByRoomId(roomId).length;
+    }
+
+    /**Returns all chat rooms opened */
+    private getChatRooms() {
+      let myRooms :IChatRoom[] = [];
+      Object.keys(this.io.sockets.adapter.rooms).forEach( (key) => {
+        if (key.includes('chat-room-'))
+          myRooms.push({
+            id: key,
+            participants: this.findClientCountSocketByRoomId(key),
+            date: new Date(),
+            messages: []
+          });
+      });
+      return myRooms;
+    }
+
     /**Gets nickname of the connection */
     private getConnectionFirstName(socket:socketio.Socket) {
         const connection = this.findConnectionBySocket(socket);
@@ -303,81 +352,100 @@ export class SocketHandler  {
   ////////////////////////////////////////////////////////////////////////
   //Functions for handling CHAT PART
   ////////////////////////////////////////////////////////////////////////
-  /**When client sends first message, then we notify all chat admins with onPush and update chats */
-  private loadOnChatNewNotify(socket:socketio.Socket) {
-    socket.on(SocketEvents.CHAT_NEW_NOTIFY, (msg:IChatMessage) => {
-        //Find all chat admins users, do onPush notification and send them Room update
-        User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
-            for (let user of users) {
-              user.notify(this.messagesAll[user.language].notificationNewChat,msg.message);
-              //Add alert and send update to user
-              Alert.create({userId:user.id,type:"chat",title:this.messagesAll[user.language].notificationNewChat,message:msg.message}).then(res => {
-                User.scope("details").findByPk(user.id).then(userChatAdmin => {
-                  if (userChatAdmin) {
-                    let connection = this.findConnectionByUserId(userChatAdmin.id);
-                    if (connection)
-                      connection.socket.emit(SocketEvents.UPDATE_USER,userChatAdmin);
-                  }
-                })
-              })
-            }
-        });
-    });
-  }
-
-
-  /**Creates all required rooms and return them */
-  private loadOnChatAdminStart(socket:socketio.Socket) {
-    socket.on(SocketEvents.CHAT_ADMIN_ROOMS, () => {
-      //Find all orphan messages and create rooms for them if connection is still alive
-      //Remove any messages that they already have a room assigned or socket doesn't exist
-      for (let i = this.chatMessages.length - 1; i >= 0; --i) {
-        const index = this.connections.findIndex(obj => obj.socket.id == this.chatMessages[i].sender);
-        if ((this.chatMessages[i].room != null) || (index<0)) {
-            this.chatMessages.splice(i,1);
-        }
-      }
-      //Now create a senders array with each socket and it's messages
-      let senders : any = [];
-      for (let message of this.chatMessages) {
-         if (message.room ==null) {
-           if (message.sender) {
-             if (!senders[message.sender]) {
-                senders[message.sender] = [];
-             }
-             senders[message.sender].push(message);
-           }
-         }
-      }
-      let myRooms : IChatRoom[] = [];
-      //Now create a chat room for each sender and join mySelf and the sender
-      Object.keys(senders).forEach( (socketId)=> {
-          const roomName = "chat-room-" + Helper.generateRandomString(10)
-          const hisSocket = this.io.sockets.connected[socketId];
-          socket.join(roomName);
-          hisSocket.join(roomName);
-          myRooms.push({
-            id:roomName,
-            participants:2,
-            date: new Date(),
-            messages: senders[socketId]
-          });
-      });
-      //Emit to the admin all the rooms
-      socket.emit(SocketEvents.CHAT_ADMIN_ROOMS, myRooms);
-    });
-  }
-
   /**Sends data to the chat room others*/
   private loadOnChatData(socket:socketio.Socket) {
     socket.on(SocketEvents.CHAT_DATA, (data:IChatData) => {
         console.log("Broadcasting CHAT_DATA", data);
-        if (data.room)
-          socket.broadcast.to(data.room).emit(SocketEvents.CHAT_DATA,data);
-        else if (!data.room && data.type == ChatDataType.Message) {
-          console.log("STORING ORPHAN MESSAGE", data.object.message);
-          this.chatMessages.push(data.object.message);
+        switch(data.type) {   
+          case ChatDataType.CreateRoom:
+            if (!this.isChatAdminUser(socket)) {
+              console.log("Creating room as not admin chat !");
+              const roomName = "chat-room-" + Helper.generateRandomString(10);
+              const myRoom = {
+                id:roomName,
+                participants:1,
+                date: new Date(),
+                messages: []
+              }
+              socket.join(roomName);
+              //return to socket the room
+              socket.emit(SocketEvents.CHAT_DATA, {room:myRoom.id, type:ChatDataType.Room, object: {room:myRoom}});
+              let myMessage = {
+                message:this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome,
+                room: data.room,
+                isBot:true
+              }
+              socket.emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Message, object:{message:myMessage}});
+
+            } else {
+              console.log("NOT CREATING ROOM, YOU ARE ADMIN !!!!")
+            }
+            break;
+          case ChatDataType.FirstMessage:
+            if (!this.isChatAdminUser(socket)) {
+                console.log("NOTIFING ALL ADMINS...")
+                User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
+                  for (let user of users) {
+                    user.notify(this.messagesAll[user.language].notificationNewChat,data.object.message.message);
+                    //Add alert and send update to user
+                    Alert.create({userId:user.id,type:"chat",title:this.messagesAll[user.language].notificationNewChat,message:data.object.message.message}).then(res => {
+                      User.scope("details").findByPk(user.id).then(userChatAdmin => {
+                        if (userChatAdmin) {
+                          let connection = this.findConnectionByUserId(userChatAdmin.id);
+                          if (connection)
+                            connection.socket.emit(SocketEvents.UPDATE_USER,userChatAdmin);
+                        }
+                      })
+                    })
+                  }
+                });
+                //Tell to all already connected admins all the available chat rooms
+                let myRooms : IChatRoom[] = this.getChatRooms();
+                console.log("SENDING ROOMS !!!!",myRooms);
+                socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRooms}});
+            } else {
+              //In case of admin just forward message
+              if (data.room)
+                socket.broadcast.to(data.room).emit(SocketEvents.CHAT_DATA,data);
+            }
+            break;
+          case ChatDataType.WaitingRooms:
+            let myRoomsNow : IChatRoom[] = this.getChatRooms();
+            socket.emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRoomsNow}});
+            break;
+          case ChatDataType.StoredMessagesResponse:
+            console.log("Sending messages to admins", data);
+            socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, data);
+            break;
+          case ChatDataType.JoinRoom:
+            console.log(data);
+            console.log("Joining room",data.room);
+            if (data.room) {
+              socket.join(data.room);
+              let myMessage = {
+                message:this.messagesAll[this.getConnectionLanguage(socket)].chatJoinRoom(this.getConnectionFirstName(socket)),
+                room: data.room,
+                isBot:true
+              }
+              socket.broadcast.to(data.room).emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Message, object:{message:myMessage}});
+              this.io.to(data.room).emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Participants, object:{participants:this.findClientCountSocketByRoomId(data.room)}})
+            }
+            break;    
+          /*case ChatDataType.Message:
+              if (!data.room && data.type == ChatDataType.Message) {
+                  console.log("STORING ORPHAN MESSAGE", data.object.message);
+                  this.chatMessages.push(data.object.message);
+                  //socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ADMIN_ROOMS, myRooms);
+              }
+              break;*/
+          default:
+            console.log("BROADCAST DEFAULT !!! -> BYPASS")
+            if (data.room) {
+              console.log("Broadcasting to room " +data.room, data);
+              socket.broadcast.to(data.room).emit(SocketEvents.CHAT_DATA,data);
+            }
         }
+
     });
   }
 
