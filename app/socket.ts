@@ -442,6 +442,7 @@ export class SocketHandler  {
             }
             break;   
           case ChatDataType.LeaveRoom: 
+            console.log("IN LEAVE ROOOM",data);
             if (data.object.room)
               if (data.object.room.id) {
                   let key=data.object.room.id;
@@ -450,6 +451,7 @@ export class SocketHandler  {
                     room: key,
                     isBot:true
                   }
+                  console.log("LEAVING ROOOOOOOOOOOOOOOOOOOOOOOOOOOM",key);
                   socket.leave(key);
                   socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Message, object:{message:myMessage}});
                   socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Participants, object:{participants:this.findClientCountSocketByRoomId(key)}});
