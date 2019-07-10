@@ -442,21 +442,20 @@ export class SocketHandler  {
             }
             break;   
           case ChatDataType.LeaveRoom: 
-            Object.keys(socket.adapter.rooms).forEach( (key) => {
-              if (key.includes('chat-room-')) {
-              let myMessage = {
-                message:this.messagesAll[AppConfig.api.defaultLanguage].chatLeaveRoom(this.getConnectionFirstName(socket)),
-                room: key,
-                isBot:true
+            if (data.object.room)
+              if (data.object.room.id) {
+                  let key=data.object.room.id;
+                  let myMessage = {
+                    message:this.messagesAll[AppConfig.api.defaultLanguage].chatLeaveRoom(this.getConnectionFirstName(socket)),
+                    room: key,
+                    isBot:true
+                  }
+                  socket.leave(key);
+                  socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Message, object:{message:myMessage}});
+                  socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Participants, object:{participants:this.findClientCountSocketByRoomId(key)}});
+                  let myRoomsNow2 : IChatRoom[] = this.getChatRooms();
+                  this.io.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRoomsNow2}});
               }
-              socket.leave(key);
-              socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Message, object:{message:myMessage}});
-              this.io.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Participants, object:{participants:this.findClientCountSocketByRoomId(key)}});
-              let myRoomsNow2 : IChatRoom[] = this.getChatRooms();
-              this.io.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRoomsNow2}});
-  
-            }
-            });
             break;
           default:
             console.log("BROADCAST DEFAULT !!! -> BYPASS")
