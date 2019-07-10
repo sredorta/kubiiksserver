@@ -10,6 +10,7 @@ import { messagesAll } from './middleware/common';
 import { Alert } from './models/alert';
 import { Socket } from 'dgram';
 import { breakStatement } from 'babel-types';
+import { createRegularExpressionLiteral } from 'typescript';
 
 /**Enumerator with all socket events*/
 export enum SocketEvents {
@@ -47,7 +48,6 @@ export interface ISocketToken {
   interface ISocketConnection {
     socket: socketio.Socket;
     user: User;
-    language:string;
   }
   /**Contains reduced view of users, used for getting chat admins data */
   interface IChatUser {
@@ -72,6 +72,7 @@ export interface ISocketToken {
       participants:number;
       date:Date;
       messages: IChatMessage[];
+      language:string;
   }
 
   /**Chat data structure */
@@ -88,6 +89,7 @@ export interface ISocketToken {
      StoredMessagesResponse = "stored-messages-response",
      Participants = "room-participants",
      JoinRoom = "join-room",
+     LeaveRoom = "leave-room",
      Message = "message",
      Room = "room",
      Admins = "admins",
@@ -121,7 +123,7 @@ export class SocketHandler  {
     /**Starts listening on sockets and handling events*/
     listen() {
         this.io.on(SocketEvents.CONNECT, (socket) => {
-            this.addConnection({socket:socket,user:new User(),language:AppConfig.api.defaultLanguage});
+            this.addConnection({socket:socket,user:new User()});
             this.loadOnDisconnect(socket);            //Disconnection
             this.loadOnAuthenticate(socket);          //Identify connected user
             this.loadOnChatAdmins(socket);            //Returns current status of admins, who they are and if connected or not
@@ -203,11 +205,26 @@ export class SocketHandler  {
             id: key,
             participants: this.findClientCountSocketByRoomId(key),
             date: new Date(),
-            messages: []
+            messages: [],
+            language: AppConfig.api.defaultLanguage
           });
       });
       return myRooms;
     }
+
+    /**Gets if user already has one chat room  */
+    private hasChatRoom(socket:socketio.Socket) {
+      let result :boolean = false;
+      Object.keys(socket.adapter.rooms).forEach( (key) => {
+        if (key.includes('chat-room-')) {
+          console.log("USERRRRRRRRRRRRRRRRRRR ALREEEEEEEEEEEADDDYYYYYYYYYYYYYY!!!!!!!!!!!!", key);
+          result = true;
+        }
+      });
+      return result;
+    }
+
+
 
     /**Gets nickname of the connection */
     private getConnectionFirstName(socket:socketio.Socket) {
@@ -218,12 +235,6 @@ export class SocketHandler  {
         return null;
     }
 
-    /**Returns the current language of the connection */
-    private getConnectionLanguage(socket:socketio.Socket) {
-        const connection = this.findConnectionBySocket(socket);
-        if (connection) return connection.language;
-        return AppConfig.api.defaultLanguage;
-    }
 
     ////////////////////////////////////////////////////////////////////////
     //Functions for handling all connections ENTER/EXIT
@@ -294,8 +305,7 @@ export class SocketHandler  {
           } catch (error) {}
           let connection : ISocketConnection = {
               socket: socket,
-              user: new User(),
-              language:data.language
+              user: new User()
           }
           console.log("FROM PAYLOAD", userId)
           if (userId)
@@ -323,7 +333,6 @@ export class SocketHandler  {
         let myConnection = this.findConnectionBySocket(connection.socket);
         const index = this.connections.findIndex(obj => obj.socket.id == connection.socket.id);
         if (myConnection) {
-            myConnection.language = connection.language;
             myConnection.user = connection.user;
         }
         if (index>=0 && myConnection) {
@@ -359,24 +368,24 @@ export class SocketHandler  {
         switch(data.type) {   
           case ChatDataType.CreateRoom:
             if (!this.isChatAdminUser(socket)) {
-              console.log("Creating room as not admin chat !");
-              const roomName = "chat-room-" + Helper.generateRandomString(10);
-              const myRoom = {
-                id:roomName,
-                participants:1,
-                date: new Date(),
-                messages: []
-              }
-              socket.join(roomName);
-              //return to socket the room
-              socket.emit(SocketEvents.CHAT_DATA, {room:myRoom.id, type:ChatDataType.Room, object: {room:myRoom}});
-              let myMessage = {
-                message:this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome,
-                room: data.room,
-                isBot:true
-              }
-              socket.emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Message, object:{message:myMessage}});
-
+                  console.log("Creating room as not admin chat !");
+                  const roomName = "chat-room-" + Helper.generateRandomString(10);
+                  const myRoom = {
+                    id:roomName,
+                    participants:1,
+                    date: new Date(),
+                    messages: [],
+                    language: data.object.language
+                  }
+                  socket.join(roomName);
+                  //return to socket the room
+                  socket.emit(SocketEvents.CHAT_DATA, {room:myRoom.id, type:ChatDataType.Room, object: {room:myRoom}});
+                  let myMessage = {
+                    message:this.messagesAll[myRoom.language].chatWelcome,
+                    room: data.room,
+                    isBot:true
+                  }
+                  socket.emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Message, object:{message:myMessage}});
             } else {
               console.log("NOT CREATING ROOM, YOU ARE ADMIN !!!!")
             }
@@ -423,21 +432,26 @@ export class SocketHandler  {
             if (data.room) {
               socket.join(data.room);
               let myMessage = {
-                message:this.messagesAll[this.getConnectionLanguage(socket)].chatJoinRoom(this.getConnectionFirstName(socket)),
+                message:this.messagesAll[data.object.room.language].chatJoinRoom(this.getConnectionFirstName(socket)),
                 room: data.room,
                 isBot:true
               }
               socket.broadcast.to(data.room).emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Message, object:{message:myMessage}});
               this.io.to(data.room).emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Participants, object:{participants:this.findClientCountSocketByRoomId(data.room)}})
             }
-            break;    
-          /*case ChatDataType.Message:
-              if (!data.room && data.type == ChatDataType.Message) {
-                  console.log("STORING ORPHAN MESSAGE", data.object.message);
-                  this.chatMessages.push(data.object.message);
-                  //socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ADMIN_ROOMS, myRooms);
-              }
-              break;*/
+            break;   
+          case ChatDataType.LeaveRoom: 
+            Object.keys(socket.adapter.rooms).forEach( (key) => {
+              if (key.includes('chat-room-')) {
+                  console.log("LEEEAVVING : ", key);
+                  socket.leave(key);
+  
+                }
+                let myRoomsNow : IChatRoom[] = this.getChatRooms();
+                console.log("LEFT ROOMS: ", myRoomsNow);
+                this.io.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRoomsNow}});
+            });
+            break;
           default:
             console.log("BROADCAST DEFAULT !!! -> BYPASS")
             if (data.room) {
@@ -451,298 +465,4 @@ export class SocketHandler  {
 
 
 
-
-
-
-
-
-
-
-
-    /**Leaves room from a specific connection */
-    /*private leaveChatRoom(socket:socketio.Socket, room:IChatRoom) {
-      const myRoomIndex = this.chatRooms.findIndex(obj => obj.id == room.id);
-      if (myRoomIndex>=0) {
-        this.chatRooms[myRoomIndex].participants = this.chatRooms[myRoomIndex].participants-1;
-        socket.leave(this.chatRooms[myRoomIndex].id);
-        socket.to(this.chatRooms[myRoomIndex].id).emit(SocketEvents.CHAT_MESSAGE, this.newBotMessage(this.messagesAll[this.getConnectionLanguage(socket)].chatLeaveRoom(this.getConnectionFirstName(socket)),this.chatRooms[myRoomIndex].id));
-      }
-      //Notify admins that there are changes on the chatRooms
-      socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOM_UPDATE, this.chatRooms);
-    } */   
-
-    /**Determines if socket can start a room. Only non chat admins can start a room. Only one room per client */
-    /*private socketCanStartRoom(socket:socketio.Socket) {
-      let result : boolean = true;
-       Object.keys(socket.rooms).forEach( (key:string) => {
-           console.log("KEY : " + key);
-           if (key.includes('chat-room-')) result = false;
-           if (key == SocketRooms.CHAT_ADMIN) result = false;
-       })
-       return result;
-    }*/
-
-
-    /**When the client starts a chat. We create a room and send BOT message, then we send to client the chat admins user list and ask admins to join room ! */
-/*    private loadOnChatStart(socket:socketio.Socket) {
-      socket.on(SocketEvents.CHAT_START_REQUEST, () => {
-        //STEP0: Do work if socket is not already in a chat room and is not chat admin
-        console.log("Recieved CHAT_START_REQUEST",this.socketCanStartRoom(socket));
-        if (this.socketCanStartRoom(socket)) {
-            //STEP1: Create a room and join the socket to the room
-            let myRoom : IChatRoom = {
-              id: "chat-room-" + Helper.generateRandomString(10),
-              participants:1,
-              date: new Date(),
-              language: this.getConnectionLanguage(socket)
-            }
-            let myMessage : IChatMessage = {
-              message:this.messagesAll[this.getConnectionLanguage(socket)].chatWelcome,
-              date: new Date(),  
-              sender: "bot",
-            }
-            this.chatMessages.push(myMessage);
-            this.chatRooms.push(myRoom);
-            socket.join(myRoom.id);
-            //Prevent admins that chat-room changes
-            socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOMS_UPDATE,this.chatRooms);
-
-            //STEP2: Get all chat admins and their status
-            User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
-              let myUsers : IChatUser[] = [];
-              for (let user of users) {
-                  myUsers.push({userId:user.id,firstName:user.firstName,avatar:user.avatar,connected:this.isUserConnected(user.id)})
-              }
-              this.chatAdmins = myUsers;
-              const response : IChatData = {
-                admins:myUsers,
-                room:myRoom,
-                messages: this.chatMessages.filter(obj=>obj.room == myRoom.id)
-              }
-              socket.emit(SocketEvents.CHAT_START_RESPONSE, response);
-            });
-        }
-      });
-    }*/
-
-
-
-
-  /**Returns current chat rooms if request to socket*/
-  /*private loadOnChatRooms(socket:socketio.Socket) {
-    socket.on(SocketEvents.CHAT_ROOMS_UPDATE, () => {
-      console.log("Sending chat rooms", this.chatRooms);
-      socket.emit(SocketEvents.CHAT_ROOMS_UPDATE,this.chatRooms);
-    });
-  }*/
-
-
-
-
-
-
-
-
-
-
-
-  /**Returns all messages of a room */
-/*  private loadOnGetStoredMessages(socket:socketio.Socket) {
-    socket.on(SocketEvents.CHAT_STORED_MESSAGES, (room:string)=> {
-      let myMessages = this.chatMessages.filter(obj=> obj.room == room);
-      console.log("Sending all stored messages of room " + room, myMessages );
-      socket.emit(SocketEvents.CHAT_STORED_MESSAGES, myMessages);
-    })
-  }*/
-
-
-  /**When admin wants to know chat rooms currently opened */
-  /*private loadOnGetChatRooms(socket:socketio.Socket) {
-    socket.on(SocketEvents.CHAT_ROOMS_UPDATE, () => {
-      console.log("Sending current chatRooms", this.chatRooms);
-      socket.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOMS_UPDATE, this.chatRooms);
-    });
-  }*/
-
-
-
-
-  /**Chat echo function */
- /* private loadOnChatEcho(socket:socketio.Socket) {
-      socket.on(SocketEvents.CHAT_ECHO, (message:IChatMessage) => {
-          //message.iAmSender = false;
-          socket.emit(SocketEvents.CHAT_MESSAGE, message);
-      });
-  }*/
-
-  /**Updates connection language */
-  /*private loadOnChatLanguageChange(socket:socketio.Socket) {
-      socket.on(SocketEvents.CHAT_LANGUAGE, (data:ISocketLanguage) => {
-          let connection = this.findConnectionBySocket(socket);
-          if (connection) {
-              connection.language = data.language;
-              //socket.emit(SocketEvents.CHAT_MESSAGE, this.newBotMessage(this.messagesAll[this.getConnectionLanguage(socket)].chatLanguageSwitch));
-          }
-      });      
-  }*/
-  //This is the missing part now....
-/*
-
-    private removeChatRoom(room:IChatRoom) {
-      const myRoomIndex = this.chatRooms.findIndex(obj => obj.id == room.id);
-      if (myRoomIndex>=0) {
-        this.chatRooms.splice(myRoomIndex,1);
-        //this.io.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_ROOM_UPDATE, this.chatRooms);
-      }
-    }
-
-
-    private loadOnJoinRoom(socket:socketio.Socket) {
-      socket.on(SocketEvents.CHAT_JOIN, (room:string) => {
-        console.log("Recieved request to join room: ",room);
-        let myRoom = this.chatRooms.find(obj => obj.id == room);
-        console.log(myRoom);
-        if (myRoom) {
-          //this.joinRoom(socket,myRoom.id);
-        }
-      });
-    }
-    private loadOnLeaveRoom(socket:socketio.Socket) {
-      socket.on(SocketEvents.CHAT_LEAVE, (room:string) => {
-        console.log("Recieved request to leave room: ",room);
-        let myRoom = this.chatRooms.find(obj => obj.id == room);
-        console.log(myRoom);
-        if (myRoom) {
-          //this.leaveRoom(socket,myRoom.id);
-        }
-      });
-    }
-    private loadOnDeleteRoom(socket:socketio.Socket) {
-      socket.on(SocketEvents.CHAT_ROOM_DELETE, (room:string) => {
-        console.log("Recieved request to remove room: ",room);
-        let myRoom = this.chatRooms.find(obj => obj.id == room);
-        if (myRoom) {
-          //Notify all users that room is being closed
-          socket.to(myRoom.id).emit(SocketEvents.CHAT_ROOM_CLOSE);
-          //this.removeChatRoom(myRoom);
-        }
-      });
-    }*/
-
 }
-
-/*
-io.on("connection", function(socket:any) {
-    console.log("CONNECTED TO SOCKET : " + socket.id);
-    //Ask for authentification first of all
-    socket.emit('authenticate');
-
-    //When we get the authentication
-    //we recieve language and token
-    socket.on('authenticate',(data:ISocketAuth) => {
-      //We need to validate user and save to sockets
-      let userId = null;
-      try {
-        const payload = <any>jwt.verify(data.token,AppConfig.auth.jwtSecret);
-        userId = payload.id;  
-      } catch (error) {}
-      const result : ISocket = {
-        socket: socket,
-        userId: userId,
-        language:data.language,
-        welcomeSent:false
-      }
-      //If user has chat rights join it to chat-admin-room
-      if (userId)
-        User.scope("fulldetails").findByPk(userId).then(user => {
-            if (user)
-              if (user.roles.find(obj=> obj.name == "chat")) {
-                socket.join('chat-admin-room');
-                console.log("USER JOINED chat-admin-room");
-              }
-        });
-
-      sockets.push(result);
-      console.log(sockets);
-    })
-
-    //When socket is disconnected we remove it from the sockets list
-    socket.on('disconnect', function () {
-      let index = sockets.findIndex(obj=> obj.socket.id == socket.id);
-      if (index>=0) {
-        sockets.splice(index,1);
-      }
-      console.log(sockets);
-      console.log("Socket disconnected : " + socket.id);
-    });
-
-    //Update token
-    socket.on('update-token', (data:ISocketToken) => {
-      let userId = null;
-      try {
-        const payload = <any>jwt.verify(data.token,AppConfig.auth.jwtSecret);
-        userId = payload.id;  
-      } catch (error) {}
-      let index = sockets.findIndex(obj=> obj.socket.id == socket.id);
-      if (index>=0)
-           sockets[index].userId = userId;
-      console.log(sockets);  
-      console.log("updated token");   
-    })
-
-    //Update language
-    socket.on('update-language', (data:ISocketLanguage) => {
-      let index = sockets.findIndex(obj=> obj.socket.id == socket.id);
-      if (index>=0) {
-          sockets[index].language = data.language;
-          if (sockets[index].welcomeSent)
-            socket.emit('chat-message', messagesAll[data.language].chatLanguageSwitch);
-      }     
-      console.log(sockets);  
-      console.log("updated language");       
-    });
-
-
-    //Chat echo part
-    //----------------------------------------------------------
-    //Start chat
-    socket.on('chat-start', () => {
-      console.log("CHAT START !!!!!!");
-      let mySocket = sockets.find(obj => obj.socket.id == socket.id);
-      if (mySocket) {
-        if (!mySocket.welcomeSent)
-          socket.emit('chat-message',messagesAll[mySocket.language].chatWelcome);
-        mySocket.welcomeSent = true;
-      }
-    });
-
-    //When we recieve a message from the chat
-    socket.on('chat-message',(message:string)=> {
-      let clients = io.sockets.adapter.rooms['chat-admin-room'].sockets; 
-      console.log("Found following chat admin id's : ");
-      for (let clientId in clients) {
-        let clientSocket = io.sockets.connected[clientId];
-        console.log(clientSocket.id);
-        //Here we need to notify admins that new message is recieved !
-        //Then create a room 1-1 with client and admin
-        //Need to create angular admin chat with several discussions
-        //For the moment I just send to admin
-        clientSocket.emit('chat-message',message);
-      }
-
-    });
-
-
-    //Echo for testing
-    socket.on('chat-echo', (message:string) => {
-      socket.emit('chat-message', message);
-    });
-
-    //When user is writting or not
-    socket.on('chat-writting', (writting:boolean) => {
-      if (writting)
-        console.log("User is writting");
-      else
-        console.log("NOT WRITTING");  
-    });
-  });*/
