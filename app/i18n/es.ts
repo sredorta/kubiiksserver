@@ -41,6 +41,8 @@ export const messages = {
 
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nuevo password`,
     emailSentOk:    (name = 'field') => `Un correo electronico ha sido enviado a : ${name}`,
+    emailSentOkAll: (count = '0') => `Correo enviado a ${count} recipientes`,
+
     emailSentError: 'No se ha podido enviar el correo, contacte con el administrador',
     emailSiteAccess : 'IR AL SITIO WEB',
     emailDeleteProtected: 'Los modelos de correo del systema no se pueden borrar',

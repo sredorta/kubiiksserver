@@ -9,6 +9,7 @@ import path from 'path';
 import htmlToText from 'html-to-text';
 import InlineCss from 'inline-css';
 import nodemailer from 'nodemailer';
+import { Helper } from '../classes/Helper';
 
 export const EmailN = 'Not a model';
 export const NEmail = 'Not a model';
@@ -210,13 +211,14 @@ export class Email extends Model<Email> {
   /**Returns the html of the final email */
   public async getHtml(iso:string, additionalHtml?:string) {
     try {
+        let messagesAll = Helper.translations();
         await this.populate(); //Populate email with all settings that are common for all emails
         let myData = JSON.parse(JSON.stringify(this));
         myData.translations = JSON.parse(JSON.stringify(this.translations));
         myData.footer = JSON.parse(JSON.stringify(this.footer));
         myData.social = JSON.parse(JSON.stringify(this.social));
         myData.siteUrl = this.siteUrl;
-        myData.siteAccess = messages.emailSiteAccess; //Add site Access string
+        myData.siteAccess = messagesAll[iso].emailSiteAccess; //Add site Access string
         let myTrans = myData.translations.find((obj:any) => obj.iso == iso);
         myData.translations = [];
         myData.translations.push(myTrans);
@@ -240,6 +242,23 @@ export class Email extends Model<Email> {
         return null;
     }
   }
+
+  /**Returns the header of the email translated */
+  public async getHeader(iso:string, additionalHtml?:string) {
+    try {
+        let myData = JSON.parse(JSON.stringify(this));
+        myData.translations = JSON.parse(JSON.stringify(this.translations));
+        let myTrans = myData.translations.find((obj:any) => obj.iso == iso);
+        myData.translations = [];
+        myData.translations.push(myTrans);
+        if(!myData.translations[0].header) myData.translations[0].header = "";
+        return myData.translations[0].header;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+  }
+
 
   /**Sends email to email recipients with a certain template, additional html if any, subject... */
   public static async send(iso:string, template:string, subject:string, to:string[], additionalHtml?:string) {

@@ -38,6 +38,7 @@ export const messages = {
     authEmailValidateSuccess: 'Your account has been activated',
     authAccountNotActive: 'You need to validate your email account before getting access',
     emailSentOk:    (name = 'field') => `An email has been sent to : ${name}`,
+    emailSentOkAll: (count = '0') => `Sent email to ${count} recipients`,
     emailSentError: 'An error happened when sending the email, please contact the administrator',
     emailSiteAccess : 'GO TO SITE',
     emailDeleteProtected: 'System email templates cannot be deleted',

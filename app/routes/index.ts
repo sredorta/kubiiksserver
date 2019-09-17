@@ -127,6 +127,14 @@ export class Routes {
     app.route('/api/email/send')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendChecks(),EmailController.send);      
 
+    /**Sends email to one recipients with given template */
+    app.route('/api/email/send-to')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendToChecks(),EmailController.sendTo);      
+
+    /**Sends email to all users registered with given template */
+    app.route('/api/email/send-to-all')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(), EmailController.sendToAllChecks(),EmailController.sendToAll);      
+
 
     /////////////////////////////////////////////////////////////////
     // CONTACT CONTROLLER PART

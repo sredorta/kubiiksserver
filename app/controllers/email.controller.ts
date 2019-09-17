@@ -19,6 +19,8 @@ import InlineCss from 'inline-css';
 import { IsPhoneNumber } from 'class-validator';
 import { Email } from '../models/email';
 import { EmailTranslation } from '../models/email_translation';
+import { Table } from 'sequelize-typescript';
+import { Helper } from '../classes/Helper';
 
 export class EmailController {
     /**Email transporter check */
@@ -226,6 +228,94 @@ export class EmailController {
             Middleware.validate()
         ]
     }    
+
+
+
+    /**Sends email to one email recipient using a specific template*/
+    static sendTo = async (req: Request, res: Response, next:NextFunction) => {
+        //TODO: Get post parameter of template email, additionalHTML
+        try {
+            console.log(req.body);
+            console.log("Additional HTML : " + req.body.additionalHtml);
+            let myEmail = await Email.findByPk(req.body.email.id);
+            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
+            let html = await myEmail.getHtml(res.locals.language, req.body.additionalHtml);
+            if (!html)  return next(new HttpException(500, messages.emailSentError,null));
+            let header = await myEmail.getHeader(res.locals.language);
+
+            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+            let myEmailT = {
+                            from: AppConfig.emailSmtp.sender,
+                            to: req.body.to,
+                            subject: htmlToText.fromString(header, {uppercaseHeadings:false}),
+                            text: htmlToText.fromString(html),
+                            html: html
+            }
+            await transporter.sendMail(myEmailT);
+            res.send({message: {show:true, text:messages.emailSentOk(req.body.to)}}); 
+        } catch (error) {
+            next(new HttpException(500, messages.emailSentError,null));
+        }
+    }
+   /**Parameter validation */
+   static sendToChecks() {
+        return [
+            body('to').exists().withMessage('exists').isEmail(),
+            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            Middleware.validate()
+        ]
+    }    
+
+    
+
+    /**Sends email to all registered users using a specific template*/
+    static sendToAll = async (req: Request, res: Response, next:NextFunction) => {
+        //TODO: Get post parameter of template email, additionalHTML
+        try {
+            
+            let myEmail = await Email.findByPk(req.body.email.id);
+            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
+            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+            let users = await User.findAll();
+            for (let user of users) {
+                let html = await myEmail.getHtml(user.language);
+                if (!html)  return next(new HttpException(500, messages.emailSentError,null));
+                let header = await myEmail.getHeader(user.language);
+                console.log(header);
+                let myEmailT = {
+                                from: AppConfig.emailSmtp.sender,
+                                to: user.email,
+                                subject: htmlToText.fromString(header, {uppercaseHeadings:false}),
+                                text: htmlToText.fromString(html),
+                                html: html
+                }
+                await transporter.sendMail(myEmailT);
+            }
+
+            res.send({message: {show:true, text:messages.emailSentOkAll(users.length.toString())}}); 
+        } catch (error) {
+            next(new HttpException(500, messages.emailSentError,null));
+
+        }
+    }
+   /**Parameter validation */
+   static sendToAllChecks() {
+        return [
+            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            //TODO: Add here all required checks !!!
+            Middleware.validate()
+        ]
+    }    
+
+
+
+
+
+
+
+
+
+
 
 
     /**Creates email template based on reference. Admin or content required */

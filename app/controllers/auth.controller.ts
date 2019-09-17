@@ -222,7 +222,9 @@ export class AuthController {
             if (req.body.mobile)
                 myUser.mobile = req.body.mobile;    
             if (req.body.avatar)
-                myUser.avatar = req.body.avatar;                          
+                myUser.avatar = req.body.avatar;    
+            if (req.body.language)
+                myUser.language = req.body.language;                          
             if (req.body.passwordOld) {
                 if (!myUser.checkPassword(req.body.passwordOld))
                     next (new HttpException(400, messages.authInvalidCredentials, null)); 

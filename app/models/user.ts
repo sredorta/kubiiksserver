@@ -302,19 +302,19 @@ export class User extends Model<User> {
 
         /*Debug users*/
         myUser = await User.scope("full").create({
-          firstName: "Christine",
-          lastName: "Besson",
-          email: "christine.besson@hotmail2.com",
+          firstName: "Sergi",
+          lastName: "Red",
+          email: "sergi.redorta@gmail.com",
           phone: null,
           mobile: "0623133222",
-          language: "fr",
+          language: "en",
           passport: "local",
           terms: true,
           emailValidationKey: Helper.generateRandomString(30),
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
         });
-        await myUser.attachRole("chat");
+/*        await myUser.attachRole("chat");
         myUser = await User.scope("full").create({
           firstName: "Laia",
           lastName: "Redorta",
@@ -434,7 +434,7 @@ export class User extends Model<User> {
           emailValidationKey: Helper.generateRandomString(30),
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
-        });                  
+        });    */              
 
     }
     return _seed();

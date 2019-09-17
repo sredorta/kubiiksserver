@@ -11,7 +11,9 @@ body {
     }
     .kii-email .col245 {width: 245px!important;}
 }
-
+.hidden {
+    display:none;
+}
 .kii-email .content {
     width: 100%; 
     max-width: 600px;
@@ -89,20 +91,20 @@ body {
     opacity:0.8 !important;
 }
 
-.kii-email .borderbottom {border-bottom: 1px solid #f2eeed;}
+.content .borderbottom {border-bottom: 1px solid #f2eeed;}
 
-.kii-email .kii-email-embedded-title {font-size: 33px; line-height: 38px; font-weight: bold;}
-.kii-email .kii-email-embedded-subtitle {font-size: 20px; font-family: sans-serif; letter-spacing: 5px;}
+.content .kii-email-embedded-title {font-size: 33px; line-height: 38px; font-weight: bold;}
+.content .kii-email-embedded-subtitle {font-size: 20px; font-family: sans-serif; letter-spacing: 5px;}
 
-.kii-email .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
-.kii-email .h1, .h2, .bodycopy {font-family: sans-serif;}
-.kii-email .innerpadding {padding: 30px 30px 30px 30px;}
-.kii-email .innerpadding15 {padding: 15px 15px 15px 15px;}
+.content .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
+.content .h1, .h2, .bodycopy {font-family: sans-serif;}
+.content .innerpadding {padding: 30px 30px 30px 30px;}
+.content .innerpadding15 {padding: 15px 15px 15px 15px;}
 
-.kii-email .borderbottom {border-bottom: 1px solid #f2eeed;}
-.kii-email .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
-.kii-email .bodycopy {font-size: 16px; line-height: 22px;}
-.kii-email .bodycopy img {
+.content .borderbottom {border-bottom: 1px solid #f2eeed;}
+.content .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
+.content .bodycopy p {font-size: 16px; line-height: 22px;}
+.content .bodycopy img {
     width:100%;
 }
 
