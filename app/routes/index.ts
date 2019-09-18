@@ -32,6 +32,7 @@ import { InitController } from '../controllers/init.controller';
 import { EmailController } from '../controllers/email.controller';
 import { NotificationController } from '../controllers/notification.controller';
 import { AlertController } from '../controllers/alert.controller';
+import { StatController } from '../controllers/stat.controller';
 
 
 
@@ -135,6 +136,16 @@ export class Routes {
     app.route('/api/email/send-to-all')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(), EmailController.sendToAllChecks(),EmailController.sendToAll);      
 
+    /////////////////////////////////////////////////////////////////
+    // STATS CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
+    /**Saves the current stat */
+    app.route('/api/stats/save')
+      .post(StatController.saveChecks(),StatController.save);      
+
+    /**Return current stats of the given days analysis */
+    app.route('/api/stats/analyze')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasStatsRights(),StatController.analyzeChecks(),StatController.analyze);   
 
     /////////////////////////////////////////////////////////////////
     // CONTACT CONTROLLER PART

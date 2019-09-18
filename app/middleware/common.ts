@@ -273,6 +273,24 @@ export class Middleware {
         }
     }   
 
+    /** Checks that the registered user has stats role or is an administrator if not errors */     
+    public static hasStatsRights() {
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            try {
+                let myUser = await User.scope("details").findByPk(req.user.id);
+                if (myUser) {
+                    if (await myUser.hasRole("stats") )
+                        next();
+                    else
+                        next(new HttpException(403, messages.authTokenInvalidRole('stats'), null));
+                } else
+                    next(new HttpException(403, messages.authTokenInvalidRole('stats'), null));
+            } catch(error) {
+                next(new HttpException(403, messages.authTokenInvalidRole('stats'), null));
+            }
+        }
+    }   
+
     /** Checks that the registered user has content role or is an administrator if not errors */     
     public static hasBlogRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
