@@ -43,6 +43,7 @@ class StatResult {
     visits_count : IStatWindow = {current:0,previous:0};
     visits_duration : IStatWindow = {current:0,previous:0};
     visits_hours_histogram : any[] = [];
+    visits_over_day : any[] = [];
 
     constructor() {};
 
@@ -171,6 +172,10 @@ export class StatController {
         try {
             const currentTimeWindow = [new Date(new Date().setDate(new Date().getDate()-req.body.days)), new Date()];
             const previousTimeWindow = [new Date(new Date().setDate(new Date().getDate()-2*req.body.days)), new Date(new Date().setDate(new Date().getDate()-req.body.days))];
+            
+            console.log("WINDOWS !!!!!!!!!!!!!");
+            console.log(currentTimeWindow);
+            
             //Get all sessions of the period and precedent period
             const currentStats = await Stat.findAll({where:{start: {[Op.between]:currentTimeWindow}}});
             const previousStats = await Stat.findAll({where:{start: {[Op.between]:previousTimeWindow}}});
@@ -183,7 +188,24 @@ export class StatController {
             result.visits_count.previous = previous.length;
             result.visits_duration.current = StatController.getAverageDuration(current);
             result.visits_duration.previous = StatController.getAverageDuration(previous);
-            
+            //Generate visits per day data
+            let visitsOverDay : any[]= [];
+            for (let stat of current) {
+                let day = new Date(new Date(stat.start).setHours(0,0,0,0)).toDateString();
+                let elem = visitsOverDay.find(obj => obj.day == day);
+                if (elem) {
+                    elem.count = elem.count+1;
+                } else {
+                    visitsOverDay.push({day:day,count:1})
+                }
+
+            }
+            //Sort array of objects and generate array
+            visitsOverDay.sort((val1, val2)=> {return new Date(val1.day).getTime() - new Date(val2.day).getTime()});
+            for (let elem of visitsOverDay) {
+                result.visits_over_day.push([elem.day, elem.count]);
+            }
+
             //Generate histogram with visiting hours through day
             let histo : any = [];
             for (let i=0; i < 24; i++) {
@@ -197,16 +219,6 @@ export class StatController {
                 result.visits_hours_histogram.push([i + ' - ' + (i+1) , histo[i]]);
             }
 
-            /*data = [
-                ['0-1', 0],
-                ['1-2', 0],
-                ['2-3', 0],
-                ['3-4', 1],
-                ['4-5', 10],
-                ['5-6', 12],
-                ...
-                ['23-24',0]
-            ]*/
             console.log(result);
             console.log("HERE ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             //console.log(currentStats);
