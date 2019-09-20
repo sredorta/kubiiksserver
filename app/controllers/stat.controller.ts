@@ -200,28 +200,34 @@ export class StatController {
                 }
 
             }
-            //Sort array of objects and generate array
+            //Sort array of objects
             visitsOverDay.sort((val1, val2)=> {return new Date(val1.day).getTime() - new Date(val2.day).getTime()});
             for (let elem of visitsOverDay) {
                 result.visits_over_day.push([elem.day, elem.count]);
             }
 
             //Generate histogram with visiting hours through day
+            let days : any = [];
             let histo : any = [];
             for (let i=0; i < 24; i++) {
                 histo[i] = 0;
             }
+            for (let i=1; i<=8; i++) {
+                days[i] = Array.from(histo);
+            }
             for (let stat of current) {
                 let hour = new Date(stat.start).getHours();
-                histo[hour] = histo[hour] + 1;
+                days[new Date(stat.start).getDay()][hour] =  days[new Date(stat.start).getDay()][hour] + 1;
+                days[8][hour] = days[8][hour] + 1;
             }
-            for (let i=0; i < 24; i++) {
-                result.visits_hours_histogram.push([i + ' - ' + (i+1) , histo[i]]);
+            for (let j=1; j<=8; j++) {
+                result.visits_hours_histogram[j] = [];
+                for (let i=0; i < 24; i++) {
+                    result.visits_hours_histogram[j].push([i + ' - ' + (i+1) , days[j][i]]);
+                }
             }
-
-            console.log(result);
+            console.log(result)
             console.log("HERE ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            //console.log(currentStats);
             
 
         } catch (error) {
