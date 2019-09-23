@@ -44,6 +44,9 @@ class StatResult {
     visits_duration : IStatWindow = {current:0,previous:0};
     visits_hours_histogram : any[] = [];
     visits_over_day : any[] = [];
+    referrals_histogram : any[] = [];
+    pages_visited_histogram : any = {};
+    languages : any[] = [];
 
     constructor() {};
 
@@ -198,34 +201,82 @@ export class StatController {
                 } else {
                     visitsOverDay.push({day:day,count:1})
                 }
-
             }
             //Sort array of objects
             visitsOverDay.sort((val1, val2)=> {return new Date(val1.day).getTime() - new Date(val2.day).getTime()});
             for (let elem of visitsOverDay) {
                 result.visits_over_day.push([elem.day, elem.count]);
             }
-
             //Generate histogram with visiting hours through day
             let days : any = [];
             let histo : any = [];
             for (let i=0; i < 24; i++) {
                 histo[i] = 0;
             }
-            for (let i=1; i<=8; i++) {
+            for (let i=0; i<=7; i++) {
                 days[i] = Array.from(histo);
             }
             for (let stat of current) {
                 let hour = new Date(stat.start).getHours();
                 days[new Date(stat.start).getDay()][hour] =  days[new Date(stat.start).getDay()][hour] + 1;
-                days[8][hour] = days[8][hour] + 1;
+                days[7][hour] = days[7][hour] + 1;
             }
-            for (let j=1; j<=8; j++) {
+
+            for (let j=0; j<=7; j++) {
                 result.visits_hours_histogram[j] = [];
                 for (let i=0; i < 24; i++) {
                     result.visits_hours_histogram[j].push([i + ' - ' + (i+1) , days[j][i]]);
                 }
             }
+
+            //Generate referral histograms
+            let referrals : any = [];
+            for (let stat of current) {
+                let href : string = "direct";
+                if (stat.ressource) {
+                    href = stat.ressource.replace(/(^\w+:|^)\/\//, '');
+                    href = href.replace(/\/.*/,'');
+                } 
+                if (!referrals[href]) referrals[href] = 1;
+                else referrals[href] = referrals[href] + 1;
+                referrals[href]
+            }
+            Object.keys(referrals).forEach((key) => {
+                result.referrals_histogram.push([key,referrals[key]]);
+            });
+
+
+            //Generate pages visited language chart pie
+            current = currentStats.filter(obj => obj.type == StatType.PAGE);
+            let languages :any = [];
+            histo = [];
+            for (let page of current) {
+                let name = page.ressource;
+                if (name.search(/^\/[a-z][a-z]\//)>=0) {
+                    let tail = name.replace(/^\/[a-z][a-z]\//, '');
+                    let lang = name.replace(tail, '');
+                    lang = lang.replace(/\//g,'');
+                    if (!languages[lang]) languages[lang] = 1;
+                    else languages[lang] = languages[lang] + 1; 
+                    if (!histo[lang]) histo[lang] = [];
+                    let tmp = histo[lang];
+                    if(!tmp[tail]) tmp[tail] = 1;
+                    else tmp[tail] = tmp[tail] + 1;
+                    histo[lang] = tmp; 
+                }
+            }
+            Object.keys(languages).forEach((key) => {
+                result.languages.push([key,languages[key]]);
+                result.pages_visited_histogram[key] = [];
+                Object.keys(histo[key]).forEach((keyHisto) => {
+                    result.pages_visited_histogram[key].push([keyHisto,histo[key][keyHisto]]);
+                });
+            });
+            
+            
+            console.log(histo);
+
+
             console.log(result)
             console.log("HERE ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             
