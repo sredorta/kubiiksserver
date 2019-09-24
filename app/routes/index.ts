@@ -147,6 +147,10 @@ export class Routes {
     app.route('/api/stats/analyze')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasStatsRights(),StatController.analyzeChecks(),StatController.analyze);   
 
+    /**Deletes all stats */
+    app.route('/api/stats/delete')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasStatsRights(),StatController.deleteChecks(),StatController.delete);   
+
     /////////////////////////////////////////////////////////////////
     // CONTACT CONTROLLER PART
     ////////////////////////////////////////////////////////////////

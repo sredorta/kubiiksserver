@@ -23,6 +23,8 @@ export enum StatAction {
     SOCIAL_SHARE = "social_share",
     CHAT_ENTER = "chat_enter",
     CHAT_LEAVE = "chat_leave",
+    CHAT_MESSAGE = "chat_message",
+    APP_INSTALL = "app_install",
     UNDEFINED = "unknown"
 }
 
@@ -31,7 +33,10 @@ export enum StatType {
     PAGE = "page",
     SOCIAL_CLICK = "social_click",
     SOCIAL_SHARE = "social_share",
-    CHAT = "chat"
+    APP_INSTALL = "app_install",
+    CHAT = "chat",
+    CHAT_MESSAGE = "chat_message"
+
 }
 
 interface IStatWindow {
@@ -42,10 +47,21 @@ interface IStatWindow {
 class StatResult {
     visits_count : IStatWindow = {current:0,previous:0};
     visits_duration : IStatWindow = {current:0,previous:0};
+    pages_count : IStatWindow = {current:0,previous:0};
+    pages_per_visit : IStatWindow = {current:0,previous:0};
+    social_click_count : IStatWindow = {current:0,previous:0};
+    chat_click_count : IStatWindow = {current:0,previous:0};
+    chat_duration : IStatWindow = {current:0,previous:0};
+    chat_message_count : IStatWindow = {current:0,previous:0};
+    app_install_count : IStatWindow = {current:0,previous:0};
+
     visits_hours_histogram : any[] = [];
     visits_over_day : any[] = [];
     referrals_histogram : any[] = [];
+    social_histogram : any[] = [];
+    social_over_day: any = {};
     pages_visited_histogram : any = {};
+
     languages : any[] = [];
 
     constructor() {};
@@ -145,6 +161,28 @@ export class StatController {
                     }
                     break;
                 }
+                case StatAction.CHAT_MESSAGE: {
+                    await Stat.create({
+                        session: req.body.stat.session,
+                        ressource: StatType.CHAT_MESSAGE,
+                        type: StatType.CHAT_MESSAGE,
+                        start: new Date(),
+                        end: new Date()
+                    });
+                    console.log("CREATED APP_INSTALL !!!!!");
+                    break;
+                }
+                case StatAction.APP_INSTALL: {
+                    await Stat.create({
+                        session: req.body.stat.session,
+                        ressource: StatType.APP_INSTALL,
+                        type: StatType.APP_INSTALL,
+                        start: new Date(),
+                        end: new Date()
+                    });
+                    console.log("CREATED APP_INSTALL !!!!!");
+                    break;
+                }
                 default: {
 
                 }
@@ -167,30 +205,48 @@ export class StatController {
         ]
     }    
 
+    /**Removes all stats from the database */
+    static delete = async(req: Request, res: Response, next: NextFunction) => {  
+        try {
+            await Stat.destroy({where:{}});
+            res.json(new StatResult());
 
+        } catch(error) {
+            next(new HttpException(500, error,null));
+        }
+    }
+    /** Analyze parameter validation */
+    static deleteChecks() {
+        return [
+            Middleware.validate()
+        ]
+    }    
 
     /**Analyzes the stats and return result*/
     static analyze = async(req: Request, res: Response, next: NextFunction) => {  
         let result : StatResult = new StatResult();
         try {
-            const currentTimeWindow = [new Date(new Date().setDate(new Date().getDate()-req.body.days)), new Date()];
-            const previousTimeWindow = [new Date(new Date().setDate(new Date().getDate()-2*req.body.days)), new Date(new Date().setDate(new Date().getDate()-req.body.days))];
-            
-            console.log("WINDOWS !!!!!!!!!!!!!");
-            console.log(currentTimeWindow);
-            
+            req.body.days = req.body.days-1;
+            const todayStart = new Date(new Date().setHours(0,0,0,0));
+            const todayEnd = new Date(new Date().setHours(23,59,59,0));
+            const currentTimeWindow = [new Date(new Date(todayStart).setDate(new Date(todayEnd).getDate()-req.body.days)), new Date(todayEnd)];
+            const previousTimeWindow = [new Date(new Date(todayStart).setDate(new Date(todayEnd).getDate()-2*req.body.days-1)), new Date(new Date(todayEnd).setDate(new Date(todayStart).getDate()-req.body.days-1))];
+            //console.log(currentTimeWindow);
+            //console.log(previousTimeWindow);
+
             //Get all sessions of the period and precedent period
             const currentStats = await Stat.findAll({where:{start: {[Op.between]:currentTimeWindow}}});
             const previousStats = await Stat.findAll({where:{start: {[Op.between]:previousTimeWindow}}});
             //Construct the result ------------------
 
-            //Handle app analysis
+            //APP DATA
             let current = currentStats.filter(obj => obj.type == StatType.APP);
             let previous = previousStats.filter(obj => obj.type == StatType.APP);
             result.visits_count.current = current.length;
             result.visits_count.previous = previous.length;
             result.visits_duration.current = StatController.getAverageDuration(current);
             result.visits_duration.previous = StatController.getAverageDuration(previous);
+            
             //Generate visits per day data
             let visitsOverDay : any[]= [];
             for (let stat of current) {
@@ -246,8 +302,20 @@ export class StatController {
             });
 
 
-            //Generate pages visited language chart pie
+            //PAGES DATA
             current = currentStats.filter(obj => obj.type == StatType.PAGE);
+            previous = previousStats.filter(obj => obj.type == StatType.PAGE);
+
+            result.pages_count.current = current.length;
+            result.pages_count.previous = previous.length;
+            if (result.visits_count.current>0) {
+                result.pages_per_visit.current = parseFloat(Number(result.pages_count.current/result.visits_count.current).toFixed(2));
+            }
+            if (result.visits_count.previous>0) {
+                result.pages_per_visit.previous = parseFloat(Number(result.pages_count.previous/result.visits_count.previous).toFixed(2));;
+            }
+
+            //Generate pages visited language chart pie
             let languages :any = [];
             histo = [];
             for (let page of current) {
@@ -272,14 +340,83 @@ export class StatController {
                     result.pages_visited_histogram[key].push([keyHisto,histo[key][keyHisto]]);
                 });
             });
-            
-            
-            console.log(histo);
 
+            //SOCIAL DATA
+            current = currentStats.filter(obj => obj.type == StatType.SOCIAL_CLICK);
+            previous = previousStats.filter(obj => obj.type == StatType.SOCIAL_CLICK);
+            result.social_click_count.current = current.length;
+            result.social_click_count.previous = previous.length;
 
-            console.log(result)
-            console.log("HERE ENDS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            //Generate histogram for each social ressource
+            histo = [];
+            for (let stat of current) {
+                if (!histo[stat.ressource]) histo[stat.ressource] = 1;
+                else histo[stat.ressource] = histo[stat.ressource] + 1;
+            }
+            Object.keys(histo).forEach((key) => {
+                result.social_histogram.push([key,histo[key]]);
+            });
+
+            Object.keys(histo).forEach((social) => {
+                let socialOverDay : any[]= [];
+                let currentSocial = current.filter(obj => obj.ressource == social);
+                for (let stat of currentSocial) {
+                    let day = new Date(new Date(stat.start).setHours(0,0,0,0)).toDateString();
+                    let elem = socialOverDay.find(obj => obj.day == day);
+                    if (elem) {
+                        elem.count = elem.count+1;
+                    } else {
+                        socialOverDay.push({day:day,count:1})
+                    }
+                }
+                //Sort array of objects
+                socialOverDay.sort((val1, val2)=> {return new Date(val1.day).getTime() - new Date(val2.day).getTime()});
+                let tmp = [];
+                for (let elem of socialOverDay) {
+                    tmp.push([elem.day, elem.count]);
+                }
+                result.social_over_day[social] = tmp;
+            });
+            //Now generate all field
+            let socialOverDay : any[]= [];
+            for (let stat of current) {
+                let day = new Date(new Date(stat.start).setHours(0,0,0,0)).toDateString();
+                let elem = socialOverDay.find(obj => obj.day == day);
+                if (elem) {
+                    elem.count = elem.count+1;
+                } else {
+                    socialOverDay.push({day:day,count:1})
+                }
+            }
+            //Sort array of objects
+            socialOverDay.sort((val1, val2)=> {return new Date(val1.day).getTime() - new Date(val2.day).getTime()});
+            let tmp = [];
+            for (let elem of socialOverDay) {
+                tmp.push([elem.day, elem.count]);
+            }
+            result.social_over_day['all'] = tmp;
             
+
+            //CHAT DATA
+            current = currentStats.filter(obj => obj.type == StatType.CHAT);
+            previous = previousStats.filter(obj => obj.type == StatType.CHAT);
+            
+            result.chat_click_count.current = current.length;
+            result.chat_click_count.previous = previous.length;
+            result.chat_duration.current = StatController.getAverageDuration(current);
+            result.chat_duration.previous = StatController.getAverageDuration(previous);
+
+            current = currentStats.filter(obj => obj.type == StatType.CHAT_MESSAGE);
+            previous = previousStats.filter(obj => obj.type == StatType.CHAT_MESSAGE);
+            result.chat_message_count.current = current.length;
+            result.chat_message_count.previous = previous.length;
+            //APP DATA
+            current = currentStats.filter(obj => obj.type == StatType.APP_INSTALL);
+            previous = previousStats.filter(obj => obj.type == StatType.APP_INSTALL);
+            result.app_install_count.current = current.length;
+            result.app_install_count.previous = previous.length;          
+            
+            console.log(result)            
 
         } catch (error) {
             //Do nothing on error
