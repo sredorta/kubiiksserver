@@ -233,7 +233,7 @@ export class Email extends Model<Email> {
         }
 
         console.log(myData);
-        let html = pug.renderFile(path.join(__dirname, "../emails/emails.pug"), {data:myData,iso:iso});
+        let html = pug.renderFile(path.join(process.cwd() + '/app/emails/emails.pug'), {data:myData,iso:iso});
         //CSS must be put inline for better support of all browsers
         html =  await InlineCss(html, {extraCss:this.createAdditionalCss(),applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});
         return html;

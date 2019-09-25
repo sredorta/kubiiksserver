@@ -79,7 +79,7 @@ export class Helper {
 
     /**Gets all translations in a variable */
     public static translations() {
-        const acceptableLanguages = glob.sync(`${__dirname}/../i18n/*.ts`)
+        const acceptableLanguages = glob.sync(process.cwd() + '/app/i18n/*.ts')
             .map((file:any) => path.basename(file, '.ts'))
             .filter((language:string) => language !== 'index');
         let result : any = [];

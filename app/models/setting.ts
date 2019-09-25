@@ -172,6 +172,18 @@ export class Setting extends Model<Setting> {
 
         mySetting = await Setting.create({
           type: "general",
+          key: "appicon512",
+          value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/icon-512x512.png"
+        });
+        mySetting = await Setting.create({
+          type: "general",
+          key: "appicon192",
+          value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/icon-192x192.png"
+        });
+
+
+        mySetting = await Setting.create({
+          type: "general",
           key: "companyPhone",
           value: '0423133212'
         });

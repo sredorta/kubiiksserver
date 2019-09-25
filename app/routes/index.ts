@@ -33,6 +33,7 @@ import { EmailController } from '../controllers/email.controller';
 import { NotificationController } from '../controllers/notification.controller';
 import { AlertController } from '../controllers/alert.controller';
 import { StatController } from '../controllers/stat.controller';
+import { DiskController } from '../controllers/disk.controller';
 
 
 
@@ -150,6 +151,16 @@ export class Routes {
     /**Deletes all stats */
     app.route('/api/stats/delete')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasStatsRights(),StatController.deleteChecks(),StatController.delete);   
+
+
+    /////////////////////////////////////////////////////////////////
+    // DISK CONTROLLER PART
+    ////////////////////////////////////////////////////////////////   
+    /**Returns current disk utilization*/
+    app.route('/api/disk/scan')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),DiskController.scanChecks(),DiskController.scan);   
+
+
 
     /////////////////////////////////////////////////////////////////
     // CONTACT CONTROLLER PART

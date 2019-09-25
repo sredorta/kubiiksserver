@@ -57,11 +57,10 @@ export class Middleware {
         console.log("Language enabled !!");
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             //Languages supported
-            const acceptableLanguages = glob.sync(`${__dirname}/../i18n/*.ts`)
+            const acceptableLanguages = glob.sync(process.cwd() + '/app/i18n/*.ts')
                     .map((file:any) => path.basename(file, '.ts'))
                     .filter((language:string) => language !== 'index');
             let language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
-
             res.locals.language = language;  //Store language in the locals
             if (!req.user)
                 req.user = {};
@@ -79,7 +78,7 @@ export class Middleware {
 
 
     public static languagesSupported() {
-        return glob.sync(`${__dirname}/../i18n/*.ts`)
+        return glob.sync(process.cwd() + '/app/i18n/*.ts')
         .map((file:any) => path.basename(file, '.ts'))
         .filter((language:string) => language !== 'index');
     }
@@ -146,7 +145,6 @@ export class Middleware {
     }
     /** Middleware that handles parameter input validation using express-validation*/
     public static validate(): express.RequestHandler {
-        console.log("Validate middleWare enabled !");
         return function (req:Request, res:Response, next: NextFunction) {
             try{  
                 validationResult(req).throw();
