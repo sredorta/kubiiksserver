@@ -112,7 +112,10 @@ export class ArticleController {
             let article = await Article.findByPk(req.body.article.id);
             if (!article) return new Error("Could not find article with id : " + req.body.article.id);
             let trans = article.translations.find(obj => obj.iso == res.locals.language);
-            if (!trans) return new Error("Could not find article translation with iso : " + res.locals.language);
+            if (!trans) {
+                trans = await ArticleTranslation.create({articleId:article.id, iso:res.locals.language,title:"",description:"",content:""});             
+                //return new Error("Could not find article translation with iso : " + res.locals.language);
+            }
             let myUser = await User.scope("details").findByPk(req.user.id);   
             if (!myUser) return new Error("Could not find current user !");    
             //Protection rights     
@@ -130,9 +133,10 @@ export class ArticleController {
             article.backgroundImage = req.body.article.backgroundImage;
             article.image = req.body.article.image;
             await article.save();
-            trans.title = req.body.article.title;
-            trans.description = req.body.article.description;
-            trans.content = req.body.article.content;
+            trans.title = req.body.article.title==null?"":req.body.article.title;
+            trans.description = req.body.article.description==null?"":req.body.article.description;
+            trans.content = req.body.article.content==null?"":req.body.article.content;
+
             await trans.save();
             article = await Article.findByPk(req.body.article.id);
 

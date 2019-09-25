@@ -300,6 +300,7 @@ export class Email extends Model<Email> {
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele de courriel de reference pour tous les nouveaux modeles",title:"Mon titre",subtitle:"Mon soustitre",header:"<h1>Exemple entete email</h1>",content:"<h1>Exemple de contenu</h1>"});  
         await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Reference email template for all new models",title:"My title",subtitle:"My subtitle",header:"<h1>Example email Header</h1>",content:"<h1>Content example</h1>"});    
         await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo de referencia para todos los nuevos modelos",title:"Mi titulo",subtitle:"Mi subtitulo",header:"<h1>Ejemplo de cabecera email</h1>",content:"<h1>Ejemplo de contenido</h1>"});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model de referència per tots els nous models", title:"El meu titol",subtitle:"El meu subtitol",header:"<h1>Exemple de capçalera email</h1>",content:"<h1>Exemple de contingut</h1>"});             
 
 
         myEmail = await Email.create({
@@ -312,6 +313,7 @@ export class Email extends Model<Email> {
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la validation de compte de courriel client",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
         await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer to validate account",title:"title 1",subtitle:"subtitle en 1",header:"<h1>Email Header</h1>",content:"<h1>content 1</h1>"});    
         await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes para validar su cuenta de correo",title:"titulo 1",subtitle:"subititulo es 1",header:"<h1>Cabecera email</h1>",content:"<h1>contenido 1</h1>"});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat als clients per validar el compte de correu electronic",title:"titol 1",subtitle:"subititol 1",header:"<h1>Capçalera email</h1>",content:"<h1>contenido 1</h1>"});             
 
         myEmail = await Email.create({
           name: "reset-password",
@@ -323,6 +325,7 @@ export class Email extends Model<Email> {
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la demande de nouveau mot de passe",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
         await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer when new password has been asked",title:"title 1",subtitle:"subtitle en 1",header:"<h1>Email Header</h1>",content:"<h1>content 1</h1>"});    
         await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes cuando piden un nuevo password",title:"titulo 1",subtitle:"subititulo es 1",header:"<h1>Cabecera email</h1>",content:"<h1>contenido 1</h1>"});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat als clients quan demanen un nou password",title:"titol1",subtitle:"subititol1",header:"<h1>Capçalera email</h1>",content:"<h1>contingut</h1>"});             
 
         myEmail = await Email.create({
           name: "contact-reply",
@@ -334,6 +337,7 @@ export class Email extends Model<Email> {
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé comme réponse automatique au formulaire de contact",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
         await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer as automatic reply of contact form",title:"title 1",subtitle:"subtitle en 1",header:"<h1>Email Header</h1>",content:"<h1>content 1</h1>"});    
         await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes como respuesta automatica al formulario de contacto",title:"titulo 1",subtitle:"subititulo es 1",header:"<h1>Cabecera email</h1>",content:"<h1>contenido 1</h1>"});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat com a resposta automàtica al formulari de contacte",title:"titol",subtitle:"subititol",header:"<h1>Capçalera email</h1>",content:"<h1>contingut</h1>"});             
 
     }
     return _seed();

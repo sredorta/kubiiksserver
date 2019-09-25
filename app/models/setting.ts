@@ -130,6 +130,8 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Titre en français"});  
         await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Title in english"});    
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Titulo en español"});
+        await SettingTranslation.create({settingId:mySetting.id, iso:"ca",value:"Titol en català"});
+
 
         mySetting = await Setting.create({
             type: "seo",
@@ -138,7 +140,9 @@ export class Setting extends Model<Setting> {
         });
         await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description en francais"});  
         await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description in english"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español"});             
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español"});   
+        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"descripció en català"});             
+          
                
         mySetting = await Setting.create({
             type: "seo",

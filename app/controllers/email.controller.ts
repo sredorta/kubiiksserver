@@ -308,16 +308,6 @@ export class EmailController {
     }    
 
 
-
-
-
-
-
-
-
-
-
-
     /**Creates email template based on reference. Admin or content required */
     static create = async (req: Request, res: Response, next:NextFunction) => {
         try {

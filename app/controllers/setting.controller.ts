@@ -43,7 +43,10 @@ export class SettingController {
                 await mySetting.save();
             } else {
                 let myTrans = mySetting.translations.find(obj => obj.iso == res.locals.language);
-                if (!myTrans) throw new Error("Translation not found for lang : " + res.locals.language);
+                if (!myTrans) {
+                    myTrans = await SettingTranslation.create({settingId:mySetting.id, iso:res.locals.language, value:""});  
+                    //throw new Error("Translation not found for lang : " + res.locals.language);
+                }
                 myTrans.value =  req.body.setting.value;
                 await myTrans.save();
                 mySetting = await Setting.scope("full").findByPk(req.body.setting.id);
