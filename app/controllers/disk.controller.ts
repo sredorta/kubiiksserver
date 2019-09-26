@@ -1,20 +1,16 @@
 import {Request, Response, NextFunction} from 'express'; //= require('express');
-import {HttpException} from '../classes/HttpException';
-import {messages} from '../middleware/common';
 import { Middleware } from '../middleware/common';
-import { Helper } from '../classes/Helper';
-import { Role } from '../models/role';
 import { User } from '../models/user';
 
-import {body} from 'express-validator/check';
-import { CustomValidators } from '../classes/CustomValidators';
 import fs from 'fs';
 import path from 'path';
-import sequelize from 'sequelize';
-import {Sequelize} from 'sequelize-typescript';
 
-import app from '../app';
-import { AppConfig } from '../utils/Config';
+import { Setting } from '../models/setting';
+import {Op} from "sequelize";
+import { ArticleTranslation } from '../models/article_translation';
+import { Email } from '../models/email';
+import { Article } from '../models/article';
+
 
 /**Enumerator with all stats events*/
 export enum DiskType {
@@ -27,6 +23,7 @@ export class FileItem {
     basename:string = "";
     extension:string = "";
     size:number = 0;
+    inUse:boolean = true;
     constructor() {}
 }
 
@@ -70,9 +67,8 @@ export class Disk {
                         tmp.extension = path.extname(tmp.filename);
                         resolve(tmp);
                     });
-                //resolve(true);
             } catch(error) {
-               reject("Email header generation error");
+               reject(new FileItem());
             }
           }
           _getData();
@@ -92,7 +88,7 @@ export class Disk {
                 }
                 resolve(true);
             } catch(error) {
-               reject("Email header generation error");
+               reject(true);
             }
           }
           _getData();
@@ -111,8 +107,96 @@ export class Disk {
         return total;
     }
 
-    /**Gets from all tables all records any link to images */
+    /**Gets total size of files in use*/
+    getInUseSize() {
+            let total : number = 0;
+            for (let item of this.files.filter(obj=> obj.inUse == true)) {
+                total = total + item.size;
+            }
+            return total;
+    }
+    /**Gets total size of files not in use*/
+    getNotInUseSize() {
+        let total : number = 0;
+        for (let item of this.files.filter(obj=> obj.inUse == false)) {
+            total = total + item.size;
+        }
+        return total;
+    }
 
+    /**Gets if file is in use */
+    static fileInUse(file:FileItem) {
+        let myPromise : Promise<boolean>;
+        let myObj = this;
+        myPromise =  new Promise<boolean>((resolve,reject) => {
+          async function _getData() {
+            let found = null;  
+            try {
+                //Default images are always in use
+                if (file.filename.includes('\\defaults\\')) {
+                    resolve(true);
+                } 
+
+                //Find in users avatars
+                found = await User.findOne({where:{avatar:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                //Find in settings
+                found = await Setting.findOne({where:{value:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+
+                //Find in articles
+                found = await Article.findOne({where:{image:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                found = await Article.findOne({where:{backgroundImage:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                found = await ArticleTranslation.findOne({where:{content:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+
+                //Find in emails
+                found = await Email.findOne({where:{logo:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                found = await Email.findOne({where:{backgroundHeader:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                found = await Email.findOne({where:{backgroundContent:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                resolve(false);
+            } catch(error) {
+               reject(true);
+            }
+          }
+          _getData();
+        });
+        return myPromise;
+    }
+}
+
+/**Class to provide the result to the web */
+class DiskResult {
+    /**Disk total size */
+    totalSize : number = 0;
+
+    /**System files size */
+    systemSize : number = 0;
+
+    /**Ressources files size */
+    ressourcesSize : number = 0;
+
+    /**removable total file size */
+    removableSize : number = 0;
+
+    /**Disk chart */
+    disk : any[] = [];
+
+
+    /**Images chart */
+    images : any[] = [];
+    /**Removable images Size */
+    removableImagesSize : number = 0;
+
+    /**List of all files to remove found */
+    filesToRemove : string[] = [];
+
+    constructor() {};
 
 }
 
@@ -120,41 +204,103 @@ export class Disk {
 export class DiskController {
 
 
+    /**Gets disk utilization result */
+    private static getResult() {
+        let myPromise : Promise<DiskResult>;
+        let myObj = this;
+        myPromise =  new Promise<DiskResult>((resolve,reject) => {
+          async function _getData() {
+            let result = new DiskResult();
+            try {
+                //Get all disk size
+                let dir = process.cwd() + '\\app';
+                let myDisk = new Disk(dir);
+                await myDisk.init();
+                result.totalSize = myDisk.getTotalSize(); 
+        
+                //Get disk size of ressources
+                dir = process.cwd() + '\\app\\public\\images';
+                //Now find all images create a list
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                result.systemSize = result.totalSize - myDisk.getTotalSize();
+                result.ressourcesSize = myDisk.getTotalSize();
+        
+        
+                //IMAGES
+                dir = process.cwd() + '\\app\\public\\images';
+                //Now find all images create a list
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                //Find if file is used
+                for (let file of myDisk.files) {
+                    file.inUse = await Disk.fileInUse(file);
+                    if (!file.inUse)
+                        result.filesToRemove.push(file.filename);
+                }
+                //VIDEOS
+        
+                //DOCUMENTS
+        
+                //Return the data
+                result.disk.push(['system', result.systemSize]);
+                result.disk.push(['ressources', result.ressourcesSize]);
+                result.images.push(['images', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.removableImagesSize = myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+result.removableImagesSize;
+                resolve(result);
+            } catch(error) {
+               reject(new DiskResult());
+            }
+          }
+          _getData();
+        });
+        return myPromise;
+
+    }    
+
     /**Gets all available roles */
     static scan = async(req: Request, res: Response, next: NextFunction) => {  
-        //We remove the kubiiks role so that is not visible on the frontend
-        let dir = process.cwd() + '\\app\\public';
-        switch (req.body.type) {
-            case DiskType.IMAGES:
-                dir = dir + '\\images';
-                break;
-            default:
-                //Do nothing
-        }
-        //Now find all images create a list
-        let myDisk = new Disk(dir);
-        await myDisk.init();
-        console.log(myDisk.files);
-        console.log("Total size : ", myDisk.getTotalSize());
-        
-        let sequelize = new Sequelize({database: AppConfig.db.database,
-            dialect: 'mariadb',
-            username: AppConfig.db.username,
-            password: AppConfig.db.password});
-        sequelize.query('show tables').then(function(rows) {
-            console.log(JSON.stringify(rows));
-        });
-
-        res.json("Current dir is : " + dir);
+        let result = await DiskController.getResult();
+        console.log(result.filesToRemove);
+        result.filesToRemove = [];
+        res.json(result);
     }
 
     /** Role attach parameter validation */
     static scanChecks() {
         return [
-            body('type').exists().withMessage('exists'),
             Middleware.validate()
         ]
     }    
+
+
+    /**Gets all available roles */
+    static optimize = async(req: Request, res: Response, next: NextFunction) => {  
+        console.log("RUNNING OPTIMIZE !!!!!!!!!!!!!!!!!");
+        //Get current list of files to delete
+        let result = await DiskController.getResult();
+        for (let file of result.filesToRemove) {
+            console.log("REMOVE",file);
+            try {
+                fs.unlinkSync(file);
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        result = await DiskController.getResult();
+        result.filesToRemove = [];
+        console.log(result);
+        res.json(result);
+        res.json(new DiskResult());
+    }
+
+    /** Role attach parameter validation */
+    static optimizeChecks() {
+        return [
+            Middleware.validate()
+        ]
+    }  
 
 
 }

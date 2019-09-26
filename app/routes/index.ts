@@ -160,6 +160,9 @@ export class Routes {
     app.route('/api/disk/scan')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),DiskController.scanChecks(),DiskController.scan);   
 
+    /**Removes unused ressources and returns new disk utilization*/
+    app.route('/api/disk/optimize')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),DiskController.optimizeChecks(),DiskController.optimize);   
 
 
     /////////////////////////////////////////////////////////////////
