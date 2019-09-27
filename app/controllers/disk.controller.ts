@@ -190,8 +190,11 @@ class DiskResult {
     /**System files size */
     systemSize : number = 0;
 
-    /**Ressources files size */
-    ressourcesSize : number = 0;
+    /**Ressources images files size */
+    imagesSize : number = 0;
+
+    /**Ressources  videos files size */
+    videosSize : number = 0;
 
     /**removable total file size */
     removableSize : number = 0;
@@ -199,11 +202,17 @@ class DiskResult {
     /**Disk chart */
     disk : any[] = [];
 
+    /**Images chart */
+    videos : any[] = [];
+    /**Removable images Size */
+    removableVideosSize : number = 0;
 
     /**Images chart */
     images : any[] = [];
     /**Removable images Size */
     removableImagesSize : number = 0;
+
+
 
     /**List of all files to remove found */
     filesToRemove : string[] = [];
@@ -236,7 +245,8 @@ export class DiskController {
                 myDisk = new Disk(dir);
                 await myDisk.init();
                 result.systemSize = result.totalSize - myDisk.getTotalSize();
-                result.ressourcesSize = myDisk.getTotalSize();
+                result.imagesSize = myDisk.getTotalSize();
+
         
         
                 //IMAGES
@@ -250,16 +260,40 @@ export class DiskController {
                     if (!file.inUse)
                         result.filesToRemove.push(file.filename);
                 }
+                result.removableImagesSize = myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+                result.images.push(['images', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+
                 //VIDEOS
-        
+                console.log("PROCESSING VIDEOS !!!!!!!!!!!!!!");
+
+                dir = process.cwd() + '\\app\\public\\videos';
+                //Now find all images create a list
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                //Find if file is used
+                for (let file of myDisk.files) {
+                    console.log(file);
+                    file.inUse = await Disk.fileInUse(file);
+                    if (!file.inUse)
+                        result.filesToRemove.push(file.filename);
+                }
+                result.systemSize = result.systemSize -myDisk.getTotalSize();
+                result.videosSize = myDisk.getTotalSize();
+                result.videos.push(['videos', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.removableVideosSize = myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+
                 //DOCUMENTS
         
                 //Return the data
                 result.disk.push(['system', result.systemSize]);
-                result.disk.push(['ressources', result.ressourcesSize]);
-                result.images.push(['images', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
-                result.removableImagesSize = myDisk.getNotInUseSize();
-                result.removableSize = result.removableSize+result.removableImagesSize;
+                result.disk.push(['images', result.imagesSize]);
+                result.disk.push(['videos', result.videosSize]);
+
+
+
+
                 resolve(result);
             } catch(error) {
                reject(new DiskResult());
