@@ -73,4 +73,10 @@ export class GalleryController {
         res.send({imageUrl: "https://localhost:3000/public/images/defaults/" + req.file.filename});  
     }    
 
+    /**Uploads video to content folder*/
+    static uploadVideoToContent = async (req: Request, res: Response, next:NextFunction) => {
+        console.log("UPLOADING VIDEO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        res.send({videoUrl: "https://localhost:3000/public/videos/content/" + req.file.filename});  
+    } 
+
 }        

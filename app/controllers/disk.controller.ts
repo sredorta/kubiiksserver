@@ -10,6 +10,7 @@ import {Op} from "sequelize";
 import { ArticleTranslation } from '../models/article_translation';
 import { Email } from '../models/email';
 import { Article } from '../models/article';
+import { AppConfig } from '../utils/Config';
 
 
 /**Enumerator with all stats events*/
@@ -49,6 +50,17 @@ export class Disk {
           return filelist;
         }
         return walkSync(dir,fileList);
+    }
+
+    /**Gets a list of all the files recursivelly and returns the corresponding link */
+    getFileListLink(dir:string) {
+        let result : string[] = [];
+        for (let file of this.getFileList(dir)) {
+            file = file.replace(/^.*\\public\\/,AppConfig.api.host + ":" + AppConfig.api.port + '/public/');
+            file = file.replace(/\\/g,'/')
+            result.push(file);
+        }
+        return result;
     }
 
     /**Returns file information of a file */
@@ -294,13 +306,24 @@ export class DiskController {
         res.json(result);
         res.json(new DiskResult());
     }
-
-    /** Role attach parameter validation */
     static optimizeChecks() {
         return [
             Middleware.validate()
         ]
     }  
 
+    /**Gets all available videos */
+    static getVideos = async(req: Request, res: Response, next: NextFunction) => { 
+        let dir = process.cwd() + '\\app\\public\\videos';
+        let myDisk = new Disk(dir);
+        res.send(myDisk.getFileListLink(dir));
+    }
+
+    /** Role attach parameter validation */
+    static getVideosChecks() {
+        return [
+            Middleware.validate()
+        ]
+    }  
 
 }

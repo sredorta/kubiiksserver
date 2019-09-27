@@ -164,6 +164,10 @@ export class Routes {
     app.route('/api/disk/optimize')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),DiskController.optimizeChecks(),DiskController.optimize);   
 
+    /**Gets all videos on the server */  
+    app.route('/api/disk/videos/all')
+      .get(DiskController.getVideosChecks(),DiskController.getVideos);   
+
 
     /////////////////////////////////////////////////////////////////
     // CONTACT CONTROLLER PART
@@ -307,6 +311,10 @@ export class Routes {
     /**Uploads image to blog folder */
     app.route('/api/upload/editor/defaults')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),uploads.defaults.single('file'), GalleryController.uploadImageToDefaults);
+
+    /**Uploads videos */
+    app.route('/api/upload/videos/content')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.videos.single('file'), GalleryController.uploadVideoToContent);
        
     /////////////////////////////////////////////////////////////////
     // HANDLE BLOG ARTICLES
