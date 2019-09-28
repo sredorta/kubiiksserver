@@ -69,6 +69,9 @@ export const messages = {
 
     apiRouteNotFound: 'El servidor no ha trobat la petició',
 
+    newsletterSubscribed: 'Esteu registrat a la newsletter',
+    newsletterUnsubscribed: 'Ja no esteu registrat a la newsletter',
+    newsletterMissing: "El compte de correu donat no esta registrat",
 
 
 

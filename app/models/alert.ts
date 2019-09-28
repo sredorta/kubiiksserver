@@ -54,7 +54,7 @@ export class Alert extends Model<Alert> {
               await Alert.create({id:5,userId:2,type:"email",title:"title3 user2",message:"New order has been created for $25 total"});
 
             } catch(err) {
-                console.log("ERROR: Could not seed USERS !!!")
+                console.log("ERROR: Could not seed ALERTS !!!")
             }
         }
         return _seed();

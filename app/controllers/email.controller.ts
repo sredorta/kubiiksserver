@@ -21,6 +21,7 @@ import { Email } from '../models/email';
 import { EmailTranslation } from '../models/email_translation';
 import { Table } from 'sequelize-typescript';
 import { Helper } from '../classes/Helper';
+import { Newsletter } from '../models/newsletter';
 
 export class EmailController {
     /**Email transporter check */
@@ -268,7 +269,7 @@ export class EmailController {
 
     
 
-    /**Sends email to all registered users using a specific template*/
+    /**Sends email to all registered users to the newsletter using a specific template*/
     static sendToAll = async (req: Request, res: Response, next:NextFunction) => {
         //TODO: Get post parameter of template email, additionalHTML
         try {
@@ -276,7 +277,7 @@ export class EmailController {
             let myEmail = await Email.findByPk(req.body.email.id);
             if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
             const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-            let users = await User.findAll();
+            let users = await Newsletter.findAll();
             for (let user of users) {
                 let html = await myEmail.getHtml(user.language);
                 if (!html)  return next(new HttpException(500, messages.emailSentError,null));

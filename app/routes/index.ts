@@ -34,6 +34,7 @@ import { NotificationController } from '../controllers/notification.controller';
 import { AlertController } from '../controllers/alert.controller';
 import { StatController } from '../controllers/stat.controller';
 import { DiskController } from '../controllers/disk.controller';
+import { NewsletterController } from '../controllers/newsletter.controller';
 
 
 
@@ -279,6 +280,21 @@ export class Routes {
     app.route('/api/role/detach')
         .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),RoleController.detachChecks(),RoleController.detach)   
         
+
+    /////////////////////////////////////////////////////////////////
+    // NEWSLETTER CONTROLLER PART
+    ////////////////////////////////////////////////////////////////
+
+    /** Subscribes to the newsletter  */    
+    app.route('/api/newsletter/subscribe')
+      .post(NewsletterController.subscribeChecks(),NewsletterController.subscribe)           
+
+    /** Unsubscribes from the newsletter */    
+    app.route('/api/newsletter/unsubscribe')
+      .post(NewsletterController.unsubscribeChecks(),NewsletterController.unsubscribe)           
+        
+
+
     /////////////////////////////////////////////////////////////////
     // ALERT PART
     ////////////////////////////////////////////////////////////////  

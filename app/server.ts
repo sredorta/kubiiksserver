@@ -21,6 +21,7 @@ import { Helper } from "./classes/Helper";
 import jwt from 'jsonwebtoken';
 import { IJwtPayload } from "./controllers/auth.controller";
 import { SocketHandler } from "./socket";
+import { Newsletter } from "./models/newsletter";
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
 const privateKey = fs.readFileSync('server.key');
@@ -54,6 +55,7 @@ async function startServer() {
     await Article.seed();
     await Email.seed();
     await Alert.seed();
+    await Newsletter.seed();
    }
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");

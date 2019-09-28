@@ -16,6 +16,7 @@ import {Validator} from "class-validator";
 //Data models
 import {User} from '../models/user';
 import { Email } from '../models/email';
+import { Newsletter } from '../models/newsletter';
 
 /**Payload interface */
 export interface IJwtPayload {
@@ -50,6 +51,8 @@ export class AuthController {
                 mobileValidationKey: Helper.generateRandomNumber(4),
                 password: User.hashPassword(req.body.password)
             });
+            //If newsletter is check add email to the newsletter
+            if (req.body.newsletter == true) Newsletter.subscribe(req.body.email,req.user.language);
 
             //Attach admin role if required
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
@@ -92,6 +95,7 @@ export class AuthController {
                 body('email').exists().withMessage('exists').isEmail(),
                 body('password').exists().withMessage('exists').custom(CustomValidators.password()),
                 body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
+                body('newsletter').exists().withMessage('exists').isBoolean(),
                 body('dummy').custom(CustomValidators.dBuserNotPresent(User)),
                 Middleware.validate()
             ]
@@ -174,6 +178,12 @@ export class AuthController {
             next( new HttpException(400, messages.validationNotFound(messages.User), null))
         } else {
             await myUser.update(req.body);
+            //Add the newsletter if checked
+            if (myUser)
+                if (req.body.newsletter)
+                    if (req.body.newsletter == true) {
+                        await Newsletter.subscribe(myUser.email,myUser.language);
+                    }            
             let result = await User.scope("details").findByPk(req.user.id);
             res.json(result);
         }
@@ -187,6 +197,7 @@ export class AuthController {
             body('phone').custom(CustomValidators.phone('phone')),
             body('mobile').custom(CustomValidators.mobile('mobile')),
             body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
+            body('newsletter').exists().isBoolean(),   
             body('dummy').custom(CustomValidators.dBuserNotPresentExceptMe(User)),
             Middleware.validate()
         ]
@@ -248,7 +259,7 @@ export class AuthController {
             body('mobile').optional().custom(CustomValidators.mobile('mobile')),
             body('password').optional().custom(CustomValidators.passwordUpdate()),
             body('password').optional().custom(CustomValidators.passwordUpdate()),
-            body('avatar').optional().isString(),            
+            body('avatar').optional().isString(),         
             body('dummy').custom(CustomValidators.dBuserNotPresentExceptMe(User)),
             Middleware.validate()
         ]

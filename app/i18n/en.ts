@@ -71,7 +71,9 @@ export const messages = {
 
     apiRouteNotFound: 'The server could not found the requested action',
 
-
+    newsletterSubscribed: 'You are now registered to the newsletter',
+    newsletterUnsubscribed: 'You are not registered to the newsletter anymore',
+    newsletterMissing: "The email account you are providing is not registered",
 
 
     messageSent: 'Your message has been sent',
