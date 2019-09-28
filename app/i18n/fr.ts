@@ -70,9 +70,9 @@ export const messages = {
 
     apiRouteNotFound: "Le serveur n'a pas trouvé la requete demandé",
 
-    newsletterSubscribed: "Vous êtes desormais enregistré pour recevoir nos 'newsletters'",
-    newsletterUnsubscribed: "Vous ne recevrez plus nos 'newsletters'",
-    newsletterMissing: "Ce compte de courriel n'est pas enregistré",
+    newsletterSubscribed: "Vous êtes desormais enregistré pour recevoir nos bulletins d'information",
+    newsletterUnsubscribed: "Vous ne recevrez plus nos bulletins d'information",
+    newsletterMissing: "Ce compte de courriel n'est pas enregistré pour les bulletins d'information",
 
     messageSent: 'Votre message à bien été envoyé',
     saved : 'Modifications enregistrées correctement',

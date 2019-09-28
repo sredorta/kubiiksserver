@@ -69,9 +69,9 @@ export const messages = {
 
     apiRouteNotFound: 'El servidor no encontró la petición',
 
-    newsletterSubscribed: "Correo registrado para la 'newsletter'",
-    newsletterUnsubscribed: "Ya no recevera mas 'newsletter' en esta cuenta de correo electronico",
-    newsletterMissing: "Esta cuenta de correo no esta registrada en la 'newsletter'",
+    newsletterSubscribed: "A partir de ahora recebera los bolletines informativos",
+    newsletterUnsubscribed: "Ya no recevera mas los bolletines informativos en esta cuenta de correo electronico",
+    newsletterMissing: "Esta cuenta de correo no esta dada de alta para los bolletines informativos",
 
 
     messageSent: 'Su mensaje a sido enviado',

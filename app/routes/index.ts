@@ -169,6 +169,9 @@ export class Routes {
     app.route('/api/disk/videos/all')
       .get(DiskController.getVideosChecks(),DiskController.getVideos);   
 
+    /**Gets all videos on the server */  
+    app.route('/api/disk/images/all')
+      .get(DiskController.getImagesChecks(),DiskController.getImages);   
 
     /////////////////////////////////////////////////////////////////
     // CONTACT CONTROLLER PART

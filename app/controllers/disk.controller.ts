@@ -360,4 +360,18 @@ export class DiskController {
         ]
     }  
 
+    /**Gets all available images */
+    static getImages = async(req: Request, res: Response, next: NextFunction) => { 
+        let dir = process.cwd() + '\\app\\public\\images';
+        let myDisk = new Disk(dir);
+        //Remove defaults 
+        res.send(myDisk.getFileListLink(dir).filter(image => image.includes('/defaults/') == false));
+    }
+
+    /** Role attach parameter validation */
+    static getImagesChecks() {
+        return [
+            Middleware.validate()
+        ]
+    }  
 }
