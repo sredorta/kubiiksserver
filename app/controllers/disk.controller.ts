@@ -27,6 +27,7 @@ export class FileItem {
     extension:string = "";
     size:number = 0;
     inUse:boolean = true;
+    date:number =0;
     constructor() {}
 }
 
@@ -55,12 +56,13 @@ export class Disk {
     }
 
     /**Gets a list of all the files recursivelly and returns the corresponding link */
-    getFileListLink(dir:string) {
+    getFileListLink() {
         let result : string[] = [];
-        for (let file of this.getFileList(dir)) {
-            file = file.replace(/^.*\\public\\/,AppConfig.api.host + ":" + AppConfig.api.port + '/public/');
-            file = file.replace(/\\/g,'/')
-            result.push(file);
+        for (let file of this.files) {
+            let link = file.filename;
+            link = link.replace(/^.*\\public\\/,AppConfig.api.host + ":" + AppConfig.api.port + '/public/');
+            link = link.replace(/\\/g,'/')
+            result.push(link);
         }
         return result;
     }
@@ -79,6 +81,7 @@ export class Disk {
                         tmp.size = stats["size"];
                         tmp.basename = path.basename(tmp.filename);
                         tmp.extension = path.extname(tmp.filename);
+                        tmp.date = Math.floor(stats.birthtimeMs);
                         resolve(tmp);
                     });
             } catch(error) {
@@ -100,6 +103,8 @@ export class Disk {
                 for (let file of myObj.getFileList(myObj.dir)) {
                     myObj.files.push(await myObj.getFileData(file));
                 }
+                /**Order by creation date */
+                myObj.files.sort((a,b) => {return (a.date>b.date)?1:-1});
                 resolve(true);
             } catch(error) {
                reject(true);
@@ -352,7 +357,13 @@ export class DiskController {
     static getVideos = async(req: Request, res: Response, next: NextFunction) => { 
         let dir = process.cwd() + '\\app\\public\\videos';
         let myDisk = new Disk(dir);
-        res.send(myDisk.getFileListLink(dir));
+        try {
+            await myDisk.init();
+            res.send(myDisk.getFileListLink());
+        } catch(error) {
+            console.log(error);
+            res.send([]);
+        }    
     }
 
     /** Role attach parameter validation */
@@ -366,7 +377,13 @@ export class DiskController {
     static getImages = async(req: Request, res: Response, next: NextFunction) => { 
         let dir = process.cwd() + '\\app\\public\\images\\' + req.body.disk;
         let myDisk = new Disk(dir);
-        res.send(myDisk.getFileListLink(dir));
+        try {
+            await myDisk.init();
+            res.send(myDisk.getFileListLink());
+        } catch(error) {
+            console.log(error);
+            res.send([]);
+        }
     }
 
     /** Role attach parameter validation */
