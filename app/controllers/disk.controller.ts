@@ -4,6 +4,7 @@ import { User } from '../models/user';
 
 import fs from 'fs';
 import path from 'path';
+import {body} from 'express-validator/check';
 
 import { Setting } from '../models/setting';
 import {Op} from "sequelize";
@@ -11,6 +12,7 @@ import { ArticleTranslation } from '../models/article_translation';
 import { Email } from '../models/email';
 import { Article } from '../models/article';
 import { AppConfig } from '../utils/Config';
+import passport from "passport";
 
 
 /**Enumerator with all stats events*/
@@ -362,16 +364,46 @@ export class DiskController {
 
     /**Gets all available images */
     static getImages = async(req: Request, res: Response, next: NextFunction) => { 
-        let dir = process.cwd() + '\\app\\public\\images';
+        let dir = process.cwd() + '\\app\\public\\images\\' + req.body.disk;
         let myDisk = new Disk(dir);
-        //Remove defaults 
-        res.send(myDisk.getFileListLink(dir).filter(image => image.includes('/defaults/') == false));
+        res.send(myDisk.getFileListLink(dir));
     }
 
     /** Role attach parameter validation */
     static getImagesChecks() {
         return [
+            body('disk').exists().withMessage('exists').isString(),
             Middleware.validate()
         ]
     }  
+
+    /**Uploads image to content folder and returns imageUrl for angular-editor*/
+    static uploadImageToContent = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: "https://localhost:3000/public/images/content/" + req.file.filename});  
+    }
+
+    /**Uploads image to blog folder and returns imageUrl for angular-editor*/
+    static uploadImageToBlog = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: "https://localhost:3000/public/images/blog/" + req.file.filename});  
+    }
+
+
+    /**Uploads image to email folder and returns imageUrl for angular-editor*/
+    static uploadImageToEmail = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: "https://localhost:3000/public/images/email/" + req.file.filename});  
+    }    
+
+    /**Uploads image to email folder and returns imageUrl for angular-editor*/
+    static uploadImageToDefaults = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: "https://localhost:3000/public/images/defaults/" + req.file.filename});  
+    }    
+
+    /**Uploads video to the content folder*/
+    static uploadVideoToContent = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({videoUrl: "https://localhost:3000/public/videos/content/" + req.file.filename});  
+    } 
+    /**Uploads video to the blog folder*/
+    static uploadVideoToBlog = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({videoUrl: "https://localhost:3000/public/videos/blog/" + req.file.filename});  
+    }     
 }

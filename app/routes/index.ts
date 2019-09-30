@@ -6,7 +6,6 @@ import {SettingController} from '../controllers/setting.controller';
 import {AuthController} from '../controllers/auth.controller';
 import {RoleController} from '../controllers/role.controller';
 import { ContactController } from '../controllers/contact.controller';
-import { GalleryController } from '../controllers/gallery.controller';
 import { ArticleController } from '../controllers/article.controller';
 
 import { messages } from "../middleware/common";
@@ -171,7 +170,33 @@ export class Routes {
 
     /**Gets all videos on the server */  
     app.route('/api/disk/images/all')
-      .get(DiskController.getImagesChecks(),DiskController.getImages);   
+      .post(DiskController.getImagesChecks(),DiskController.getImages);   
+
+
+    /**Uploads to content folder */ 
+    app.route('/api/disk/images/upload/content')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.imagesContent.single('file'), DiskController.uploadImageToContent);
+
+    /**Uploads image to blog folder */
+    app.route('/api/disk/images/upload/blog')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),uploads.imagesBlog.single('file'), DiskController.uploadImageToBlog);
+
+    /**Uploads image to blog folder */
+    app.route('/api/disk/images/upload/email')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(),uploads.imagesEmail.single('file'), DiskController.uploadImageToEmail);
+
+    /**Uploads image to blog folder */
+    app.route('/api/disk/images/upload/defaults')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),uploads.imagesDefaults.single('file'), DiskController.uploadImageToDefaults);
+
+    /**Uploads videos to content */
+    app.route('/api/disk/videos/upload/content')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.videosContent.single('file'), DiskController.uploadVideoToContent);
+   
+    /**Uploads videos to blog */
+    app.route('/api/disk/videos/upload/blog')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),uploads.videosBlog.single('file'), DiskController.uploadVideoToBlog);
+
 
     /////////////////////////////////////////////////////////////////
     // CONTACT CONTROLLER PART
@@ -312,29 +337,7 @@ export class Routes {
         .post(passport.authenticate('jwt',{session: false}), AlertController.deleteChecks(),AlertController.delete)           
 
 
-    /////////////////////////////////////////////////////////////////
-    // HANDLE GALLERY
-    ////////////////////////////////////////////////////////////////  
-    /**Uploads to content folder */ 
-    app.route('/api/upload/editor/content')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.content.single('file'), GalleryController.uploadImageToContent);
 
-    /**Uploads image to blog folder */
-    app.route('/api/upload/editor/blog')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasBlogRights(),uploads.blog.single('file'), GalleryController.uploadImageToBlog);
-
-    /**Uploads image to blog folder */
-    app.route('/api/upload/editor/email')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.email.single('file'), GalleryController.uploadImageToEmail);
-
-    /**Uploads image to blog folder */
-    app.route('/api/upload/editor/defaults')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),uploads.defaults.single('file'), GalleryController.uploadImageToDefaults);
-
-    /**Uploads videos */
-    app.route('/api/upload/videos/content')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.videos.single('file'), GalleryController.uploadVideoToContent);
-       
     /////////////////////////////////////////////////////////////////
     // HANDLE BLOG ARTICLES
     //////////////////////////////////////////////////////////////// 

@@ -4,8 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import Jimp from 'jimp';
 
-/**videos */  
-const storageVideos = multer.diskStorage({    
+/**videos of content*/  
+const storageVideosContent = multer.diskStorage({    
   destination: function(req, file, cb) {
     console.log("DESTINATION",process.cwd()+ 'app/public/videos/content');
     cb(null, join(process.cwd(), 'app/public/videos/content'));
@@ -15,6 +15,19 @@ const storageVideos = multer.diskStorage({
     cb(null, file.originalname);
   }
 }); 
+
+/**videos of blog*/  
+const storageVideosBlog = multer.diskStorage({    
+  destination: function(req, file, cb) {
+    console.log("DESTINATION",process.cwd()+ 'app/public/videos/blog');
+    cb(null, join(process.cwd(), 'app/public/videos/blog'));
+  },
+  filename: function(req, file, cb) {
+    console.log("filename", file.originalname);
+    cb(null, file.originalname);
+  }
+}); 
+
 
 /**Images of product */  
 const storageDefaults = multer.diskStorage({    
@@ -64,9 +77,12 @@ const storageImagesProducts = multer.diskStorage({
     filename: function(req, file, cb) {
       cb(null, file.originalname);
     }
-  });  
+  });    
 
-const uploadsVideos = multer({ storage: storageVideos });
+
+const uploadsVideosContent = multer({ storage: storageVideosContent });
+const uploadsVideosBlog = multer({ storage: storageVideosBlog });
+
 
 const uploadsImagesContent = multer({ storage: storageImagesContent});//,limits:{fileSize:1024*1024*1} });
 const uploadsImagesBlog = multer({ storage: storageImagesBlog});//,limits:{fileSize:1024*1024*1}});
@@ -76,12 +92,13 @@ const uploadsDefaults = multer({ storage: storageDefaults });
 const uploadsImagesProducts = multer({ storage: storageImagesProducts });
 
 const uploads = {
-    videos:     uploadsVideos,
-    content :   uploadsImagesContent,
-    blog:       uploadsImagesBlog,
-    email:      uploadsImagesEmail,
-    defaults:    uploadsDefaults,
-    products:   uploadsImagesProducts
+    videosContent:     uploadsVideosContent,
+    videosBlog: uploadsVideosBlog,
+    imagesContent :   uploadsImagesContent,
+    imagesBlog:       uploadsImagesBlog,
+    imagesEmail:      uploadsImagesEmail,
+    imagesDefaults:    uploadsDefaults,
+    imagesProducts:   uploadsImagesProducts
 }
 
 
