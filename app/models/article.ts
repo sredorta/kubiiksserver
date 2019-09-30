@@ -35,7 +35,7 @@ export class Article extends Model<Article> {
   image!: string;
 
   @AllowNull(true)
-  @Default("none")
+  @Default(null)
   @Column(DataTypes.STRING(300))
   backgroundImage!: string;
 
@@ -79,11 +79,11 @@ export class Article extends Model<Article> {
 
   /**Gets well formatted bacgkround image for emails */
   getBackgroundImage() {
-    if (!this.backgroundImage) {
+    /*if (!this.backgroundImage) {
       return "none";
       //if (this.backgroundImage == "none") return "none";
       //  return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
-    } else 
+    } else */
         return this.backgroundImage;
   }
 
