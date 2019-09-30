@@ -94,7 +94,7 @@ export class Article extends Model<Article> {
 
         let myArticle = await Article.create({
                 cathegory: "realisations",
-                image:"https://localhost:3000/public/images/content/logo50x50.jpg"
+                image:null
         });                    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu 1</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content 1</h1>"});    
@@ -102,7 +102,7 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
             cathegory: "realisations",
-            image:"https://localhost:3000/public/images/content/logo50x50.jpg"
+            image:null
         });                    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 2",description:"description fr 2",content:"<h1>contenu 2</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 2",description:"description en 2",content:"<h1>content 2</h1>"});    
@@ -110,7 +110,7 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
             cathegory: "realisations",
-            image:"https://localhost:3000/public/images/content/logo50x50.jpg"
+            image:null
         });                    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 3",description:"description fr 3",content:"<h1>contenu 3</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 3",description:"description en 3",content:"<h1>content 3</h1>"});    
@@ -118,7 +118,7 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
           cathegory: "prix",
-          image:"https://localhost:3000/public/images/content/logo50x50.jpg"
+          image:null
         });                    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre prix 1",description:"description fr 1",content:"<h1>contenu 1</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content 1</h1>"});    
@@ -126,7 +126,7 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
             cathegory: "prix",
-            image:"https://localhost:3000/public/images/content/logo50x50.jpg"
+            image:null
         });                    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre prix 2",description:"description fr 2",content:"<h1>contenu 2</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 2",description:"description en 2",content:"<h1>content 2</h1>"});    
@@ -135,7 +135,7 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
             cathegory: "blog",
-            image:"https://localhost:3000/public/images/content/logo50x50.jpg"
+            image:null
         });                    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1 blog",description:"description fr 1 blog",content:"<h1>contenu 1 blog</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1 blog",description:"description en 1 blog",content:"<h1>content 1 blog</h1>"});    
@@ -143,7 +143,7 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
             cathegory: "blog",
-            image:"https://localhost:3000/public/images/content/logo50x50.jpg"
+            image:null
         });                    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 2 blog",description:"description fr 2 blog",content:"<h1>contenu 1 blog</h1>"});  
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 2 blog",description:"description en 2 blog",content:"<h1>content 1 blog</h1>"});    

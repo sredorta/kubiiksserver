@@ -13,6 +13,7 @@ import { Email } from '../models/email';
 import { Article } from '../models/article';
 import { AppConfig } from '../utils/Config';
 import passport from "passport";
+import { EmailTranslation } from '../models/email_translation';
 
 
 /**Enumerator with all stats events*/
@@ -178,6 +179,10 @@ export class Disk {
                 if (found) resolve(true);
                 found = await Email.findOne({where:{backgroundContent:{[Op.like]:'%'+file.basename+'%'}}});
                 if (found) resolve(true);
+                found = await EmailTranslation.findOne({where:{content:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                found = await EmailTranslation.findOne({where:{header:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
                 resolve(false);
             } catch(error) {
                reject(true);
@@ -245,19 +250,14 @@ export class DiskController {
                 let myDisk = new Disk(dir);
                 await myDisk.init();
                 result.totalSize = myDisk.getTotalSize(); 
-        
-                //Get disk size of ressources
-                dir = process.cwd() + '\\app\\public\\images';
-                //Now find all images create a list
-                myDisk = new Disk(dir);
-                await myDisk.init();
-                result.systemSize = result.totalSize - myDisk.getTotalSize();
-                result.imagesSize = myDisk.getTotalSize();
-
+                result.systemSize = myDisk.getTotalSize();
         
         
                 //IMAGES
-                dir = process.cwd() + '\\app\\public\\images';
+                dir = process.cwd() + '\\app\\public\\images\\defaults';
+                //Defaults is not considered as we add it in the system
+
+                dir = process.cwd() + '\\app\\public\\images\\content';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
@@ -265,16 +265,68 @@ export class DiskController {
                 for (let file of myDisk.files) {
                     file.inUse = await Disk.fileInUse(file);
                     if (!file.inUse)
-                        result.filesToRemove.push(file.filename);
+                        result.filesToRemove.push(file.filename);  
                 }
-                result.removableImagesSize = myDisk.getNotInUseSize();
+                result.imagesSize = result.imagesSize + myDisk.getTotalSize();
+                result.systemSize = result.systemSize - myDisk.getTotalSize();
+                result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
-                result.images.push(['images', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.images.push(['content', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+
+                dir = process.cwd() + '\\app\\public\\images\\blog';
+                //Now find all images create a list
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                //Find if file is used
+                for (let file of myDisk.files) {
+                    file.inUse = await Disk.fileInUse(file);
+                    if (!file.inUse)
+                        result.filesToRemove.push(file.filename);  
+                }
+                result.imagesSize = result.imagesSize + myDisk.getTotalSize();
+                result.systemSize = result.systemSize - myDisk.getTotalSize();
+                result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+                result.images.push(['blog', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+
+                dir = process.cwd() + '\\app\\public\\images\\email';
+                //Now find all images create a list
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                //Find if file is used
+                for (let file of myDisk.files) {
+                    file.inUse = await Disk.fileInUse(file);
+                    if (!file.inUse)
+                        result.filesToRemove.push(file.filename);  
+                }
+                result.imagesSize = result.imagesSize + myDisk.getTotalSize();
+                result.systemSize = result.systemSize - myDisk.getTotalSize();
+                result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+                result.images.push(['email', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+
+
+                dir = process.cwd() + '\\app\\public\\images\\products';
+                //Now find all images create a list
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                //Find if file is used
+                for (let file of myDisk.files) {
+                    file.inUse = await Disk.fileInUse(file);
+                    if (!file.inUse)
+                        result.filesToRemove.push(file.filename);  
+                }
+                result.imagesSize = result.imagesSize + myDisk.getTotalSize();
+                result.systemSize = result.systemSize - myDisk.getTotalSize();
+                result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+                result.images.push(['products', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+
 
                 //VIDEOS
                 console.log("PROCESSING VIDEOS !!!!!!!!!!!!!!");
 
-                dir = process.cwd() + '\\app\\public\\videos';
+                dir = process.cwd() + '\\app\\public\\videos\\blog';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
@@ -285,11 +337,28 @@ export class DiskController {
                     if (!file.inUse)
                         result.filesToRemove.push(file.filename);
                 }
-                result.systemSize = result.systemSize -myDisk.getTotalSize();
-                result.videosSize = myDisk.getTotalSize();
-                result.videos.push(['videos', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
-                result.removableVideosSize = myDisk.getNotInUseSize();
+                result.videosSize = result.videosSize + myDisk.getTotalSize();
+                result.systemSize = result.systemSize - myDisk.getTotalSize();
+                result.removableVideosSize = result.removableVideosSize+myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+                result.videos.push(['blog', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+ 
+                dir = process.cwd() + '\\app\\public\\videos\\content';
+                //Now find all images create a list
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                //Find if file is used
+                for (let file of myDisk.files) {
+                    console.log(file);
+                    file.inUse = await Disk.fileInUse(file);
+                    if (!file.inUse)
+                        result.filesToRemove.push(file.filename);
+                }
+                result.videosSize = result.videosSize + myDisk.getTotalSize();
+                result.systemSize = result.systemSize - myDisk.getTotalSize();
+                result.removableVideosSize = result.removableVideosSize+myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+                result.videos.push(['content', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);                
 
                 //DOCUMENTS
         
