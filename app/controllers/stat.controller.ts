@@ -72,7 +72,6 @@ export class StatController {
 
     /**Gets the stat and updates the table depending on the action*/
     static save = async(req: Request, res: Response, next: NextFunction) => {  
-        console.log(req.body);
         try {
             switch(req.body.stat.action) {
                 //Save the data accordingly
@@ -169,7 +168,6 @@ export class StatController {
                         start: new Date(),
                         end: new Date()
                     });
-                    console.log("CREATED APP_INSTALL !!!!!");
                     break;
                 }
                 case StatAction.APP_INSTALL: {
@@ -180,7 +178,6 @@ export class StatController {
                         start: new Date(),
                         end: new Date()
                     });
-                    console.log("CREATED APP_INSTALL !!!!!");
                     break;
                 }
                 default: {
@@ -416,8 +413,6 @@ export class StatController {
             result.app_install_count.current = current.length;
             result.app_install_count.previous = previous.length;          
             
-            console.log(result)            
-
         } catch (error) {
             //Do nothing on error
         }

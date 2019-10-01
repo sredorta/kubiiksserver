@@ -31,6 +31,7 @@ export let sockets :SocketHandler;
 
 
 const sequelize = new Sequelize({
+    logging: false,
     database: AppConfig.db.database,
     dialect: 'mariadb',
     username: AppConfig.db.username,

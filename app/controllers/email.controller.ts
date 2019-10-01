@@ -236,8 +236,6 @@ export class EmailController {
     static sendTo = async (req: Request, res: Response, next:NextFunction) => {
         //TODO: Get post parameter of template email, additionalHTML
         try {
-            console.log(req.body);
-            console.log("Additional HTML : " + req.body.additionalHtml);
             let myEmail = await Email.findByPk(req.body.email.id);
             if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
             let html = await myEmail.getHtml(res.locals.language, req.body.additionalHtml);
@@ -282,7 +280,6 @@ export class EmailController {
                 let html = await myEmail.getHtml(user.language);
                 if (!html)  return next(new HttpException(500, messages.emailSentError,null));
                 let header = await myEmail.getHeader(user.language);
-                console.log(header);
                 let myEmailT = {
                                 from: AppConfig.emailSmtp.sender,
                                 to: user.email,

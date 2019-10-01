@@ -51,7 +51,6 @@ export class UserController {
     /**Update value with translations if required, we expect object with id,default, fr,en... */
     static update = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            console.log(req.body.user);
             let myUser = await User.findByPk(req.body.user.id);
             if (!myUser) throw new Error("User not found with id: " + req.body.user.id);
             if (req.body.firstName)

@@ -219,7 +219,6 @@ export class SocketHandler  {
       let result :boolean = false;
       Object.keys(socket.adapter.rooms).forEach( (key) => {
         if (key.includes('chat-room-')) {
-          console.log("USERRRRRRRRRRRRRRRRRRR ALREEEEEEEEEEEADDDYYYYYYYYYYYYYY!!!!!!!!!!!!", key);
           result = true;
         }
       });
@@ -253,7 +252,6 @@ export class SocketHandler  {
          result.push(newUser);
       }
       if (JSON.stringify(result) != JSON.stringify(this.chatAdmins)) {
-          console.log("Emitting CHAT_ADMINS_DATA !!!!!!!",result);
           socket.broadcast.emit(SocketEvents.CHAT_ADMINS_DATA,result);
       }
       this.chatAdmins = result;  
@@ -269,7 +267,6 @@ export class SocketHandler  {
               myUsers.push({userId:user.id,firstName:user.firstName,avatar:user.avatar,connected:this.isUserConnected(user.id)})
           }
           this.chatAdmins = myUsers;
-          console.log("Recieved CHAT_ADMINS_DATA !!!!!!!!!!!!!!!!");
           socket.emit(SocketEvents.CHAT_ADMINS_DATA,this.chatAdmins);
         });
       });
@@ -279,7 +276,6 @@ export class SocketHandler  {
     /**Adds connection to the list */
     private addConnection(connection:ISocketConnection) {
         this.connections.push(connection);
-        console.log("Socket connection :", connection.socket.id)
         this.chatAdminsChange(connection.socket);
 
     }
@@ -292,7 +288,6 @@ export class SocketHandler  {
         if (index>=0) {
             this.connections.splice(index,1);
         }
-        console.log("Socket disconnected : " + socket.id);
         this.chatAdminsChange(socket);
         });
     }
@@ -309,7 +304,6 @@ export class SocketHandler  {
               socket: socket,
               user: new User()
           }
-          console.log("FROM PAYLOAD", userId)
           if (userId)
               User.scope("details").findByPk(userId).then(user => {
                   if (user) {
@@ -366,11 +360,9 @@ export class SocketHandler  {
   /**Sends data to the chat room others*/
   private loadOnChatData(socket:socketio.Socket) {
     socket.on(SocketEvents.CHAT_DATA, (data:IChatData) => {
-        console.log("Broadcasting CHAT_DATA", data);
         switch(data.type) {   
           case ChatDataType.CreateRoom:
             if (!this.isChatAdminUser(socket)) {
-                  console.log("Creating room as not admin chat !");
                   const roomName = "chat-room-" + Helper.generateRandomString(10);
                   const myRoom = {
                     id:roomName,
@@ -394,7 +386,6 @@ export class SocketHandler  {
             break;
           case ChatDataType.FirstMessage:
             if (!this.isChatAdminUser(socket)) {
-                console.log("NOTIFING ALL ADMINS...")
                 User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
                   for (let user of users) {
                     user.notify(this.messagesAll[user.language].notificationNewChat,data.object.message.message);
@@ -412,7 +403,6 @@ export class SocketHandler  {
                 });
                 //Tell to all already connected admins all the available chat rooms
                 let myRooms : IChatRoom[] = this.getChatRooms();
-                console.log("SENDING ROOMS !!!!",myRooms);
                 socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRooms}});
             } else {
               //In case of admin just forward message
@@ -425,12 +415,9 @@ export class SocketHandler  {
             socket.emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRoomsNow}});
             break;
           case ChatDataType.StoredMessagesResponse:
-            console.log("Sending messages to admins", data);
             socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, data);
             break;
           case ChatDataType.JoinRoom:
-            console.log(data);
-            console.log("Joining room",data.room);
             if (data.room) {
               socket.join(data.room);
               let myMessage = {
@@ -443,7 +430,6 @@ export class SocketHandler  {
             }
             break;   
           case ChatDataType.LeaveRoom: 
-            console.log("IN LEAVE ROOOM",data);
             if (data.object.room)
               if (data.object.room.id) {
                   let key=data.object.room.id;
@@ -452,7 +438,6 @@ export class SocketHandler  {
                     room: key,
                     isBot:true
                   }
-                  console.log("LEAVING ROOOOOOOOOOOOOOOOOOOOOOOOOOOM",key);
                   socket.leave(key);
                   socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Message, object:{message:myMessage}});
                   socket.broadcast.to(key).emit(SocketEvents.CHAT_DATA, {room:key, type:ChatDataType.Participants, object:{participants:this.findClientCountSocketByRoomId(key)}});
@@ -461,9 +446,7 @@ export class SocketHandler  {
               }
             break;
           default:
-            console.log("BROADCAST DEFAULT !!! -> BYPASS")
             if (data.room) {
-              console.log("Broadcasting to room " +data.room, data);
               socket.broadcast.to(data.room).emit(SocketEvents.CHAT_DATA,data);
             }
         }

@@ -323,15 +323,12 @@ export class DiskController {
 
 
                 //VIDEOS
-                console.log("PROCESSING VIDEOS !!!!!!!!!!!!!!");
-
                 dir = process.cwd() + '\\app\\public\\videos\\blog';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
                 //Find if file is used
                 for (let file of myDisk.files) {
-                    console.log(file);
                     file.inUse = await Disk.fileInUse(file);
                     if (!file.inUse)
                         result.filesToRemove.push(file.filename);
@@ -347,7 +344,6 @@ export class DiskController {
                 await myDisk.init();
                 //Find if file is used
                 for (let file of myDisk.files) {
-                    console.log(file);
                     file.inUse = await Disk.fileInUse(file);
                     if (!file.inUse)
                         result.filesToRemove.push(file.filename);
@@ -383,7 +379,6 @@ export class DiskController {
     /**Gets all available roles */
     static scan = async(req: Request, res: Response, next: NextFunction) => {  
         let result = await DiskController.getResult();
-        console.log(result.filesToRemove);
         result.filesToRemove = [];
         res.json(result);
     }
@@ -398,11 +393,9 @@ export class DiskController {
 
     /**Gets all available roles */
     static optimize = async(req: Request, res: Response, next: NextFunction) => {  
-        console.log("RUNNING OPTIMIZE !!!!!!!!!!!!!!!!!");
         //Get current list of files to delete
         let result = await DiskController.getResult();
         for (let file of result.filesToRemove) {
-            console.log("REMOVE",file);
             try {
                 fs.unlinkSync(file);
             } catch (error) {
@@ -411,7 +404,6 @@ export class DiskController {
         }
         result = await DiskController.getResult();
         result.filesToRemove = [];
-        console.log(result);
         res.json(result);
         res.json(new DiskResult());
     }

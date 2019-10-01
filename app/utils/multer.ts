@@ -7,11 +7,9 @@ import Jimp from 'jimp';
 /**videos of content*/  
 const storageVideosContent = multer.diskStorage({    
   destination: function(req, file, cb) {
-    console.log("DESTINATION",process.cwd()+ 'app/public/videos/content');
     cb(null, join(process.cwd(), 'app/public/videos/content'));
   },
   filename: function(req, file, cb) {
-    console.log("filename", file.originalname);
     cb(null, file.originalname);
   }
 }); 
@@ -19,11 +17,9 @@ const storageVideosContent = multer.diskStorage({
 /**videos of blog*/  
 const storageVideosBlog = multer.diskStorage({    
   destination: function(req, file, cb) {
-    console.log("DESTINATION",process.cwd()+ 'app/public/videos/blog');
     cb(null, join(process.cwd(), 'app/public/videos/blog'));
   },
   filename: function(req, file, cb) {
-    console.log("filename", file.originalname);
     cb(null, file.originalname);
   }
 }); 

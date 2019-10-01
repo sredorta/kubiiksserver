@@ -169,7 +169,6 @@ export class Email extends Model<Email> {
                 return;
             }
             result.siteUrl = tmp.value;
-            console.log("SETTING siteUrl to : ", tmp.value);
 
             //Get all socialLinks
             let links: any = {};
@@ -225,14 +224,12 @@ export class Email extends Model<Email> {
         if(!myData.translations[0].content) myData.translations[0].content = "";
         if(!myData.translations[0].header) myData.translations[0].header = "";
         
-        console.log("HEADER BACKGROUND : " , myData.backgroundHeader);
 
         //Add extra html if required
         if (additionalHtml) {
             myData.translations[0].content = myData.translations[0].content + additionalHtml;
         }
 
-        console.log(myData);
         let html = pug.renderFile(path.join(process.cwd() + '/app/emails/emails.pug'), {data:myData,iso:iso});
         //CSS must be put inline for better support of all browsers
         html =  await InlineCss(html, {extraCss:this.createAdditionalCss(),applyStyleTags:true,applyLinkTags:true,removeStyleTags:false,removeLinkTags:true,url:"filePath"});
@@ -276,7 +273,6 @@ export class Email extends Model<Email> {
                             text: htmlToText.fromString(html),
                             html: html
             }
-            console.log("SENDING EMAIL !!!!!!!!!!!!!!!!!!!!!!!!!!!");
             await transporter.sendMail(myEmailT);
             return true;
       } catch (error) {
