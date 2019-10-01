@@ -255,8 +255,11 @@ export class DiskController {
         
                 //IMAGES
                 dir = process.cwd() + '\\app\\public\\images\\defaults';
-                //Defaults is not considered as we add it in the system
+                myDisk = new Disk(dir);
+                await myDisk.init();
+                result.images.push(['defaults', myDisk.getInUseSize() ]);
 
+                //Defaults is not considered as we add it in the system
                 dir = process.cwd() + '\\app\\public\\images\\content';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
@@ -268,10 +271,9 @@ export class DiskController {
                         result.filesToRemove.push(file.filename);  
                 }
                 result.imagesSize = result.imagesSize + myDisk.getTotalSize();
-                result.systemSize = result.systemSize - myDisk.getTotalSize();
                 result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
-                result.images.push(['content', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.images.push(['content', myDisk.getTotalSize() ]);
 
                 dir = process.cwd() + '\\app\\public\\images\\blog';
                 //Now find all images create a list
@@ -284,10 +286,9 @@ export class DiskController {
                         result.filesToRemove.push(file.filename);  
                 }
                 result.imagesSize = result.imagesSize + myDisk.getTotalSize();
-                result.systemSize = result.systemSize - myDisk.getTotalSize();
                 result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
-                result.images.push(['blog', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.images.push(['blog', myDisk.getTotalSize() ]);
 
                 dir = process.cwd() + '\\app\\public\\images\\email';
                 //Now find all images create a list
@@ -300,10 +301,9 @@ export class DiskController {
                         result.filesToRemove.push(file.filename);  
                 }
                 result.imagesSize = result.imagesSize + myDisk.getTotalSize();
-                result.systemSize = result.systemSize - myDisk.getTotalSize();
                 result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
-                result.images.push(['email', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.images.push(['email', myDisk.getTotalSize() ]);
 
 
                 dir = process.cwd() + '\\app\\public\\images\\products';
@@ -317,10 +317,9 @@ export class DiskController {
                         result.filesToRemove.push(file.filename);  
                 }
                 result.imagesSize = result.imagesSize + myDisk.getTotalSize();
-                result.systemSize = result.systemSize - myDisk.getTotalSize();
                 result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
-                result.images.push(['products', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.images.push(['products', myDisk.getTotalSize() ]);
 
 
                 //VIDEOS
@@ -338,10 +337,9 @@ export class DiskController {
                         result.filesToRemove.push(file.filename);
                 }
                 result.videosSize = result.videosSize + myDisk.getTotalSize();
-                result.systemSize = result.systemSize - myDisk.getTotalSize();
                 result.removableVideosSize = result.removableVideosSize+myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
-                result.videos.push(['blog', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);
+                result.videos.push(['blog', myDisk.getTotalSize() ]);
  
                 dir = process.cwd() + '\\app\\public\\videos\\content';
                 //Now find all images create a list
@@ -355,17 +353,18 @@ export class DiskController {
                         result.filesToRemove.push(file.filename);
                 }
                 result.videosSize = result.videosSize + myDisk.getTotalSize();
-                result.systemSize = result.systemSize - myDisk.getTotalSize();
                 result.removableVideosSize = result.removableVideosSize+myDisk.getNotInUseSize();
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
-                result.videos.push(['content', myDisk.getInUseSize(), myDisk.getNotInUseSize() ]);                
+                result.videos.push(['content', myDisk.getTotalSize() ]); 
+                
+                //Update totals
+                result.systemSize = result.totalSize - result.videosSize - result.imagesSize;
 
                 //DOCUMENTS
         
                 //Return the data
-                result.disk.push(['system', result.systemSize]);
-                result.disk.push(['images', result.imagesSize]);
-                result.disk.push(['videos', result.videosSize]);
+                result.disk.push(['used', result.totalSize - result.removableSize]);
+                result.disk.push(['not used', result.removableSize]);
 
 
 
