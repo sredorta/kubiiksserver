@@ -285,11 +285,11 @@ export class Routes {
 
     /** Removes specific user. Admin or 'users' required  */    
     app.route('/api/user/delete')
-        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),UserController.deleteChecks(),UserController.delete)           
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),UserController.deleteChecks(),UserController.delete)           
 
     /** Updates specific user. Admin or 'users' required */    
     app.route('/api/user/update')
-        .post(passport.authenticate('jwt',{session: false}),Middleware.hasAdminRights(),UserController.updateChecks(),UserController.update)           
+        .post(passport.authenticate('jwt',{session: false}),Middleware.hasUsersRights(),UserController.updateChecks(),UserController.update)           
 
 
     /**Get user details by id. Admin or 'users' required */

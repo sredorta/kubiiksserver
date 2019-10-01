@@ -301,19 +301,21 @@ export class User extends Model<User> {
         await myUser.attachRole("chat");
 
         /*Debug users*/
-/*        myUser = await User.scope("full").create({
-          firstName: "Sergi",
+        myUser = await User.scope("full").create({
+          firstName: "gmail",
           lastName: "Red",
           email: "sergi.redorta@gmail.com",
           phone: null,
           mobile: "0623133222",
-          language: "en",
+          language: "ca",
           passport: "local",
           terms: true,
           emailValidationKey: Helper.generateRandomString(30),
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
-        });*/
+        });
+        await myUser.attachRole("stats");
+
         
         /*        await myUser.attachRole("chat");
         myUser = await User.scope("full").create({
