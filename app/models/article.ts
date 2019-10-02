@@ -247,6 +247,18 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
           cathegory: "content",
+          key: "contact-chat",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Contact: Horaires",description:"Chat en contact",content:"<h1>chat...</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Contact: Timetable",description:"Chat in contact",content:"<h1>chat...</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Contacto: Horarios",description:"Chat en contacto",content:"<h1>chat...</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Contacte: Horaris",description:"Chat a la pàgina de contacte",content:"<h1>chat...</h1>"});             
+
+
+        myArticle = await Article.create({
+          cathegory: "content",
           key: "contact-form",
           image:null,
           public:true
