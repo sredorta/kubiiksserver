@@ -48,6 +48,15 @@ export class EmailController {
         try {
             let result = [];
             let emails = await Email.findAll({order: [sequelize.literal('id DESC')]});
+            let myUser = await User.scope("details").findByPk(req.user.id);
+            //Only show protected emails if kubiiks role exists
+            if (myUser) {
+                if (!myUser.hasRole("kubiiks")){
+                    emails = emails.filter(obj => obj.isProtected == false);
+                }
+            } else {
+                emails = emails.filter(obj => obj.isProtected == false);
+            }
             for (let article of emails) result.push(article.sanitize(res.locals.language));
             res.json(result);
         } catch(error) {

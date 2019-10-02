@@ -220,6 +220,9 @@ export class User extends Model<User> {
   public hasRole(role:string | number) : boolean {  
       if (!this.roles) return false;
       if (typeof role == "string") {
+          if (role == "kubiiks") {
+            return this.roles.findIndex(obj => obj.name == role) >= 0;
+          }
           if (this.roles.findIndex(obj => obj.name == role) >= 0 || this.roles.findIndex(obj => obj.name == 'admin')>=0) return true;
           else return false;
       } else {
@@ -314,7 +317,8 @@ export class User extends Model<User> {
           mobileValidationKey: Helper.generateRandomNumber(4),
           password: User.hashPassword("Secure0")
         });
-        await myUser.attachRole("stats");
+        await myUser.attachRole("admin");
+
 
         
         /*        await myUser.attachRole("chat");
