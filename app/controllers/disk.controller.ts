@@ -259,12 +259,25 @@ export class DiskController {
                 await myDisk.init();
                 result.images.push(['defaults', myDisk.getInUseSize() ]);
 
-                //Defaults is not considered as we add it in the system
-                dir = process.cwd() + '\\app\\public\\images\\content';
-                //Now find all images create a list
+                //Avatar pictures
+                dir = process.cwd() + '\\app\\public\\images\\avatar';
                 myDisk = new Disk(dir);
                 await myDisk.init();
-                //Find if file is used
+                for (let file of myDisk.files) {
+                    file.inUse = await Disk.fileInUse(file);
+                    if (!file.inUse)
+                        result.filesToRemove.push(file.filename);  
+                }
+                result.imagesSize = result.imagesSize + myDisk.getTotalSize();
+                result.removableImagesSize = result.removableImagesSize + myDisk.getNotInUseSize();
+                result.removableSize = result.removableSize+myDisk.getNotInUseSize();
+                result.images.push(['avatars', myDisk.getTotalSize() ]);
+
+
+
+                dir = process.cwd() + '\\app\\public\\images\\content';
+                myDisk = new Disk(dir);
+                await myDisk.init();
                 for (let file of myDisk.files) {
                     file.inUse = await Disk.fileInUse(file);
                     if (!file.inUse)
@@ -475,6 +488,11 @@ export class DiskController {
         res.send({imageUrl: "https://localhost:3000/public/images/defaults/" + req.file.filename});  
     }    
 
+    /**Uploads image to avatar folder and returns imageUrl for angular-editor*/
+    static uploadImageToAvatar = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: "https://localhost:3000/public/images/avatar/" + req.file.filename});  
+    }   
+
     /**Uploads video to the content folder*/
     static uploadVideoToContent = async (req: Request, res: Response, next:NextFunction) => {
         res.send({videoUrl: "https://localhost:3000/public/videos/content/" + req.file.filename});  
@@ -483,4 +501,5 @@ export class DiskController {
     static uploadVideoToBlog = async (req: Request, res: Response, next:NextFunction) => {
         res.send({videoUrl: "https://localhost:3000/public/videos/blog/" + req.file.filename});  
     }     
+
 }

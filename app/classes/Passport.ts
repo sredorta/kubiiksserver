@@ -131,7 +131,7 @@ export class Passport {
         clientSecret: AppConfig.auth.facebook.clientSecret,
         callbackURL: AppConfig.api.host + ":" + AppConfig.api.port + "/api/auth/facebook/callback",
         passReqToCallback:true,
-        profileFields: ['id', 'emails', 'name', "link","locale","timezone"]
+        profileFields: ['id', 'emails', 'name', "link","locale",'photos',"timezone"]
       },
       function(req, accessToken, refreshToken, profile, cb) {
         //Now we need to see if user already exists in database and if not then add it
@@ -169,6 +169,7 @@ export class Passport {
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
               emailValidationKey: Helper.generateRandomString(30),
               mobileValidationKey: Helper.generateRandomNumber(4),
+              avatar: profile._json.picture.data.url,
               passport: "facebook",
               facebookId : profile._json.id,
               facebookToken: accessToken            
@@ -251,6 +252,7 @@ export class Passport {
               emailValidationKey: Helper.generateRandomString(30),
               mobileValidationKey: Helper.generateRandomNumber(4),
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
+              avatar: profile._json.picture,
               passport:"google",
               googleId : profile._json.sub,
               googleToken: accessToken            

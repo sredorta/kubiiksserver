@@ -173,6 +173,10 @@ export class Routes {
       .post(DiskController.getImagesChecks(),DiskController.getImages);   
 
 
+    /**Uploads to avatar folder */ 
+    app.route('/api/disk/images/upload/avatar')
+      .post(passport.authenticate('jwt',{session: false}),uploads.imagesAvatar.single('file'), DiskController.uploadImageToAvatar);
+
     /**Uploads to content folder */ 
     app.route('/api/disk/images/upload/content')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),uploads.imagesContent.single('file'), DiskController.uploadImageToContent);

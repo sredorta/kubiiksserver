@@ -65,6 +65,16 @@ const storageImagesEmail = multer.diskStorage({
   }
 });
 
+/**Images of avatars */  
+const storageImagesAvatars = multer.diskStorage({    
+  destination: function(req, file, cb) {
+    cb(null, join(process.cwd(), 'app/public/images/avatar'));
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.originalname);
+  }
+});  
+
 /**Images of product */  
 const storageImagesProducts = multer.diskStorage({    
     destination: function(req, file, cb) {
@@ -83,6 +93,8 @@ const uploadsVideosBlog = multer({ storage: storageVideosBlog });
 const uploadsImagesContent = multer({ storage: storageImagesContent});//,limits:{fileSize:1024*1024*1} });
 const uploadsImagesBlog = multer({ storage: storageImagesBlog});//,limits:{fileSize:1024*1024*1}});
 const uploadsImagesEmail = multer({ storage: storageImagesEmail });
+const uploadsImagesAvatar = multer({ storage: storageImagesAvatars });
+
 const uploadsDefaults = multer({ storage: storageDefaults });
 
 const uploadsImagesProducts = multer({ storage: storageImagesProducts });
@@ -94,6 +106,7 @@ const uploads = {
     imagesBlog:       uploadsImagesBlog,
     imagesEmail:      uploadsImagesEmail,
     imagesDefaults:    uploadsDefaults,
+    imagesAvatar:     uploadsImagesAvatar,
     imagesProducts:   uploadsImagesProducts
 }
 

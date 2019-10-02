@@ -360,6 +360,7 @@ export class SocketHandler  {
   /**Sends data to the chat room others*/
   private loadOnChatData(socket:socketio.Socket) {
     socket.on(SocketEvents.CHAT_DATA, (data:IChatData) => {
+        console.log("loadOnChatData",data);
         switch(data.type) {   
           case ChatDataType.CreateRoom:
             if (!this.isChatAdminUser(socket)) {

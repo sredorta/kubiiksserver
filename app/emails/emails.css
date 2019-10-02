@@ -103,9 +103,21 @@ body {
 
 .content .borderbottom {border-bottom: 1px solid #f2eeed;}
 .content .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
-.content .bodycopy p {font-size: 16px; line-height: 22px;}
-.content .bodycopy img {
-    width:100%;
+
+
+/*Content of the editors*/
+.content .bodycopy a {
+        font-weight: bold;
+        text-decoration: none;
 }
+
+
+.content .bodycopy img {
+        max-width: 100% !important;
+        object-fit: cover;
+}
+
+
+
 
 
