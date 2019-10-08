@@ -314,6 +314,16 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Cabecera", description:"Cabecera de la pagina de precios", content:'precios...'});             
         await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Preus: Capçalera", description:"Capçalera de la pagina de preus", content:'preus...'});             
 
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "page-not-found",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"404: Page non trouvé",description:"Page non trouvé",content:"<h1>Page non trouvé</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"404: Page not found",description:"Page not found",content:"<h1>Page not found</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"404: Pàgina no encontrada",description:"Pagina no encontrada",content:"<h1>Pàgina no encontrada</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"404: Pàgina no trobada",description:"Pàgina no trobada",content:"<h1>Pàgina no trobada</h1>"});             
 
 
     }

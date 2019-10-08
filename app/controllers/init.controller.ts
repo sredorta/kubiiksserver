@@ -26,9 +26,9 @@ export class InitController {
             let settings = await Setting.findAll();
             if (settings) 
                 result["settings"] = [];
-                for (let setting of settings) {
+            for (let setting of settings) {
                     result["settings"].push(setting.sanitize(res.locals.language))
-                }  
+            }
             let articles = await Article.findAll({order: [sequelize.literal('id DESC')]});
             result["articles"] = [];
             for (let article of articles) 
