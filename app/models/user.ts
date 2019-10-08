@@ -118,16 +118,8 @@ export class User extends Model<User> {
   facebookId!:string;
 
   @AllowNull(true)
-  @Column(DataTypes.STRING(255))
-  facebookToken!:string;
-
-  @AllowNull(true)
   @Column(DataTypes.STRING(50))
-  googleId!:string;
-
-  @AllowNull(true)
-  @Column(DataTypes.STRING(255))
-  googleToken!:string;  
+  googleId!:string; 
 
   /**Stores all onPush data for onPush notifications */
   @AllowNull(true)

@@ -154,7 +154,6 @@ export class Passport {
             if (myUser) {
                 //if (profile._json.first_name) myUser.firstName = profile._json.first_name;
                 //if (profile._json.last_name) myUser.lastName = profile._json.last_name;
-                myUser.facebookToken = accessToken;
                 myUser.passport = "facebook";
                 myUser = await myUser.save();
                 return cb(null, myUser);
@@ -172,7 +171,6 @@ export class Passport {
               avatar: profile._json.picture.data.url,
               passport: "facebook",
               facebookId : profile._json.id,
-              facebookToken: accessToken            
             });
             //Attach admin role if required
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
@@ -237,7 +235,6 @@ export class Passport {
                 //if (profile._json.given_name) myUser.firstName = profile._json.given_name;
                 //if (profile._json.family_name) myUser.lastName = profile._json.family_name;
                 //TODO save also language that is in _json.locale
-                myUser.googleToken = accessToken;
                 myUser.passport = "google";
                 myUser = await myUser.save();
                 return cb(null, myUser);
@@ -255,7 +252,6 @@ export class Passport {
               avatar: profile._json.picture,
               passport:"google",
               googleId : profile._json.sub,
-              googleToken: accessToken            
             });
             //Attach admin role if required
             if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
