@@ -72,7 +72,7 @@ export class AuthController {
                 }
                 //Validation with email is the default
                 default: {
-                    const link = AppConfig.api.host + ":"+ AppConfig.api.fePort + "/login/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
+                    const link = AppConfig.api.kiiwebExtHost + "/login/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
                     let html = messages.emailValidationLink(link);
                     let recipients = [];
                     recipients.push(myUser.email);
@@ -142,13 +142,13 @@ export class AuthController {
       
             //We just need to create a token and provide it
             const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });
-            res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login/validate/"+token);      
+            res.redirect(AppConfig.api.kiiwebExtHost+"/login/validate/"+token);      
     }
 
     //When any of the oauth2 gets a fail then redirect to /login/fail
     //Angular should do nothing
     static oauth2Fail =  (req:Request, res:Response,next:NextFunction) => {
-        res.redirect(AppConfig.api.host+":"+AppConfig.api.fePort+"/login");
+        res.redirect(AppConfig.api.kiiwebExtHost + "/login");
     };
 
     /**Gets current user stored fields in the system */

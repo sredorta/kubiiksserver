@@ -2,7 +2,9 @@ import app from "./app";
 import express from 'express';
 import {Sequelize, addHook} from 'sequelize-typescript';
 import fs from 'fs';
+import http from 'http';
 import https from 'https';
+
 import {Setting} from './models/setting';
 import {User} from './models/user';
 import {Role} from './models/role';
@@ -29,11 +31,10 @@ const certificate = fs.readFileSync('server.crt');
 
 export let sockets :SocketHandler;
 
-
 const sequelize = new Sequelize({
     logging: false,
     database: AppConfig.db.database,
-    dialect: 'mariadb',
+    dialect: "mariadb",
     username: AppConfig.db.username,
     password: AppConfig.db.password,
     modelPaths: [__dirname + './models/*'],
@@ -69,18 +70,23 @@ async function startServer() {
 
     console.log('STARTED SERVER ON PORT : ' + AppConfig.api.port);
     //Serve with SSL or not
-    if (!AppConfig.api.ssl)
-        app.listen(AppConfig.api.port, () => {});
-    else {
-        const server = https.createServer({
-            key: privateKey,
-            cert: certificate
+    //if (!AppConfig.api.ssl)
+    
+    //    app.listen(AppConfig.api.port, () => {});
+    //else {
+        const server = http.createServer({
+    //        key: privateKey,
+    //        cert: certificate
         }, app);
+        /*const serverSSL = https.createServer({
+                    key: privateKey,
+                    cert: certificate
+                }, app);
         //SocketIO part
-        sockets = new SocketHandler(server);
-        sockets.listen();
+        sockets = new SocketHandler(serverSSL);
+        sockets.listen();*/
         //CRUD Listener
         server.listen(AppConfig.api.port);
-    }
+    //}
 }
 startServer();

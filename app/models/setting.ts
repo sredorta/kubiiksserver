@@ -153,7 +153,7 @@ export class Setting extends Model<Setting> {
         mySetting = await Setting.create({
             type: "seo",
             key: "url_image",
-            value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/logo.jpg"
+            value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/logo.jpg"
         });
 
 
@@ -167,18 +167,18 @@ export class Setting extends Model<Setting> {
         mySetting = await Setting.create({
           type: "general",
           key: "favicon",
-          value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/favicon.jpg"
+          value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/favicon.jpg"
         });
 
         mySetting = await Setting.create({
           type: "general",
           key: "appicon512",
-          value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/icon-512x512.png"
+          value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/icon-512x512.png"
         });
         mySetting = await Setting.create({
           type: "general",
           key: "appicon192",
-          value: AppConfig.api.host + ":" + AppConfig.api.port + "/public/images/defaults/icon-192x192.png"
+          value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/icon-192x192.png"
         });
 
 

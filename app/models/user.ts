@@ -150,7 +150,7 @@ export class User extends Model<User> {
             if (!siteUrl) {
                 throw new Error("Could not find siteUrl");
             }*/
-            let urlBase = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/";
+            let urlBase = AppConfig.api.kiiserverExtHost + "/public/images/defaults/";
             //Get baseURL from settings
             const subscription = JSON.parse(myObj.onPush);
             const payload = JSON.stringify({
@@ -161,7 +161,7 @@ export class User extends Model<User> {
                 vibrate: [100, 50, 100],
                 action:"",
                 data: {
-                  url: AppConfig.api.host +":"+ AppConfig.api.fePort,
+                  url: AppConfig.api.kiiwebExtHost,
                 }
               }
             });

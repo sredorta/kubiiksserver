@@ -129,7 +129,7 @@ export class Passport {
       passport.use('facebook', new passportFacebook.Strategy({
         clientID: AppConfig.auth.facebook.clientId,
         clientSecret: AppConfig.auth.facebook.clientSecret,
-        callbackURL: AppConfig.api.host + ":" + AppConfig.api.port + "/api/auth/facebook/callback",
+        callbackURL: AppConfig.api.kiiserverExtHost + "/api/auth/facebook/callback",
         passReqToCallback:true,
         profileFields: ['id', 'emails', 'name', "link","locale",'photos',"timezone"]
       },
@@ -208,7 +208,7 @@ export class Passport {
     passport.use('google', new passsportGoogle.OAuth2Strategy({
       clientID: AppConfig.auth.google.clientId,
       clientSecret: AppConfig.auth.google.clientSecret,
-      callbackURL: AppConfig.api.host + ":" + AppConfig.api.port + "/api/auth/google/callback",
+      callbackURL: AppConfig.api.kiiserverExtHost + "/api/auth/google/callback",
       passReqToCallback:true,
     },
     function(req, accessToken, refreshToken, profile, cb) {

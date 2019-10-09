@@ -61,7 +61,7 @@ export class Disk {
         let result : string[] = [];
         for (let file of this.files) {
             let link = file.filename;
-            link = link.replace(/^.*\\public\\/,AppConfig.api.host + ":" + AppConfig.api.port + '/public/');
+            link = link.replace(/^.*\\public\\/,AppConfig.api.kiiserverExtHost + '/public/');
             link = link.replace(/\\/g,'/')
             result.push(link);
         }

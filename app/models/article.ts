@@ -73,7 +73,7 @@ export class Article extends Model<Article> {
 
   /**Gets well formatted image for emails */
   getImage() {
-    if (!this.image) return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
+    if (!this.image) return AppConfig.api.kiiserverExtHost + "/public/images/defaults/no-photo-available.jpg";
     else return this.image;
   }
 

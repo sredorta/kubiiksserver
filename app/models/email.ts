@@ -146,7 +146,7 @@ export class Email extends Model<Email> {
     myPromise =  new Promise<Email>((resolve,reject) => {
       async function _getData() {
         try {
-            let urlBase = AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/";
+            let urlBase = AppConfig.api.kiiserverExtHost + "/public/images/defaults/";
             let result :any = new Email();
             //Get phone from settings
             let tmp = await Setting.findOne({where:{key:"companyPhone"}});

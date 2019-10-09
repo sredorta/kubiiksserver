@@ -19,6 +19,9 @@ import * as dotenv from "dotenv";
             "version" : <string>process.env.API_VERSION,
             "defaultLanguage": <string>process.env.API_DEFAULT_LANGUAGE,
             "appName": <string>process.env.API_NAME,
+            "kiiserverLocalHost": <string>process.env.API_LOCAL_HOST,
+            "kiiserverExtHost" : <string>process.env.API_EXTERNAL_HOST,
+            "kiiwebExtHost": <string>process.env.APP_EXTERNAL_HOST,
             "host": <string>process.env.API_HOST,
             "port": <string>process.env.API_PORT,
             "fePort": <string>process.env.API_FE_PORT,
@@ -28,10 +31,8 @@ import * as dotenv from "dotenv";
             "username": <string>process.env.DB_USERNAME,
             "password": <string>process.env.DB_PASSWORD,
             "database": <string>process.env.DB_DATABASE,
-            "options": {
-              "host": <string>process.env.DB_HOST,
-              "dialect" : <string>process.env.DB_DIALECT
-            }
+            "dialect" : <string>process.env.DB_DIALECT,
+            "host"    : <string>process.env.DB_HOST
         },
         "emailSmtp" : {
             "host" : <string>process.env.SMTP_HOST,
