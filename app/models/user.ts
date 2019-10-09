@@ -1,7 +1,7 @@
 import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany,HasMany, Is} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import jwt from "jsonwebtoken";
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 import bcrypt from "bcryptjs";
 
 import {Role} from './role';
@@ -119,7 +119,7 @@ export class User extends Model<User> {
 
   @AllowNull(true)
   @Column(DataTypes.STRING(50))
-  googleId!:string; 
+  googleId!:string;
 
   /**Stores all onPush data for onPush notifications */
   @AllowNull(true)

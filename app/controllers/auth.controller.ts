@@ -5,7 +5,7 @@ import nodemailer from 'nodemailer';
 import {body} from 'express-validator/check';
 import { CustomValidators } from '../classes/CustomValidators';
 
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 import {messages} from '../middleware/common';
 import { Helper } from '../classes/Helper';
 

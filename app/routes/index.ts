@@ -16,7 +16,7 @@ import passport from "passport";
 import {join} from 'path';
 
 import jwt from "jsonwebtoken";
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 
 import passportLocal from 'passport-local';
 import passportFacebook from "passport-jwt";

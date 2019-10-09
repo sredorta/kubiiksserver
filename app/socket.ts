@@ -3,7 +3,7 @@ import socketio from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { IJwtPayload } from "./controllers/auth.controller";
 import { Helper } from './classes/Helper';
-import { AppConfig } from './utils/Config';
+import { AppConfig } from './utils/config';
 import { User } from './models/user';
 import { Role } from './models/role';
 import { messagesAll } from './middleware/common';

@@ -6,7 +6,7 @@ import { Middleware } from '../middleware/common';
 import nodemailer from 'nodemailer';
 import {body} from 'express-validator/check';
 
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 import {messages} from '../middleware/common';
 import { Email } from '../models/email';
 import { Alert } from '../models/alert';

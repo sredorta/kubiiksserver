@@ -6,7 +6,7 @@ import passsportGoogle from "passport-google-oauth";
 import {ExtractJwt} from "passport-jwt";
 import {messages} from '../middleware/common';
 import { Helper } from './Helper';
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 
 
 import { Request, Response, NextFunction } from "express";
@@ -152,8 +152,6 @@ export class Passport {
             }
             //EQUIVALENT TO LOGIN
             if (myUser) {
-                //if (profile._json.first_name) myUser.firstName = profile._json.first_name;
-                //if (profile._json.last_name) myUser.lastName = profile._json.last_name;
                 myUser.passport = "facebook";
                 myUser = await myUser.save();
                 return cb(null, myUser);

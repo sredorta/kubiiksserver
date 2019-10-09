@@ -1,6 +1,6 @@
 import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope, ForeignKey, BelongsTo} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 import { Setting } from './setting';
 
 export const SettingTranslationN = 'Not a model';

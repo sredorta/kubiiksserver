@@ -11,7 +11,7 @@ import {Op} from "sequelize";
 import { ArticleTranslation } from '../models/article_translation';
 import { Email } from '../models/email';
 import { Article } from '../models/article';
-import { AppConfig } from '../utils/Config';
+import { AppConfig } from '../utils/config';
 import passport from "passport";
 import { EmailTranslation } from '../models/email_translation';
 

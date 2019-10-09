@@ -7,7 +7,7 @@ import { messages as en} from '../i18n/en';
 import {UniqueConstraintError, ValidationErrorItem} from 'sequelize';
 import * as path from 'path';
 import * as glob  from 'glob';
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 import { plainToClass } from 'class-transformer';
 import { validate, ValidationError } from 'class-validator';
 import {HttpException} from '../classes/HttpException';

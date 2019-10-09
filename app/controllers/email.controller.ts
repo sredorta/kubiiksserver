@@ -6,7 +6,7 @@ import sequelize from 'sequelize';
 
 import { Middleware } from '../middleware/common';
 import nodemailer from 'nodemailer';
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 import {body} from 'express-validator/check';
 import { CustomValidators } from '../classes/CustomValidators';
 import { User } from '../models/user';

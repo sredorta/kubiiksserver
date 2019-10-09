@@ -4,7 +4,7 @@ import {Response,Request,NextFunction} from 'express';
 import {User} from '../models/user';
 import {Model} from 'sequelize';
 import {validate, ValidationError } from 'class-validator';
-import {AppConfig} from '../utils/Config';
+import {AppConfig} from '../utils/config';
 import * as path from 'path';
 import * as glob  from 'glob';
 
