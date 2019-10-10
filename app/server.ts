@@ -26,8 +26,8 @@ import { SocketHandler } from "./socket";
 import { Newsletter } from "./models/newsletter";
 
 //const ca =  fs.readFileSync("./ssl.ca-bundle");
-const privateKey = fs.readFileSync('server.key');
-const certificate = fs.readFileSync('server.crt');
+//const privateKey = fs.readFileSync('server.key');
+//const certificate = fs.readFileSync('server.crt');
 
 export let sockets :SocketHandler;
 
@@ -69,24 +69,11 @@ async function startServer() {
 
 
     console.log('STARTED SERVER ON PORT : ' + AppConfig.api.port);
-    //Serve with SSL or not
-    //if (!AppConfig.api.ssl)
-    
-    //    app.listen(AppConfig.api.port, () => {});
-    //else {
-        const server = http.createServer({
-    //        key: privateKey,
-    //        cert: certificate
-        }, app);
-        /*const serverSSL = https.createServer({
-                    key: privateKey,
-                    cert: certificate
-                }, app);
-        //SocketIO part
-        sockets = new SocketHandler(serverSSL);
-        sockets.listen();*/
-        //CRUD Listener
-        server.listen(AppConfig.api.port);
-    //}
+    const server = http.createServer({}, app);
+    sockets = new SocketHandler(server);
+    sockets.listen();
+    //CRUD Listener
+    server.listen(AppConfig.api.port);
+
 }
 startServer();

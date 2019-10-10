@@ -61,10 +61,11 @@ export class Disk {
         let result : string[] = [];
         for (let file of this.files) {
             let link = file.filename;
-            link = link.replace(/^.*\\public\\/,AppConfig.api.kiiserverExtHost + '/public/');
+            link = link.replace(/^.*\/public\//,AppConfig.api.kiiserverExtHost + '/public/');
             link = link.replace(/\\/g,'/')
             result.push(link);
         }
+        console.log("Link files:", result);
         return result;
     }
 
@@ -153,7 +154,7 @@ export class Disk {
             let found = null;  
             try {
                 //Default images are always in use
-                if (file.filename.includes('\\defaults\\')) {
+                if (file.filename.includes('/defaults/')) {
                     resolve(true);
                 } 
 
@@ -246,7 +247,7 @@ export class DiskController {
             let result = new DiskResult();
             try {
                 //Get all disk size
-                let dir = process.cwd() + '\\app';
+                let dir = process.cwd() + '/app';
                 let myDisk = new Disk(dir);
                 await myDisk.init();
                 result.totalSize = myDisk.getTotalSize(); 
@@ -254,13 +255,13 @@ export class DiskController {
         
         
                 //IMAGES
-                dir = process.cwd() + '\\app\\public\\images\\defaults';
+                dir = process.cwd() + '/app/public/images/defaults';
                 myDisk = new Disk(dir);
                 await myDisk.init();
                 result.images.push(['defaults', myDisk.getInUseSize() ]);
 
                 //Avatar pictures
-                dir = process.cwd() + '\\app\\public\\images\\avatar';
+                dir = process.cwd() + '/app/public/images/avatar';
                 myDisk = new Disk(dir);
                 await myDisk.init();
                 for (let file of myDisk.files) {
@@ -275,7 +276,7 @@ export class DiskController {
 
 
 
-                dir = process.cwd() + '\\app\\public\\images\\content';
+                dir = process.cwd() + '/app/public/images/content';
                 myDisk = new Disk(dir);
                 await myDisk.init();
                 for (let file of myDisk.files) {
@@ -288,7 +289,7 @@ export class DiskController {
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
                 result.images.push(['content', myDisk.getTotalSize() ]);
 
-                dir = process.cwd() + '\\app\\public\\images\\blog';
+                dir = process.cwd() + '/app/public/images/blog';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
@@ -303,7 +304,7 @@ export class DiskController {
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
                 result.images.push(['blog', myDisk.getTotalSize() ]);
 
-                dir = process.cwd() + '\\app\\public\\images\\email';
+                dir = process.cwd() + '/app/public/images/email';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
@@ -319,7 +320,7 @@ export class DiskController {
                 result.images.push(['email', myDisk.getTotalSize() ]);
 
 
-                dir = process.cwd() + '\\app\\public\\images\\products';
+                dir = process.cwd() + '/app/public/images/products';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
@@ -336,7 +337,7 @@ export class DiskController {
 
 
                 //VIDEOS
-                dir = process.cwd() + '\\app\\public\\videos\\blog';
+                dir = process.cwd() + '/app/public/videos/blog';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
@@ -351,7 +352,7 @@ export class DiskController {
                 result.removableSize = result.removableSize+myDisk.getNotInUseSize();
                 result.videos.push(['blog', myDisk.getTotalSize() ]);
  
-                dir = process.cwd() + '\\app\\public\\videos\\content';
+                dir = process.cwd() + '/app/public/videos/content';
                 //Now find all images create a list
                 myDisk = new Disk(dir);
                 await myDisk.init();
@@ -428,7 +429,7 @@ export class DiskController {
 
     /**Gets all available videos */
     static getVideos = async(req: Request, res: Response, next: NextFunction) => { 
-        let dir = process.cwd() + '\\app\\public\\videos';
+        let dir = process.cwd() + '/app/public/videos';
         let myDisk = new Disk(dir);
         try {
             await myDisk.init();
@@ -448,7 +449,7 @@ export class DiskController {
 
     /**Gets all available images */
     static getImages = async(req: Request, res: Response, next: NextFunction) => { 
-        let dir = process.cwd() + '\\app\\public\\images\\' + req.body.disk;
+        let dir = process.cwd() + '/app/public/images/' + req.body.disk;
         let myDisk = new Disk(dir);
         try {
             await myDisk.init();
@@ -469,37 +470,37 @@ export class DiskController {
 
     /**Uploads image to content folder and returns imageUrl for angular-editor*/
     static uploadImageToContent = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({imageUrl: "https://localhost:3000/public/images/content/" + req.file.filename});  
+        res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/content/" + req.file.filename});  
     }
 
     /**Uploads image to blog folder and returns imageUrl for angular-editor*/
     static uploadImageToBlog = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({imageUrl: "https://localhost:3000/public/images/blog/" + req.file.filename});  
+        res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/blog/" + req.file.filename});  
     }
 
 
     /**Uploads image to email folder and returns imageUrl for angular-editor*/
     static uploadImageToEmail = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({imageUrl: "https://localhost:3000/public/images/email/" + req.file.filename});  
+        res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/email/" + req.file.filename});  
     }    
 
     /**Uploads image to email folder and returns imageUrl for angular-editor*/
     static uploadImageToDefaults = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({imageUrl: "https://localhost:3000/public/images/defaults/" + req.file.filename});  
+        res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/defaults/" + req.file.filename});  
     }    
 
     /**Uploads image to avatar folder and returns imageUrl for angular-editor*/
     static uploadImageToAvatar = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({imageUrl: "https://localhost:3000/public/images/avatar/" + req.file.filename});  
+        res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/avatar/" + req.file.filename});  
     }   
 
     /**Uploads video to the content folder*/
     static uploadVideoToContent = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({videoUrl: "https://localhost:3000/public/videos/content/" + req.file.filename});  
+        res.send({videoUrl: AppConfig.api.kiiserverExtHost+"/public/videos/content/" + req.file.filename});  
     } 
     /**Uploads video to the blog folder*/
     static uploadVideoToBlog = async (req: Request, res: Response, next:NextFunction) => {
-        res.send({videoUrl: "https://localhost:3000/public/videos/blog/" + req.file.filename});  
+        res.send({videoUrl: AppConfig.api.kiiserverExtHost+"/public/videos/blog/" + req.file.filename});  
     }     
 
 }

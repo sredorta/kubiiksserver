@@ -1,4 +1,4 @@
-import https from 'https';
+import http from 'http';
 import socketio from 'socket.io';
 import jwt from 'jsonwebtoken';
 import { IJwtPayload } from "./controllers/auth.controller";
@@ -117,7 +117,7 @@ export class SocketHandler  {
     chatMessages : IChatMessage[] = [];
 
 
-    constructor(server:https.Server,) {
+    constructor(server:http.Server,) {
         this.io = socketio(server);
     }
 
