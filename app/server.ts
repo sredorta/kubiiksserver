@@ -4,6 +4,7 @@ import {Sequelize, addHook} from 'sequelize-typescript';
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
+import * as dotenv from "dotenv";
 
 import {Setting} from './models/setting';
 import {User} from './models/user';
@@ -31,20 +32,30 @@ import { Newsletter } from "./models/newsletter";
 
 export let sockets :SocketHandler;
 
+if (!process.env.NODE_ENV) {
+  console.error("NODE_ENV not set !!!, please use set NODE_ENV = value  or export NODE_ENV = value")
+}
+let mydir :string = __dirname;
+if (String(process.env.NODE_ENV).includes("production") || String(process.env.NODE_ENV).includes("vps")) {
+  mydir = process.cwd() + '/build';
+} else {
+  mydir = process.cwd()+ '/app';
+}
+
 const sequelize = new Sequelize({
     logging: false,
     database: AppConfig.db.database,
     dialect: "mariadb",
     username: AppConfig.db.username,
     password: AppConfig.db.password,
-    modelPaths: [__dirname + './models/*'],
+    modelPaths: [mydir + './models/*'],
     modelMatch: (filename, member) => {
       filename = filename.replace("_", "");
       return filename === member.toLowerCase();
     },
   });
   //Create all models
-  sequelize.addModels([__dirname + '/models']);
+  sequelize.addModels([mydir + '/models']);
 
 async function startServer() {  
    //await sequelize.sync();
@@ -65,8 +76,9 @@ async function startServer() {
     });
 
     //Serve static files   
-    app.use('/public', express.static(__dirname + '/public', { maxAge: '1y' }));
-
+    app.use('/public', express.static(process.cwd() + '/app/public', { maxAge: '1y' }));
+ 
+    
 
     console.log('STARTED SERVER ON PORT : ' + AppConfig.api.port);
     const server = http.createServer({}, app);

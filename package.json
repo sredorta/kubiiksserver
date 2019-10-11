@@ -6,9 +6,9 @@
   "scripts": {
     "test": "test.js",
     "tsc": "tsc",
-    "dev": "ts-node-dev --respawn --transpileOnly ./app/server.ts",
-    "prod": "tsc && node ./build/server.js",
-    "kk": "test"
+    "dev": "set NODE_ENV=development && ts-node-dev --respawn --transpileOnly ./app/server.ts",
+    "prod": "set NODE_ENV=production && tsc && node ./build/server.js",
+    "vps": "set NODE_ENV=vps && tsc"
   },
   "author": "",
   "license": "ISC",

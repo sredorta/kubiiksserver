@@ -289,7 +289,7 @@ export class Email extends Model<Email> {
 
         let myEmail = await Email.create({
             name: "reference",
-            logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",  
+            logo: AppConfig.api.kiiserverExtHost+"/public/images/defaults/no-photo-available.jpg",  
             isProtected: true  
         });                    
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele de courriel de reference pour tous les nouveaux modeles",title:"Mon titre",subtitle:"Mon soustitre",header:"<h1>Exemple entete email</h1>",content:"<h1>Exemple de contenu</h1>"});  
@@ -300,7 +300,7 @@ export class Email extends Model<Email> {
 
         myEmail = await Email.create({
             name: "validate-email",
-            logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg",  
+            logo: AppConfig.api.kiiserverExtHost+"/public/images/defaults/no-photo-available.jpg",  
             isProtected: true  
         });                    
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la validation de compte de courriel client",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
@@ -310,7 +310,7 @@ export class Email extends Model<Email> {
 
         myEmail = await Email.create({
           name: "reset-password",
-          logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg", 
+          logo: AppConfig.api.kiiserverExtHost+"/public/images/defaults/no-photo-available.jpg", 
           isProtected: true  
         });                    
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la demande de nouveau mot de passe",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  
@@ -320,7 +320,7 @@ export class Email extends Model<Email> {
 
         myEmail = await Email.create({
           name: "contact-reply",
-          logo: "https://localhost:3000/public/images/defaults/no-photo-available.jpg", 
+          logo: AppConfig.api.kiiserverExtHost+"/public/images/defaults/no-photo-available.jpg", 
           isProtected: true  
         });                    
         await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé comme réponse automatique au formulaire de contact",title:"titre 1",subtitle:"subtitre fr 1",header:"<h1>Entete email</h1>",content:"<h1>contenu 1</h1>"});  

@@ -34,6 +34,7 @@ import { AlertController } from '../controllers/alert.controller';
 import { StatController } from '../controllers/stat.controller';
 import { DiskController } from '../controllers/disk.controller';
 import { NewsletterController } from '../controllers/newsletter.controller';
+import { config } from 'bluebird';
 
 
 
@@ -44,10 +45,11 @@ export class Routes {
   public routes(app:Router): void {
   
     /**Gets api description */
-    app.route('/')
+    app.route('/api/description')
         .get((req: Request, res: Response, next: NextFunction) => {            
-          res.status(200).send({
-                message: messages.description
+          res.status(200).json({
+                message: messages.description,
+                api:AppConfig.api
             });
     });
 

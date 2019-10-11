@@ -1,15 +1,20 @@
 import * as dotenv from "dotenv";
 
     let path;
-    switch (process.env.NODE_ENV) {
+    console.log(`NODE_ENV -> ${process.env.NODE_ENV}`);
+
+    switch (String(process.env.NODE_ENV).replace(/ /g,'')) {
          case "test":
-           path = `${__dirname}/../../.env.test`;
+           path = process.cwd()+'/.env.test';
            break;
          case "production":
-           path = `${__dirname}/../../.env.production`;
+           path = process.cwd()+'/.env.production';
            break;
+        case "vps":
+           path = process.cwd()+'/.env.vps';
+           break;           
          default:
-           path = `${__dirname}/../../.env.development`;
+           path = process.cwd()+'/.env.development';
     }
     dotenv.config({ path: path });
 
@@ -71,3 +76,8 @@ import * as dotenv from "dotenv";
             {"key": "article_cathegories", "value":"content,blog,prix,realisations"}, //Article cathegories
         ],
     }
+    console.log("-----  API SETTINGS  ------")
+    console.log(AppConfig.api);
+    console.log(AppConfig.db);
+    console.log('---------------------------');
+    console.log("\nPreparing database...\n");

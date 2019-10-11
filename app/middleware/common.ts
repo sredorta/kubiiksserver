@@ -30,7 +30,6 @@ export let messagesAll : string[] = [];
 export class Middleware {
     //Handle cors for the api
     public static cors() {
-        console.log("Cors enabled !!!");
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             //Enabling CORS
             //res.header("Access-Control-Allow-Origin", AppConfig.api.host + ":"+ AppConfig.api.fePort);
@@ -44,7 +43,6 @@ export class Middleware {
 
     /**Sets the onPush vapid notifications details */
     public static onPush() {
-        console.log("OnPUSH enabled !!!");
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             webPush.setVapidDetails('https://www.kubiiks.com', AppConfig.auth.onPush.public,AppConfig.auth.onPush.private);
             next();
@@ -54,7 +52,6 @@ export class Middleware {
 
     //Set language based on headers and supported languages in req.language
     public static language() {
-        console.log("Language enabled !!");
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
             //Languages supported
             const acceptableLanguages = glob.sync(process.cwd() + '/app/i18n/*.ts')
@@ -86,7 +83,6 @@ export class Middleware {
 
     //Handle all errors !
     public static errorHandler() {
-        console.log("errorHandler enabled !!!");
         return function errorMiddleware(error: HttpException, request: Request, response: Response, next: NextFunction) {
             console.log("Running errorHandler !");
             console.log("//////////////////////////////////////////////");

@@ -51,6 +51,7 @@ export class Disk {
                 : filelist.concat(path.join(dir, file));
           
             });
+
           return filelist;
         }
         return walkSync(dir,fileList);
@@ -61,8 +62,11 @@ export class Disk {
         let result : string[] = [];
         for (let file of this.files) {
             let link = file.filename;
+            console.log("Before replace:",link);
             link = link.replace(/^.*\/public\//,AppConfig.api.kiiserverExtHost + '/public/');
+            link = link.replace(/^.*\\public\\/,AppConfig.api.kiiserverExtHost + '/public/');
             link = link.replace(/\\/g,'/')
+            console.log("After replace:",link);
             result.push(link);
         }
         console.log("Link files:", result);
@@ -500,6 +504,7 @@ export class DiskController {
     } 
     /**Uploads video to the blog folder*/
     static uploadVideoToBlog = async (req: Request, res: Response, next:NextFunction) => {
+        console.log("videoURL:",AppConfig.api.kiiserverExtHost+"/public/videos/blog/" + req.file.filename);
         res.send({videoUrl: AppConfig.api.kiiserverExtHost+"/public/videos/blog/" + req.file.filename});  
     }     
 

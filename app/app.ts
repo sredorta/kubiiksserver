@@ -25,8 +25,7 @@ class App {
     private config(): void {
         //Setup views setting
         this.app.set("view engine", "pug"); 
-        this.app.set("views", path.join(__dirname, "views"));
-        //console.log(`Current NODE_ENV is ${process.env.NODE_ENV}`);
+        this.app.set("views", path.join(process.cwd()+'/app', "views"));
 
     }
 
