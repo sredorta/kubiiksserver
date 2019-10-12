@@ -75,6 +75,8 @@ export const messages = {
     newsletterUnsubscribed: 'You are not registered to the newsletter anymore',
     newsletterMissing: "The email account you are providing is not registered",
 
+    fileTooLarge: "File too large",
+
 
     messageSent: 'Your message has been sent',
     saved : 'Your modifications have been saved',

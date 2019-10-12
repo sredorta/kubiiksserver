@@ -73,7 +73,7 @@ export const messages = {
     newsletterUnsubscribed: "L'adreça de correu electrònic s'ha donat de baixa als butlletins informatius",
     newsletterMissing: "No s'ha pogut trobar cap compte de correu electrònic donat d'alta als butlletins informatius",
 
-
+    fileTooLarge: "Fitxer massa gran",
 
     messageSent: 'El missatge ha estat enviat',
     saved : 'Modificacions guardades correctament',

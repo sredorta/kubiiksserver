@@ -74,6 +74,8 @@ export const messages = {
     newsletterUnsubscribed: "Vous ne recevrez plus nos bulletins d'information",
     newsletterMissing: "Ce compte de courriel n'est pas enregistré pour les bulletins d'information",
 
+    fileTooLarge: "Fichier trop volumineux",
+
     messageSent: 'Votre message à bien été envoyé',
     saved : 'Modifications enregistrées correctement',
 

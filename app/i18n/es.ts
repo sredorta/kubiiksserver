@@ -73,6 +73,8 @@ export const messages = {
     newsletterUnsubscribed: "Ya no recevera mas los bolletines informativos en esta cuenta de correo electronico",
     newsletterMissing: "Esta cuenta de correo no esta dada de alta para los bolletines informativos",
 
+    fileTooLarge: "Fichero demasiado voluminoso",
+
 
     messageSent: 'Su mensaje a sido enviado',
     saved : 'Modificaciones guardadas correctamente',

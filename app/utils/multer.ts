@@ -3,6 +3,11 @@ import {join} from 'path';
 import fs from 'fs';
 import path from 'path';
 import Jimp from 'jimp';
+import { Helper } from "../classes/Helper";
+let messagesAll = Helper.translations();
+
+const MAX_IMAGE_SIZE = 1024*1024*2;   //2M
+const MAX_VIDEO_SIZE = 1024*1024*100; //100M 
 
 /**videos of content*/  
 const storageVideosContent = multer.diskStorage({    
@@ -52,7 +57,8 @@ const storageImagesBlog = multer.diskStorage({
     },
     filename: function(req, file, cb) {
       cb(null, file.originalname);
-    }
+    },
+
   });
 
   /**Images of email */
@@ -86,18 +92,54 @@ const storageImagesProducts = multer.diskStorage({
   });    
 
 
-const uploadsVideosContent = multer({ storage: storageVideosContent });
-const uploadsVideosBlog = multer({ storage: storageVideosBlog });
+/**Parses header and checks file size before uploading */
+const imageFilter = (req:any, file:any, callback:any) => {
+    try {
+      const headers : string[] = req.rawHeaders;
+      const index = headers.indexOf("content-length");
+      const size = headers[index+1];
+      if (Number(size) > MAX_IMAGE_SIZE) {
+        return callback(new Error(messagesAll[req.user.language].fileTooLarge));
+      }
+      callback(null, true)
+    } catch (error) {
+      callback(null, true)
+    }
+}  
+
+/**Parses header and checks file size before uploading */
+const videoFilter = (req:any, file:any, callback:any) => {
+  try {
+    const headers : string[] = req.rawHeaders;
+    const index = headers.indexOf("content-length");
+    const size = headers[index+1];
+    if (Number(size) > MAX_VIDEO_SIZE) {
+      return callback(new Error(messagesAll[req.user.language].fileTooLarge));
+    }
+    callback(null, true)
+  } catch (error) {
+    callback(null, true)
+  }
+}  
 
 
-const uploadsImagesContent = multer({ storage: storageImagesContent});//,limits:{fileSize:1024*1024*1} });
-const uploadsImagesBlog = multer({ storage: storageImagesBlog});//,limits:{fileSize:1024*1024*1}});
-const uploadsImagesEmail = multer({ storage: storageImagesEmail });
-const uploadsImagesAvatar = multer({ storage: storageImagesAvatars });
+function getFilesizeInBytes(filename:string) {
+  var stats = fs.statSync(filename)
+  var fileSizeInBytes = stats["size"]
+  return fileSizeInBytes
+}
+const uploadsVideosContent = multer({ storage: storageVideosContent,limits:{fileSize:MAX_VIDEO_SIZE}, fileFilter: videoFilter });
+const uploadsVideosBlog = multer({ storage: storageVideosBlog,limits:{fileSize:MAX_VIDEO_SIZE}, fileFilter: videoFilter });
 
-const uploadsDefaults = multer({ storage: storageDefaults });
 
-const uploadsImagesProducts = multer({ storage: storageImagesProducts });
+const uploadsImagesContent = multer({ storage: storageImagesContent,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter });
+const uploadsImagesBlog = multer({ storage: storageImagesBlog ,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter});
+const uploadsImagesEmail = multer({ storage: storageImagesEmail,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter });
+const uploadsImagesAvatar = multer({ storage: storageImagesAvatars,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter });
+
+const uploadsDefaults = multer({ storage: storageDefaults,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter });
+
+const uploadsImagesProducts = multer({ storage: storageImagesProducts,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter});
 
 const uploads = {
     videosContent:     uploadsVideosContent,

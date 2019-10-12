@@ -14,6 +14,7 @@ import { Article } from '../models/article';
 import { AppConfig } from '../utils/config';
 import passport from "passport";
 import { EmailTranslation } from '../models/email_translation';
+import {CustomValidators} from '../classes/CustomValidators';
 
 
 /**Enumerator with all stats events*/
@@ -506,6 +507,6 @@ export class DiskController {
     static uploadVideoToBlog = async (req: Request, res: Response, next:NextFunction) => {
         console.log("videoURL:",AppConfig.api.kiiserverExtHost+"/public/videos/blog/" + req.file.filename);
         res.send({videoUrl: AppConfig.api.kiiserverExtHost+"/public/videos/blog/" + req.file.filename});  
-    }     
+    }       
 
 }
