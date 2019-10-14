@@ -24,6 +24,7 @@ export class InitController {
         try {
             let result : any = {};
             let settings = await Setting.findAll();
+            let myUser = null;
             if (settings) 
                 result["settings"] = [];
             for (let setting of settings) {
@@ -34,7 +35,9 @@ export class InitController {
             for (let article of articles) 
                 result["articles"].push(article.sanitize(res.locals.language));
             if (req.user)    
-                result["user"] = await User.scope("details").findByPk(req.user.id);
+                 myUser = await User.scope("details").findByPk(req.user.id);
+                 if (myUser)
+                    result["user"] = myUser.sanitize(res.locals.language);
             else    
                 result["user"] = null;    
             res.json(result);

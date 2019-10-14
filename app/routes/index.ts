@@ -46,7 +46,12 @@ export class Routes {
   
     /**Gets api description */
     app.route('/api/description')
-        .get((req: Request, res: Response, next: NextFunction) => {            
+        .get((req: Request, res: Response, next: NextFunction) => {   
+          User.scope("details").findByPk(1).then(res => {
+            if (res)
+              console.log(JSON.parse(JSON.stringify(res)));
+          });
+
           res.status(200).json({
                 message: messages.description,
                 api:AppConfig.api

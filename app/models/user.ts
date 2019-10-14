@@ -1,4 +1,4 @@
-import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany,HasMany, Is} from 'sequelize-typescript';
+import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes, BelongsToMany,HasMany, Is, AfterFind} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import jwt from "jsonwebtoken";
 import {AppConfig} from '../utils/config';
@@ -136,6 +136,23 @@ export class User extends Model<User> {
     hooks: true})
   alerts!: Alert[];  
 
+  /**Sanitize alerts with correct language*/
+  public sanitize(iso:string) {
+    let element = JSON.parse(JSON.stringify(this));
+    if (element.alerts) {
+      let alerts : Alert[] = [];
+      for (let alert of element.alerts) {
+        let translated = alert.translations.find((obj:any) => obj.iso == iso);
+        if (translated) {
+          alert.title = translated.title;
+          if (alert.message== null) alert.message = translated.message; //Only translate if message is null
+        }
+        alerts.push(alert);
+      }
+    }
+    return element
+  }
+
   /**Sends onPush notification to user if any subscription */
   public async notify(title:string,body:string) {
 
@@ -145,11 +162,6 @@ export class User extends Model<User> {
       async function _getData(title:string,body:string) {
         try {
           if (myObj.onPush) {
-            //Get logo from settings
-            /*let siteUrl = await Setting.findOne({where:{key:"url"}});
-            if (!siteUrl) {
-                throw new Error("Could not find siteUrl");
-            }*/
             let urlBase = AppConfig.api.kiiserverExtHost + "/public/images/defaults/";
             //Get baseURL from settings
             const subscription = JSON.parse(myObj.onPush);

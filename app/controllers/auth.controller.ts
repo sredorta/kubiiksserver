@@ -210,7 +210,8 @@ export class AuthController {
         //Sending back user
         try {
             let myUser = await User.scope("details").findByPk(req.user.id);
-            res.json(myUser);
+            if (myUser)
+                res.json(myUser.sanitize(res.locals.language));
         } catch(error) {
             next(new HttpException(500, error.message, error.errors));
         }        

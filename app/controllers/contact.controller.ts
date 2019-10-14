@@ -13,6 +13,7 @@ import { Role } from '../models/role';
 import { Helper } from '../classes/Helper';
 
 import {sockets} from '../server';
+import { AlertTranslation } from '../models/alert_translation';
 
 
 export class ContactController {
@@ -35,14 +36,15 @@ export class ContactController {
             let recipients = [];
             recipients.push(req.body.email);
             let messagesAll = Helper.translations();
-
             //We add element in the alerts table and we send onPush to admins
             //Find all admin users and add alert
             let myUsers = await User.scope("fulldetails").findAll({include: [{model:Role, where: {name: "admin"}}]});
             for (let myUser of myUsers) {
-                let myAlert = await Alert.create({userId:myUser.id, type:"email", title:messagesAll[myUser.language].notificationContactEmail,  message:req.body.subject + '\n' + req.body.message, isRead:false});
+                let myAlert = await Alert.create({userId:myUser.id, type:"email", title:null,  message:req.body.subject + '\n' + req.body.message, isRead:false});
                 if (!myAlert) throw Error("Could not create alert");
-
+                for (let iso of Middleware.languagesSupported()) {
+                    await AlertTranslation.create({alertId:myAlert.id,iso:iso,title:messagesAll[iso].notificationContactEmail,message:null})
+                }
                 //Send through socket the updated user with the new alerts so that FE can update
                 sockets.updateAuth(myUser.id);
                 //Send push notif to all admins !!!
@@ -54,6 +56,7 @@ export class ContactController {
             res.send({message: {show:true, text:messages.messageSent}});
 
         } catch(error) {
+            console.log(error);
             next(new HttpException(500, messages.emailSentError,null));
         }        
         //TODO: PUSH NOTIFICATION TO ADMIN USERS !!!!

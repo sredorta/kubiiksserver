@@ -18,6 +18,8 @@ import { Article } from "./models/article";
 import { Email } from "./models/email";
 import { ArticleTranslation } from "./models/article_translation";
 import { Alert } from "./models/alert";
+import { AlertTranslation } from "./models/alert_translation";
+
 import { Routes } from "./routes";
 import socketio from 'socket.io';
 import { Helper } from "./classes/Helper";
@@ -26,9 +28,6 @@ import { IJwtPayload } from "./controllers/auth.controller";
 import { SocketHandler } from "./socket";
 import { Newsletter } from "./models/newsletter";
 
-//const ca =  fs.readFileSync("./ssl.ca-bundle");
-//const privateKey = fs.readFileSync('server.key');
-//const certificate = fs.readFileSync('server.crt');
 
 export let sockets :SocketHandler;
 
@@ -86,6 +85,6 @@ async function startServer() {
     sockets.listen();
     //CRUD Listener
     server.listen(AppConfig.api.port);
-
+    
 }
 startServer();

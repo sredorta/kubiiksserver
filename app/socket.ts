@@ -6,11 +6,12 @@ import { Helper } from './classes/Helper';
 import { AppConfig } from './utils/config';
 import { User } from './models/user';
 import { Role } from './models/role';
-import { messagesAll } from './middleware/common';
+import { messagesAll, Middleware } from './middleware/common';
 import { Alert } from './models/alert';
 import { Socket } from 'dgram';
 import { breakStatement } from 'babel-types';
 import { createRegularExpressionLiteral } from 'typescript';
+import { AlertTranslation } from './models/alert_translation';
 
 /**Enumerator with all socket events*/
 export enum SocketEvents {
@@ -99,7 +100,7 @@ export interface ISocketToken {
 
 export class SocketHandler  {
     /**Contains array of messages in all languages */
-    private messagesAll = Helper.translations();
+    public messagesAll = Helper.translations();
     
     /**Contains the socket server */
     private io : socketio.Server;
@@ -347,7 +348,10 @@ export class SocketHandler  {
         const connection = this.findConnectionByUserId(userId); 
         if (connection)
           if (connection.socket) {
+            console.log(connection);
             User.scope("details").findByPk(userId).then(user => {
+              console.log("User is:", user);
+              if (user) user = user.sanitize(user.language);
               connection.socket.emit(SocketEvents.UPDATE_USER,user);
             })
           }
@@ -387,21 +391,7 @@ export class SocketHandler  {
             break;
           case ChatDataType.FirstMessage:
             if (!this.isChatAdminUser(socket)) {
-                User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]}).then(users => {
-                  for (let user of users) {
-                    user.notify(this.messagesAll[user.language].notificationNewChat,data.object.message.message);
-                    //Add alert and send update to user
-                    Alert.create({userId:user.id,type:"chat",title:this.messagesAll[user.language].notificationNewChat,message:data.object.message.message}).then(res => {
-                      User.scope("details").findByPk(user.id).then(userChatAdmin => {
-                        if (userChatAdmin) {
-                          let connection = this.findConnectionByUserId(userChatAdmin.id);
-                          if (connection)
-                            connection.socket.emit(SocketEvents.UPDATE_USER,userChatAdmin);
-                        }
-                      })
-                    })
-                  }
-                });
+                this.notifyAdmins(data);
                 //Tell to all already connected admins all the available chat rooms
                 let myRooms : IChatRoom[] = this.getChatRooms();
                 socket.broadcast.to(SocketRooms.CHAT_ADMIN).emit(SocketEvents.CHAT_DATA, {room:null, type:ChatDataType.WaitingRooms, object:{rooms:myRooms}});
@@ -455,6 +445,40 @@ export class SocketHandler  {
     });
   }
 
+  /** Notify all admins new chat is there by sending onPush and adding new Alert in the database*/
+  public notifyAdmins(data:any) {
+    let myPromise : Promise<boolean>;
+    let messagesAll = Helper.translations();
+    let myObj = this;
+    myPromise =  new Promise<boolean>((resolve,reject) => {
+      async function _getData() {
+        try {
+          //Notify all users !!!
+          let users = await User.scope("full").findAll({include: [{model:Role, where: {name: "chat"}}]});
+          for (let user of users) {
+              //Send onPush
+              user.notify(messagesAll[user.language].notificationNewChat,data.object.message.message);
+              //Create alerts on all admin chats users
+              let myAlert = await Alert.create({userId:user.id, type:"chat", title:null, message:data.object.message.message, isRead:false})
+              for (let iso of Middleware.languagesSupported()) {
+                await AlertTranslation.create({alertId:myAlert.id,iso:iso,title:messagesAll[iso].notificationNewChat,message:null})
+              }
+              let userChatAdmin = await User.scope("details").findByPk(user.id);
+              if (userChatAdmin) {
+                let connection = myObj.findConnectionByUserId(userChatAdmin.id);
+                if (connection)
+                  connection.socket.emit(SocketEvents.UPDATE_USER,userChatAdmin.sanitize(userChatAdmin.language));
+              }
+          }
+          resolve(true);
+        } catch(error) {
+           reject("Notification failed");
+        }
+      }
+      _getData();
+    });
+    return myPromise;
+  }
 
 
 }
