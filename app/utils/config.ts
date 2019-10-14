@@ -57,6 +57,7 @@ import * as dotenv from "dotenv";
             "jwtSecret": <string>process.env.AUTH_JWT_SECRET,
             "accessShort": <string>process.env.AUTH_ACCESS_SHORT,
             "accessLong": <string>process.env.AUTH_ACCESS_LONG,
+            "accessAdmin": <string>process.env.AUTH_ACCESS_ADMIN,
             "facebook": {
                 "clientId": <string>process.env.AUTH_FACEBOOK_CLIENT_ID,
                 "clientSecret": <string>process.env.AUTH_FACEBOOK_CLIENT_SECRET

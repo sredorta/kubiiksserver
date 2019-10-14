@@ -205,11 +205,22 @@ export class User extends Model<User> {
   }
 
   /**Generates a token */
-  public createToken(time: "short" | "long") {
-    let expires = AppConfig.auth.accessLong;
-    if (time == "short") {
-      expires = AppConfig.auth.accessShort;
+  public createToken(time: "short" | "long"  | "admin") {
+    if (this.hasAnyRole()) time = "admin";
+    console.log("CREATING TOKEN :",time);
+    let expires = AppConfig.auth.accessShort;
+    switch (time) {
+       case "admin": 
+          console.log("Creating token with access of 100d !");
+          expires = AppConfig.auth.accessAdmin;
+          break;
+       case "long":
+          expires = AppConfig.auth.accessShort;
+          break;
+       default:
+          expires = AppConfig.auth.accessShort;
     }
+
     const payload : IJwtPayload = {
       id: this.id 
     }
@@ -233,6 +244,11 @@ export class User extends Model<User> {
           if (this.roles.findIndex(obj => obj.id == role) >= 0 || this.roles.findIndex(obj => obj.id == 1)>=0) return true;
           else return false;
       }              
+  }
+
+  /**Checks if user has any special role */
+  public hasAnyRole() : boolean {
+    return this.roles.length>0;
   }
 
   /**Attaches a specif role to the user */

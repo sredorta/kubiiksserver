@@ -62,7 +62,8 @@ export class AuthController {
             if (myUser.id ==1)
                 await myUser.attachRole("kubiiks"); 
 
-
+            let myUserTmp = await User.scope("details").findByPk(myUser.id);
+            if (myUserTmp) myUser = myUserTmp;
             //Depending on the validation method we need to authenticate or not
             switch (method) {
                 case "no_validation": {
@@ -137,12 +138,14 @@ export class AuthController {
     ///////////////////////////////////////////////////////////////////////////
     //When any of the oauth2 gets a success then redirect to /login/success and provide the token we have generated
     //Angular should recover the token from the page and redirect to home afterwards if all fields are ok, if not ask user to enter fields
-    static oauth2Success =  (req:Request, res:Response,next:NextFunction) => {
-            const payload : IJwtPayload = {id: req.user.id};
-      
-            //We just need to create a token and provide it
-            const token = jwt.sign( payload, AppConfig.auth.jwtSecret, { expiresIn: AppConfig.auth.accessShort });
-            res.redirect(AppConfig.api.kiiwebExtHost+"/login/validate/"+token);      
+    static oauth2Success =  (req:Request, res:Response,next:NextFunction) => {      
+        //We just need to create a token and provide it
+        User.scope("details").findByPk(req.user.id).then(user => {
+            if (user) {
+                let token = user.createToken('short');
+                res.redirect(AppConfig.api.kiiwebExtHost+"/login/validate/"+token);      
+            }
+        });    
     }
 
     //When any of the oauth2 gets a fail then redirect to /login/fail
@@ -298,6 +301,8 @@ export class AuthController {
                 myUser.emailValidationKey = Helper.generateRandomString(30);
                 await myUser.save();
                 //Generate a token
+                let myUserTmp = await User.scope("details").findByPk(myUser.id);
+                if (myUserTmp) myUser = myUserTmp;
                 let token = myUser.createToken("short");
                 myUser = await User.scope("details").findByPk(req.body.id);
                 res.send({user:myUser,token:token,message: {show:true, text:messages.authEmailValidateSuccess}});
