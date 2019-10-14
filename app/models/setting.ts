@@ -156,6 +156,12 @@ export class Setting extends Model<Setting> {
             value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/logo.jpg"
         });
 
+        mySetting = await Setting.create({
+          type: "seo",
+          key: "fb_app_id",
+          value: "2088315884799260"
+        });
+
 
         mySetting = await Setting.create({
             type: "seo",
