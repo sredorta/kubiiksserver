@@ -34,7 +34,6 @@ import { AlertController } from '../controllers/alert.controller';
 import { StatController } from '../controllers/stat.controller';
 import { DiskController } from '../controllers/disk.controller';
 import { NewsletterController } from '../controllers/newsletter.controller';
-import { config } from 'bluebird';
 
 
 
@@ -56,6 +55,12 @@ export class Routes {
                 message: messages.description,
                 api:AppConfig.api
             });
+    });
+
+    /**Returns if connection to server works */
+    app.route('/api/connected')
+        .get((req:Request, res: Response, next: NextFunction) => {
+          res.status(200).json({status:true});
     });
 
     //ACCESS CONTROL:
