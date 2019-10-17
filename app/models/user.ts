@@ -170,8 +170,8 @@ export class User extends Model<User> {
                 title: title,
                 body: body,
                 icon: urlBase + 'logo.jpg',
-                vibrate: [100, 50, 100],
-                action:"",
+                vibrate: [150, 50, 150],
+                action:AppConfig.api.kiiwebExtHost,
                 data: {
                   url: AppConfig.api.kiiwebExtHost,
                 }

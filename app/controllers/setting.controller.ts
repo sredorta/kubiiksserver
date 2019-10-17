@@ -17,6 +17,7 @@ import htmlToText from 'html-to-text';
 import InlineCss from 'inline-css';
 import { IsPhoneNumber } from 'class-validator';
 import { Email } from '../models/email';
+import { isBooleanLiteral } from 'babel-types';
 
 export class SettingController {
 
@@ -71,5 +72,29 @@ export class SettingController {
         ]
     }
 
+    /**Update value of popup dialog, it requires content rights */
+    static updateDialog = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let mySetting = await Setting.scope("full").findByPk(req.body.setting.id);
+            if (!mySetting) throw new Error("Setting not found");
+            mySetting.value = req.body.setting.value;
+            await mySetting.save();
+            res.json(mySetting.sanitize(res.locals.language));
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));    
+        }
+
+    }
+
+    /**UpdateDialog checks */
+    static updateDialogChecks() {
+        return [
+            body('setting.id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,'id')),
+            body('setting.type').exists().withMessage('exists').contains('dialog'),
+            body('setting.key').exists().withMessage('exists').contains('popup-show'),
+            body('setting.value').exists().withMessage('exists').isLength({min:4}),
+            Middleware.validate()
+        ]
+    }    
 
 }

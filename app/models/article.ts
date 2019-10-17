@@ -92,7 +92,19 @@ export class Article extends Model<Article> {
   public static seed() {
     async function _seed() {
 
-        let myArticle = await Article.create({
+      let myArticle = await Article.create({
+        cathegory: "dialog",
+        key:"dialog-initial",
+        image:null
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Dialogue initiale",description:"Dialogue initial qui apparait apres 5s",content:"<h1>Mon dialoge</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Initial dialog",description:"Initial dialog that appears after 5s",content:"<h1>My dialog</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Dialogo inicial",description:"Dialogo inicial que aparece after 5s",content:"<h1>Mi dialogo</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Diàleg inicial",description:"Diàleg inicial que apareix despres de 5s",content:"<h1>El meu dialeg</h1>"});                      
+
+
+
+        myArticle = await Article.create({
                 cathegory: "realisations",
                 image:null
         });                    

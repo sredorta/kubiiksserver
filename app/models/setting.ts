@@ -85,6 +85,15 @@ export class Setting extends Model<Setting> {
                 value: item.value
             });                
         }     
+
+      //Show or hide popup dialog
+      mySetting = await Setting.create({
+          type: "dialog",
+          key: "popup-show",
+          value: "disabled"
+      });        
+
+
         /*social*/
         mySetting = await Setting.create({
             type: "social",

@@ -106,6 +106,9 @@ export class Routes {
     app.route('/api/setting/update')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),SettingController.updateChecks(),SettingController.update);
 
+    app.route('/api/setting/update-dialog')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.updateDialogChecks(),SettingController.updateDialog);
+     
     //////////////////////////////////////////////////////////////////
     // Email part
     //////////////////////////////////////////////////////////////////
