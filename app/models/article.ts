@@ -325,6 +325,18 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Prices: Header", description:"Headers of the price list page", content:'prices...'});    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Cabecera", description:"Cabecera de la pagina de precios", content:'precios...'});             
         await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Preus: Capçalera", description:"Capçalera de la pagina de preus", content:'preus...'});             
+        
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "blog-header",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Blog: Entete du blog",description:"Contenu de l'entete du blog",content:"<h1>Entete de blog</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Blog: Blog header",description:"Blog header content",content:"<h1>Blog header</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Blog: Cabecera del blog",description:"Contenido de la cabecera del blog",content:"<h1>Cabecera del blog</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Blog: Capçalera del blog",description:"Contingut de la capçalera del blog",content:"<h1>Capçalera del blog</h1>"});             
+
 
         myArticle = await Article.create({
           cathegory: "content",
@@ -336,6 +348,20 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"404: Page not found",description:"Page not found",content:"<h1>Page not found</h1>"});    
         await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"404: Pàgina no encontrada",description:"Pagina no encontrada",content:"<h1>Pàgina no encontrada</h1>"});             
         await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"404: Pàgina no trobada",description:"Pàgina no trobada",content:"<h1>Pàgina no trobada</h1>"});             
+
+
+       //CONTENT PART THAT IS PROJECT SPECIFIC !!
+       myArticle = await Article.create({
+        cathegory: "content",
+        key: "realisations-header",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Titre dans contact",description:"Part superieur de contact",content:"<h1>contactez-nous</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Title in contact",description:"Header part of contact",content:"<h1>contact-us</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Titulo en contacto",description:"Parte superior en contacto",content:"<h1>contactanos</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Titol de contacte",description:"Capçalera de la pagina de contacte",content:"<h1>contacta'ns</h1>"});             
+
 
 
     }
