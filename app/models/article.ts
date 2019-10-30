@@ -215,14 +215,26 @@ export class Article extends Model<Article> {
         //CONTACT
         myArticle = await Article.create({
           cathegory: "content",
-          key: "contact-header",
+          key: "contact-header-first",
           image:null,
           public:true
         });                    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Titre dans contact",description:"Part superieur de contact",content:"<h1>contactez-nous</h1>"});  
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Title in contact",description:"Header part of contact",content:"<h1>contact-us</h1>"});    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Titulo en contacto",description:"Parte superior en contacto",content:"<h1>contactanos</h1>"});             
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Titol de contacte",description:"Capçalera de la pagina de contacte",content:"<h1>contacta'ns</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Contact: Premiere entete",description:"Premiere entete dans contact",content:"<h1>contactez-nous</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Contact: First header",description:"First header of contact",content:"<h1>contact-us</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Contacto: Primera cabecera",description:"Primera cabecera en la pagina contacto",content:"<h1>contactanos</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Contacte: Primera capçalera",description:"Primera capçalera de la pagina de contacte",content:"<h1>contacta'ns</h1>"});             
+
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "contact-header-second",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Contact: Seconde entete",description:"Seconde entete dans contact",content:"<h1>contactez-nous</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Contact: Second header",description:"Second header of contact",content:"<h1>contact-us</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Contacto: Segunda cabecera",description:"Segunda cabecera en la pagina contacto",content:"<h1>contactanos</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Contacte: Segona capçalera",description:"Segona capçalera de la pagina de contacte",content:"<h1>contacta'ns</h1>"});             
+
 
         myArticle = await Article.create({
           cathegory: "content",
@@ -317,25 +329,36 @@ export class Article extends Model<Article> {
 
         myArticle = await Article.create({
           cathegory: "content",
-          key: "price-header",
-          image: null,
-          public:true
-        });
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Prix: Entete de page", description:"Entete de la page des prix", content:'prix...'});  
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Prices: Header", description:"Headers of the price list page", content:'prices...'});    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Cabecera", description:"Cabecera de la pagina de precios", content:'precios...'});             
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Preus: Capçalera", description:"Capçalera de la pagina de preus", content:'preus...'});             
-        
-        myArticle = await Article.create({
-          cathegory: "content",
-          key: "blog-header",
+          key: "blog-header-first",
           image:null,
           public:true
         });                    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Blog: Entete du blog",description:"Contenu de l'entete du blog",content:"<h1>Entete de blog</h1>"});  
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Blog: Blog header",description:"Blog header content",content:"<h1>Blog header</h1>"});    
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Blog: Cabecera del blog",description:"Contenido de la cabecera del blog",content:"<h1>Cabecera del blog</h1>"});             
-        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Blog: Capçalera del blog",description:"Contingut de la capçalera del blog",content:"<h1>Capçalera del blog</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Blog: Première entete du blog",description:"Contenu de l'entete du blog",content:"<h1>Entete de blog</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Blog: First blog header",description:"Blog header content",content:"<h1>Blog header</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Blog: Primera cabecera del blog",description:"Contenido de la cabecera del blog",content:"<h1>Cabecera del blog</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Blog: Primera capçalera del blog",description:"Contingut de la capçalera del blog",content:"<h1>Capçalera del blog</h1>"});             
+
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "blog-header-second",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Blog: Segonde entete du blog",description:"Contenu de l'entete du blog",content:"<h1>Entete de blog</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Blog: Second blog header",description:"Blog header content",content:"<h1>Blog header</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Blog: Segunda cabecera del blog",description:"Contenido de la cabecera del blog",content:"<h1>Cabecera del blog</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Blog: Segona capçalera del blog",description:"Contingut de la capçalera del blog",content:"<h1>Capçalera del blog</h1>"});             
+
+        myArticle = await Article.create({
+          cathegory: "content",
+          key: "blog-footer",
+          image:null,
+          public:true
+        });                    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Blog: Pied de page du blog",description:"Contenu du pied de page du blog",content:"<h1>Pied de page de blog</h1>"});  
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Blog: Blog footer",description:"Blog footer content",content:"<h1>Blog footer</h1>"});    
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Blog: Pie de pagina del blog",description:"Contenido del pie de pagina del blog",content:"<h1>Pie de pagina del blog</h1>"});             
+        await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Blog: Peu de pagina del blog",description:"Contingut del peu de pàgina del blog",content:"<h1>Peu de pagina del blog</h1>"});             
 
 
         myArticle = await Article.create({
@@ -351,17 +374,112 @@ export class Article extends Model<Article> {
 
 
        //CONTENT PART THAT IS PROJECT SPECIFIC !!
+
        myArticle = await Article.create({
         cathegory: "content",
-        key: "realisations-header",
+        key: "price-header-first",
+        image: null,
+        public:true
+      });
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Prix: Primere entete de page", description:"Primiere entete de la page des prix", content:'prix...'});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Prices: First header", description:"First header of the price list page", content:'prices...'});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Primera cabecera", description:"Primera cabecera de la pagina de precios", content:'precios...'});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Preus: Primera capçalera", description:"Primera capçalera de la pagina de preus", content:'preus...'});             
+      
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "price-header-second",
+        image: null,
+        public:true
+      });
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Prix: Seconde entete de page", description:"Seconde entete de la page des prix", content:'prix...'});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Prices: Second header", description:"Second header of the price list page", content:'prices...'});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Segunda cabecera", description:"Segunda cabecera de la pagina de precios", content:'precios...'});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Preus: Segona capçalera", description:"Segona capçalera de la pagina de preus", content:'preus...'});             
+
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "price-footer",
+        image: null,
+        public:true
+      });
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Prix: Pied de page", description:"Pied de page de la page des prix", content:'prix...'});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Prices: Footer", description:"Footer of the price list page", content:'prices...'});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Pie de pagina", description:"Pie de pagina de la pagina de precios", content:'precios...'});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Preus: Peu de pàgina", description:"Peu de pàgina de la pagina de preus", content:'preus...'});             
+
+
+
+
+       myArticle = await Article.create({
+        cathegory: "content",
+        key: "realisations-header-first",
         image:null,
         public:true
       });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Titre dans contact",description:"Part superieur de contact",content:"<h1>contactez-nous</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Title in contact",description:"Header part of contact",content:"<h1>contact-us</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Titulo en contacto",description:"Parte superior en contacto",content:"<h1>contactanos</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Titol de contacte",description:"Capçalera de la pagina de contacte",content:"<h1>contacta'ns</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Clients: Premiere entete",description:"Premiere entete page clients",content:"<h1>Clients</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Clients: First header",description:"First header on clients page",content:"<h1>Clients</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Clientes: Primera cabecera",description:"Primera cabecera de la pagina de clientes",content:"<h1>Clientes</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Clients: Primera caçalera",description:"Primera capçalera de la pàgina clients",content:"<h1>Clients</h1>"});             
 
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "realisations-header-second",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Clients: Seconde entete",description:"Seconde entete page clients",content:"<h1>Clients</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Clients: Second header",description:"Second header on clients page",content:"<h1>Clients</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Clientes: Segunda cabecera",description:"Segunda cabecera de la pagina de clientes",content:"<h1>Clientes</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Clients: Segona caçalera",description:"Segona capçalera de la pàgina clients",content:"<h1>Clients</h1>"});             
+
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "realisations-intermediate",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Clients: Description commentaires",description:"Description des commentaires clients",content:"<h1>Clients</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Clients: Comments description",description:"Description of clients comments",content:"<h1>Clients</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Clientes: Descripcion comentarios",description:"Descripcion de los comentarios de clientes",content:"<h1>Clientes</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Clients: Descripció comentaris",description:"Descripció dels commentaris dels clients",content:"<h1>Clients</h1>"});             
+
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "realisations-footer",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Clients: Pied de page",description:"Pied de page page clients",content:"<h1>Clients</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Clients: Footer",description:"Footer on clients page",content:"<h1>Clients</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Clientes: Pie de pagina",description:"Pie de pagina de la pagina de clientes",content:"<h1>Clientes</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Clients: Peu de pàgina",description:"Peu de pàgina de la pàgina clients",content:"<h1>Clients</h1>"});             
+
+
+
+
+
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "home-header-first",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Accueil: Première entete",description:"Contenu de la première entete de l'accueil",content:"<h1>Entete de l'accueil</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Home: First header",description:"Content of the first header of home",content:"<h1>First home header</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Inicio: Primera cabecera",description:"Contenido de la primera cabecera de la pagina inicio",content:"<h1>Primera cabecera del inicio</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Inici: Primera capçalera",description:"Contingut de la primera capçalera de la pagina blog",content:"<h1>Primera capçalera del inici</h1>"});             
+
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "home-header-second",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Accueil: Seconde entete",description:"Contenu de la seconde entete de l'accueil",content:"<h1>Seconde Entete de l'accueil</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Home: Second header",description:"Content of the second header of home",content:"<h1>Second home header</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Inicio: Segunda cabecera",description:"Contenido de la segunda cabecera de la pagina inicio",content:"<h1>Segunda cabecera del inicio</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Inici: Segona capçalera",description:"Contingut de la segona capçalera de la pagina blog",content:"<h1>Segona capçalera del inici</h1>"});             
 
 
     }
