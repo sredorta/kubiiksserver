@@ -12,6 +12,7 @@ import { Article } from '../models/article';
 import { ArticleTranslation } from '../models/article_translation';
 import { User } from '../models/user';
 import { Setting } from '../models/setting';
+import { Page } from '../models/page';
 
 
 
@@ -24,6 +25,7 @@ export class InitController {
         try {
             let result : any = {};
             let settings = await Setting.findAll();
+            let pages = await Page.findAll();
             let myUser = null;
             if (settings) 
                 result["settings"] = [];
@@ -34,6 +36,10 @@ export class InitController {
             result["articles"] = [];
             for (let article of articles) 
                 result["articles"].push(article.sanitize(res.locals.language));
+            result["pages"] = [];
+            for (let page of pages) 
+             result["pages"].push(page.sanitize(res.locals.language));
+
             if (req.user)    
                  myUser = await User.scope("details").findByPk(req.user.id);
                  if (myUser)

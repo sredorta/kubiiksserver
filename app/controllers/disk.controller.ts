@@ -15,6 +15,7 @@ import { AppConfig } from '../utils/config';
 import passport from "passport";
 import { EmailTranslation } from '../models/email_translation';
 import {CustomValidators} from '../classes/CustomValidators';
+import { Page } from '../models/page';
 
 
 /**Enumerator with all stats events*/
@@ -189,6 +190,11 @@ export class Disk {
                 if (found) resolve(true);
                 found = await EmailTranslation.findOne({where:{header:{[Op.like]:'%'+file.basename+'%'}}});
                 if (found) resolve(true);
+
+                //Find in pages
+                found = await Page.findOne({where:{image:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+
                 resolve(false);
             } catch(error) {
                reject(true);

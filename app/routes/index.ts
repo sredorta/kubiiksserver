@@ -34,6 +34,7 @@ import { AlertController } from '../controllers/alert.controller';
 import { StatController } from '../controllers/stat.controller';
 import { DiskController } from '../controllers/disk.controller';
 import { NewsletterController } from '../controllers/newsletter.controller';
+import { PageController } from '../controllers/page.controller';
 
 
 
@@ -109,6 +110,13 @@ export class Routes {
     app.route('/api/setting/update-dialog')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasContentRights(),SettingController.updateDialogChecks(),SettingController.updateDialog);
      
+    /////////////////////////////////////////////////////////////////
+    // PAGE CONTROLLER PART
+    // Pages are used for SEO data
+    ////////////////////////////////////////////////////////////////      
+    app.route('/api/page/update')
+    .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),PageController.updateChecks(),PageController.update);
+
     //////////////////////////////////////////////////////////////////
     // Email part
     //////////////////////////////////////////////////////////////////
