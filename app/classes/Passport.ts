@@ -172,7 +172,7 @@ export class Passport {
               facebookId : profile._json.id,
             });
             //Attach admin role if required
-            if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
+            if (myUser.id ==1) {
               await myUser.attachRole("admin"); 
             }           
             return cb(null,myUser);
@@ -253,7 +253,7 @@ export class Passport {
               googleId : profile._json.sub,
             });
             //Attach admin role if required
-            if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
+            if (myUser.id ==1) {
               await myUser.attachRole("admin"); 
             }           
             return cb(null,myUser);

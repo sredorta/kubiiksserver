@@ -53,6 +53,12 @@ const sequelize = new Sequelize({
       filename = filename.replace("_", "");
       return filename === member.toLowerCase();
     },
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
   });
   //Create all models
   sequelize.addModels([mydir + '/models']);

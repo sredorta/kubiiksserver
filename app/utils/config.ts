@@ -72,8 +72,7 @@ import * as dotenv from "dotenv";
             {"key": "profile_lastName", "value":"include"},
             {"key": "profile_phone", "value":"optional"},
             {"key": "profile_mobile", "value":"optional"},            
-            {"key": "validation_method", "value":"no_validation"}, //email or no_validation
-            {"key": "mode", "value":"production"}, //Put 'demo' for direct admin access
+            {"key": "validation_method", "value":"email"}, //email or no_validation
             {"key": "article_cathegories", "value":"content,blog,prix,realisations,realisations-comments"}, //Article cathegories
         ],
     }

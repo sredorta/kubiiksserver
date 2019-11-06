@@ -55,14 +55,11 @@ export class AuthController {
             if (req.body.newsletter == true) Newsletter.subscribe(req.body.email,req.user.language);
 
             //Attach admin role if required
-            if (myUser.id ==1 || Helper.isSharedSettingMatch("mode", "demo")) {
+            if (myUser.id ==1) {
                 await myUser.attachRole("admin"); 
-            }
-            //Attach kubiiks role on first user
-            if (myUser.id ==1)
                 await myUser.attachRole("kubiiks"); 
-
-            let myUserTmp = await User.scope("details").findByPk(myUser.id);
+            }
+            let myUserTmp = await User.scope("fulldetails").findByPk(myUser.id);
             if (myUserTmp) myUser = myUserTmp;
             //Depending on the validation method we need to authenticate or not
             switch (method) {
@@ -73,6 +70,8 @@ export class AuthController {
                 }
                 //Validation with email is the default
                 default: {
+                    console.log("SENDING EMAIL VALIDATION !!!");
+                    console.log(myUser);
                     const link = AppConfig.api.kiiwebExtHost + "/login/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
                     let html = messages.emailValidationLink(link);
                     let recipients = [];
