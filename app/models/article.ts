@@ -377,6 +377,28 @@ export class Article extends Model<Article> {
       await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Precios: Pie de pagina", description:"Pie de pagina de la pagina de precios", content:'precios...'});             
       await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Preus: Peu de pàgina", description:"Peu de pàgina de la pagina de preus", content:'preus...'});             
 
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "demo-header",
+        image: null,
+        public:true
+      });
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Demo: Entete de page", description:"Entete de la page de demo", content:'demo...'});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Demo: Header", description:"Header of the demo page", content:'demo...'});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Demo: Cabecera", description:"Cabecera de la pagina de demo", content:'demo...'});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Demo: Capçalera", description:"Capçalera de la pagina de demo", content:'demo...'});             
+      
+
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "demo-footer",
+        image: null,
+        public:true
+      });
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Demo: Pied de page", description:"Pied de page de la page demo", content:'demo...'});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Demo: Footer", description:"Footer of the demo page", content:'demo...'});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Demo: Pie de pagina", description:"Pie de pagina de la pagina de demo", content:'demo...'});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Demo: Peu de pàgina", description:"Peu de pàgina de la pagina de demo", content:'demo...'});             
 
 
 
