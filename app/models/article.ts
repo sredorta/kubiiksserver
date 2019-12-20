@@ -352,7 +352,7 @@ export class Article extends Model<Article> {
         await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"404: Pàgina no trobada",description:"Pàgina no trobada",content:"<h1>Pàgina no trobada</h1>"});             
 
 
-       //CONTENT PART THAT IS PROJECT SPECIFIC !!
+       //CONTENT PART THAT IS PROJECT SPECIFIC  MOVE TO SEPARATE FILE !!!
 
        myArticle = await Article.create({
         cathegory: "content",
@@ -450,7 +450,27 @@ export class Article extends Model<Article> {
       await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Inicio: Cabecera",description:"Contenido de la primera cabecera de la pagina inicio",content:"<h1>Primera cabecera del inicio</h1>"});             
       await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Inici: Capçalera",description:"Contingut de la primera capçalera de la pagina blog",content:"<h1>Primera capçalera del inici</h1>"});             
 
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "home-middle",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Accueil: Milieu",description:"Contenu du milieu de l'accueil",content:"<h1>Contenu milieu</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Home: Middle",description:"Content of middle header of home",content:"<h1>Middle content</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Inicio: Medio",description:"Contenido del medio de la pagina inicio",content:"<h1>Contenido medio</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Inici: Mitg",description:"Contingut del mitg de la pagina blog",content:"<h1>Contingut mitg</h1>"});             
 
+      myArticle = await Article.create({
+        cathegory: "content",
+        key: "home-footer",
+        image:null,
+        public:true
+      });                    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Accueil: Entete",description:"Contenu du pied de page de l'accueil",content:"<h1>Contenu pied de page</h1>"});  
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Home: Header",description:"Content of footer of home",content:"<h1>Footer content</h1>"});    
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Inicio: Cabecera",description:"Contenido del pie de pagina de la pagina inicio",content:"<h1>Contenido pie de pagina</h1>"});             
+      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Inici: Capçalera",description:"Contingut del peu de pagina de la pagina blog",content:"<h1>Contingut peu de pagina</h1>"});             
 
     }
     return _seed();
