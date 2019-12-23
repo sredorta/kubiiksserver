@@ -65,7 +65,7 @@ const sequelize = new Sequelize({
 
 async function startServer() {  
    //await sequelize.sync();
-   if (true) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
+   if (false) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
     await sequelize.sync({force:true});  
     //Seeding part
     await Setting.seed(); //Seed settings from the config.json for FE sharing
