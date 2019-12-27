@@ -68,13 +68,6 @@ export class Alert extends Model<Alert> {
               await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
               await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
               await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
-              for (let i=0; i<100; i++) {
-              myAlert = await Alert.create({userId:1,type:"email",title:"My new alert",message:"New order has been created for $100 total"});
-              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
-              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
-              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
-              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
-              }
             } catch(err) {
                 console.log("ERROR: Could not seed ALERTS !!!")
             }
