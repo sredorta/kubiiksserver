@@ -3,7 +3,7 @@ export const messages = {
 
     //Validation messages
     User: 'User',
-    cathegory: "cathegory",
+    cathegory: "category",
     validationExists: (name = 'field') => `Missing parameter '${name}'`,
     validationDBExists: (name = 'field') => `'${name}' not found in the database`,
     validationDBMissing: (name = 'field') => `'${name}' already in the database`,
@@ -24,7 +24,7 @@ export const messages = {
 
     //auth
     authKubiiksRole : "Rights for 'kubiiks' cannot be modified",
-    authTokenMissing: 'Authentification is required and not provided',
+    authTokenMissing: 'Authentication is required and not provided',
     authTokenInvalid: 'Your session is not valid anymore, log in again',
     authTokenInvalidRole: (name = 'field') => `'${name}' rights are required`,
     authInvalidCredentials: 'Invalid credentials',
@@ -42,21 +42,21 @@ export const messages = {
     emailSentError: 'An error happened when sending the email, please contact the administrator',
     emailSiteAccess : 'GO TO SITE',
     emailDeleteProtected: 'System email templates cannot be deleted',
-    emailValidationLink: (name = 'field') => `<p>Please validate your account by clicking to the foollowing <a href='${name}'>link</a></p>`,
+    emailValidationLink: (name = 'field') => `<p>Please validate your account by clicking to the following <a href='${name}'>link</a></p>`,
     emailResetPassword: (name = 'field') => `<p>Your new password : <span>${name}<span></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
 
 
     //chat part
     chatWelcome: "Welcome to our chat",
-    chatLanguageSwitch: "You can talk to us in english if you prefer",
+    chatLanguageSwitch: "You can talk to us in English if you prefer",
     chatJoinRoom: (name = '') => `${name} : Joined the chat`,
     chatLeaveRoom: (name = '') => `${name} : Leaved the chat`,
 
 
 
     //notifications titles
-    notificationContactEmail: 'New contact email recieved',
+    notificationContactEmail: 'New contact email received',
     notificationNewChat: 'New chat started',
 
 
@@ -65,11 +65,11 @@ export const messages = {
     articleContentNotDelete: 'Content articles cannot be deleted',
 
     articleDelete: 'Article was successfully deleted',
-    articleNewTitle: 'New article',
-    articleNewDescription: 'Example of description',
-    articleNewContent:  '<h1>New article</h1>',
+    articleNewTitle: 'My title',
+    articleNewDescription: 'My description',
+    articleNewContent:  '<p>My content</p>',
 
-    apiRouteNotFound: 'The server could not found the requested action',
+    apiRouteNotFound: 'The server could not find the requested action',
 
     newsletterSubscribed: 'You are now registered to the newsletter',
     newsletterUnsubscribed: 'You are not registered to the newsletter anymore',
@@ -81,7 +81,5 @@ export const messages = {
     messageSent: 'Your message has been sent',
     saved : 'Your modifications have been saved',
 
-    title: 'Simple i18n implementation with TypeScript',
-    greeting: (name = 'John Doe') => `Hello, ${name}.`,
     unreadNotification: (unread: number) => `You have ${unread === 0 ? 'no' : unread} unread message${unread === 1 ? '' : 's'}.`
   };
