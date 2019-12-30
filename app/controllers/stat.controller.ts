@@ -25,6 +25,7 @@ export enum StatAction {
     CHAT_LEAVE = "chat_leave",
     CHAT_MESSAGE = "chat_message",
     APP_INSTALL = "app_install",
+    NEWSLETTER = "newsletter",
     UNDEFINED = "unknown"
 }
 
@@ -35,7 +36,8 @@ export enum StatType {
     SOCIAL_SHARE = "social_share",
     APP_INSTALL = "app_install",
     CHAT = "chat",
-    CHAT_MESSAGE = "chat_message"
+    CHAT_MESSAGE = "chat_message",
+    NEWSLETTER = "newsletter",
 
 }
 
@@ -57,6 +59,8 @@ class StatResult {
 
     visits_hours_histogram : any[] = [];
     visits_over_day : any[] = [];
+    app_over_day : any[] = [];
+    newsletter_over_day : any[] = [];
     referrals_histogram : any[] = [];
     social_histogram : any[] = [];
     social_over_day: any = {};
@@ -175,6 +179,16 @@ export class StatController {
                         session: req.body.stat.session,
                         ressource: StatType.APP_INSTALL,
                         type: StatType.APP_INSTALL,
+                        start: new Date(),
+                        end: new Date()
+                    });
+                    break;
+                }
+                case StatAction.NEWSLETTER: {
+                    await Stat.create({
+                        session: req.body.stat.session,
+                        ressource: StatType.NEWSLETTER,
+                        type: StatType.NEWSLETTER,
                         start: new Date(),
                         end: new Date()
                     });
@@ -374,7 +388,8 @@ export class StatController {
                 }
                 result.social_over_day[social] = tmp;
             });
-            //Now generate all field
+
+            //Now generate socialOverDay
             let socialOverDay : any[]= [];
             for (let stat of current) {
                 let day = new Date(new Date(stat.start).setHours(0,0,0,0)).toDateString();
@@ -392,7 +407,42 @@ export class StatController {
                 tmp.push([elem.day, elem.count]);
             }
             result.social_over_day['all'] = tmp;
-            
+
+            //Now generate apps over day
+            let apps = currentStats.filter(obj => obj.type == StatType.APP_INSTALL);
+            let appsOverDay : any[]= [];
+            for (let stat of apps) {
+                let day = new Date(new Date(stat.start).setHours(0,0,0,0)).toDateString();
+                let elem = appsOverDay.find(obj => obj.day == day);
+                if (elem) {
+                    elem.count = elem.count+1;
+                } else {
+                    appsOverDay.push({day:day,count:1})
+                }
+            }
+            //Sort array of objects
+            appsOverDay.sort((val1, val2)=> {return new Date(val1.day).getTime() - new Date(val2.day).getTime()});
+            for (let elem of appsOverDay) {
+                result.app_over_day.push([elem.day, elem.count]);
+            }
+
+            //Now generate newsletter over day
+            let news = currentStats.filter(obj => obj.type == StatType.NEWSLETTER);
+            let newsOverDay : any[]= [];
+            for (let stat of news) {
+                let day = new Date(new Date(stat.start).setHours(0,0,0,0)).toDateString();
+                let elem = newsOverDay.find(obj => obj.day == day);
+                if (elem) {
+                    elem.count = elem.count+1;
+                } else {
+                    newsOverDay.push({day:day,count:1})
+                }
+            }
+            //Sort array of objects
+            newsOverDay.sort((val1, val2)=> {return new Date(val1.day).getTime() - new Date(val2.day).getTime()});
+            for (let elem of newsOverDay) {
+                result.newsletter_over_day.push([elem.day, elem.count]);
+            }            
 
             //CHAT DATA
             current = currentStats.filter(obj => obj.type == StatType.CHAT);
@@ -411,8 +461,8 @@ export class StatController {
             current = currentStats.filter(obj => obj.type == StatType.APP_INSTALL);
             previous = previousStats.filter(obj => obj.type == StatType.APP_INSTALL);
             result.app_install_count.current = current.length;
-            result.app_install_count.previous = previous.length;          
-            
+            result.app_install_count.previous = previous.length;      
+                       
         } catch (error) {
             //Do nothing on error
         }
