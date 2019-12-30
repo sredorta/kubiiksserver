@@ -18,8 +18,19 @@ export class RoleController {
     static getAll = async(req: Request, res: Response, next: NextFunction) => {  
         //We remove the kubiiks role so that is not visible on the frontend
         let myRoles =  await Role.findAll();
-        if (myRoles)
-            myRoles = myRoles.filter(obj=> obj.name!= "kubiiks")
+        let canModifyKubiiks:boolean = false;
+        if (req.user) {
+            let authUser = await User.scope("details").findByPk(req.user.id);
+            if (authUser) {
+                if (authUser.hasRole('kubiiks'))
+                    canModifyKubiiks = true;
+            }
+        }
+
+        if (myRoles) {
+            //If auth user is not kubiiks then filter kubiiks so that is not seen
+            if (!canModifyKubiiks) myRoles = myRoles.filter(obj=> obj.name!= "kubiiks");
+        }
         res.json(myRoles);
     }
 
@@ -28,9 +39,20 @@ export class RoleController {
         try {
             let myUser = await User.findByPk(req.body.userId);
             let myRole = await Role.findByPk(req.body.roleId);
+            let canModifyKubiiks : boolean = false;
+            if (req.user) {
+                let authUser = await User.scope("details").findByPk(req.user.id);
+                if (authUser) {
+                    if (authUser.hasRole('kubiiks'))
+                        canModifyKubiiks = true;
+                }
+            }
+
             if (myRole)
-                if (myRole.name == "kubiiks") 
-                    throw new HttpException(400, messages.authKubiiksRole ,null);
+                if (myRole.name == "kubiiks") {
+                    if (!canModifyKubiiks)
+                        throw new HttpException(400, messages.authKubiiksRole ,null);
+                }
             if (myUser) {
                 await myUser.attachRole(req.body.roleId);
             }  
@@ -51,14 +73,24 @@ export class RoleController {
     /**Static detach role from user */
     static detach = async(req: Request, res: Response, next: NextFunction) => {
         try {
+            let canModifyKubiiks : boolean = false;
+            if (req.user) {
+                let authUser = await User.scope("details").findByPk(req.user.id);
+                if (authUser) {
+                    if (authUser.hasRole('kubiiks'))
+                        canModifyKubiiks = true;
+                }
+            }
             //Do not allow self removal of admin rights
             if (req.user.id == req.body.userId && req.body.roleId == 1) {
                 throw new HttpException(400, messages.validationSelfUser ,null);
             }
             let myRole = await Role.findByPk(req.body.roleId);
             if (myRole)
-                if (myRole.name == "kubiiks") 
-                    throw new HttpException(400, messages.authKubiiksRole ,null);
+                if (myRole.name == "kubiiks") {
+                    if (!canModifyKubiiks)
+                        throw new HttpException(400, messages.authKubiiksRole ,null);
+                }
             let myUser = await User.findByPk(req.body.userId);
             if (myUser) {
                 await myUser.detachRole(req.body.roleId);
