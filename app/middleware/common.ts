@@ -59,8 +59,8 @@ export class Middleware {
                     .filter((language:string) => language !== 'index');
             let language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
             res.locals.language = language;  //Store language in the locals
-            if (!req.user)
-                req.user = {};
+            if (!req.user) 
+                req.user = {};    
             req.user.language = language;   //This is used afterwards !!!!
             //Override messages so that it uses correct language
             let acc : any = [];

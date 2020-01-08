@@ -119,7 +119,7 @@ export class SocketHandler  {
 
 
     constructor(server:http.Server,) {
-        this.io = socketio(server);
+        this.io = socketio(server, {cookie:false});
     }
 
     /**Starts listening on sockets and handling events*/

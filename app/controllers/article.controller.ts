@@ -11,10 +11,13 @@ import {messages} from '../middleware/common';
 import { Article } from '../models/article';
 import { ArticleTranslation } from '../models/article_translation';
 import { User } from '../models/user';
-
+import * as converter from 'xml-js';
+import fs from 'fs';
+import { Setting } from '../models/setting';
 
 
 export class ArticleController {
+
 
     constructor() {}
 
@@ -47,7 +50,9 @@ export class ArticleController {
                 if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
                 }
+                let articleTmp = new Article(JSON.parse(JSON.stringify(article)));
                 await article.destroy();
+                await ArticleController.updateSiteMap(articleTmp);
                 res.send({message: {show:true,text:messages.articleDelete}}); 
             }
         } catch(error) {
@@ -87,8 +92,9 @@ export class ArticleController {
                             'title': messages.articleNewTitle,
                             'description': messages.articleNewDescription,
                             'content': messages.articleNewContent
-                        });
+                        });                        
                     } 
+                    ArticleController.updateSiteMap(myArticle);
                 }
                 let article = await Article.findByPk(myArticle.id);
                 if (!article) throw new Error("Could not find 'article'");
@@ -141,6 +147,7 @@ export class ArticleController {
             article = await Article.findByPk(req.body.article.id);
 
             if (!article) return new Error("Unexpected error !");
+            ArticleController.updateSiteMap(article);
             res.json(article.sanitize(res.locals.language));
 
         } catch(error) {
@@ -163,6 +170,51 @@ export class ArticleController {
 
             Middleware.validate()
         ]
+    }
+
+    /**Updates the sitemap */
+    static updateSiteMap(article:Article) {
+        //STEP 1: read current sitemap.xml
+        let data = fs.readFileSync(process.cwd() + '/app/sitemap.xml', "ascii");
+        if (!data) return;
+        const existingSitemapList = JSON.parse(converter.xml2json(data, { compact: true, ignoreComment: true, spaces: 4 }));
+
+        //STEP 2: remove all articles of the sitemap
+        let urls = existingSitemapList.urlset.url.filter((obj:any) => !obj.loc._text.match(/^.*\/[0-9]+$/) );
+
+        //STEP 3: Recreate all articles in the sitemap and update the file
+        Setting.findOne({where:{key:'url'}}).then(setting => {
+            if (setting) {
+                Article.findAll({where:{cathegory:'blog',public:true}}).then(articles => {
+                    Middleware.languagesSupported().forEach(lang => {
+                        articles.forEach(article => {
+                            urls.push({
+                                loc: {
+                                    _text: setting.value+"/"+lang+"/article/"+article.id,
+                                },
+                                changefreq: {
+                                    _text: 'monthly'
+                                },
+                                priority: {
+                                    _text: 0.8
+                                },
+                                lastmod: {
+                                    _text: article.updatedAt.toISOString().slice(0,10)
+                                }
+                            });
+                        });
+                    });
+                    //Here we got all new urls;
+                    existingSitemapList.urlset.url = urls;
+                    const finalXML = converter.json2xml(existingSitemapList, { compact: true, ignoreComment: true, spaces: 4 }); // to convert json text to xml text
+                    fs.writeFile(process.cwd() + '/app/sitemap.xml', finalXML, (err) => {
+                        if (err) {
+                         return console.log(err);
+                        }
+                       });
+                });
+            }
+        })
     }
 
 }        

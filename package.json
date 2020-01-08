@@ -67,7 +67,8 @@
     "socket.io": "^2.2.0",
     "ts-node-dev": "^1.0.0-pre.32",
     "typescript": "^3.4.3",
-    "web-push": "^3.3.5"
+    "web-push": "^3.3.5",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "@types/nodemailer": "^4.6.7"

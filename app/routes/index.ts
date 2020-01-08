@@ -44,6 +44,14 @@ export class Routes {
 
   public routes(app:Router): void {
   
+
+    /**Sends the sitemap that is dynamic modified */
+    app.route('/sitemap.xml')
+    .get((req, res) => {
+      console.log("We are sending the sitemap !", process.cwd() + '/app/sitemap.xml');
+      res.sendFile(process.cwd() + '/app/sitemap.xml');
+    });
+
     /**Gets api description */
     app.route('/api/description')
         .get((req: Request, res: Response, next: NextFunction) => {   
