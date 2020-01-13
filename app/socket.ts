@@ -118,9 +118,13 @@ export class SocketHandler  {
     chatMessages : IChatMessage[] = [];
 
 
-    constructor(server:http.Server,) {
-        this.io = socketio(server);
+    constructor(server:http.Server) {
+      //Use IO if cookies accepted if not do not use it
+        //this.io = socketio(server, {cookie:false});
+        this.io = socketio(server, {cookie:false});
     }
+
+
 
     /**Starts listening on sockets and handling events*/
     listen() {

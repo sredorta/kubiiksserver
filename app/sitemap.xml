@@ -133,4 +133,28 @@
         <loc>https://kubiiks.com/ca/connecci%C3%B3</loc>
         <priority>0.80</priority>
     </url>
+    <url>
+        <loc>https://www.kubiiks.com/ca/article/79</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-01-08</lastmod>
+    </url>
+    <url>
+        <loc>https://www.kubiiks.com/en/article/79</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-01-08</lastmod>
+    </url>
+    <url>
+        <loc>https://www.kubiiks.com/es/article/79</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-01-08</lastmod>
+    </url>
+    <url>
+        <loc>https://www.kubiiks.com/fr/article/79</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-01-08</lastmod>
+    </url>
 </urlset>
