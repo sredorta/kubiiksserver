@@ -85,14 +85,6 @@ export class User extends Model<User> {
   @Column(DataTypes.STRING(30))
   emailValidationKey!:string;
 
-  @AllowNull(false)
-  @Default(false)
-  @Column(DataTypes.BOOLEAN)
-  isMobileValidated!:boolean;
-
-  @AllowNull(false)
-  @Column(DataTypes.STRING(4))
-  mobileValidationKey!:string;
 
   @AllowNull(true)
   @Column(DataTypes.STRING(100))
@@ -305,7 +297,7 @@ export class User extends Model<User> {
   public static seed() {
     async function _seed() {
         /*first user*/
-        let myUser : User = new User();
+ /*       let myUser : User = new User();
         myUser = await User.scope("full").create({
           firstName: "Sergi",
           lastName: "Redorta",
@@ -322,9 +314,9 @@ export class User extends Model<User> {
         await myUser.attachRole("admin");
         await myUser.attachRole("kubiiks");
         await myUser.attachRole("chat");
-
+*/
         /*Debug users*/
-        myUser = await User.scope("full").create({
+/*        myUser = await User.scope("full").create({
           firstName: "gmail",
           lastName: "Red",
           email: "sergi.redorta@gmail.com",
@@ -339,7 +331,7 @@ export class User extends Model<User> {
         });
         await myUser.attachRole("email");
         await myUser.attachRole("chat");
-
+*/
 
         
         /*        await myUser.attachRole("chat");

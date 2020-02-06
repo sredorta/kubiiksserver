@@ -51,11 +51,29 @@ export class ValidationException extends Error {
                     break;
                 }
                 case "dbmissing": { //Expects not found in db
-                    this.message = messages.validationDBMissing(msg.class);
+                    let type :string = "";
+                    switch (msg.class) {
+                        case 'User': 
+                           type = messages['User'];
+                           break;
+                        default:
+                           type = 'Error';   
+
+                    }
+                    this.message = messages.validationDBMissing(type);
                     break;
                 }
                 case "dbexists": {
-                    this.message = messages.validationDBExists(msg.class);
+                    let type :string = "";
+                    switch (msg.class) {
+                        case 'User': 
+                           type = messages['User'];
+                           break;
+                        default:
+                           type = 'Error';   
+
+                    }
+                    this.message = messages.validationDBExists(type);
                     break;
                 }
                 default: {

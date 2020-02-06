@@ -17,6 +17,7 @@ import {Validator} from "class-validator";
 import {User} from '../models/user';
 import { Email } from '../models/email';
 import { Newsletter } from '../models/newsletter';
+import { ExtractJwt } from 'passport-jwt';
 
 /**Payload interface */
 export interface IJwtPayload {
@@ -34,11 +35,7 @@ export class AuthController {
     /**Sign up user using local passport */
     static signup = async (req: Request, res: Response, next:NextFunction) => {
         //Check that we got the terms accepted
-        if (req.body.terms!= true)
-            return next( new HttpException(500, messages.validationTerms,null))
-
         let myUser : User;
-        let method = Helper.getSharedSetting("validation_method");
         try {
             myUser = await User.scope("full").create({
                 firstName: req.body.firstName,
@@ -52,7 +49,7 @@ export class AuthController {
                 password: User.hashPassword(req.body.password)
             });
             //If newsletter is check add email to the newsletter
-            if (req.body.newsletter == true) Newsletter.subscribe(req.body.email,req.user.language);
+            if (req.body.newsletter == true) Newsletter.subscribe(req.body.firstName,req.body.lastName,req.body.email,req.user.language);
 
             //Attach admin role if required
             if (myUser.id ==1) {
@@ -62,26 +59,16 @@ export class AuthController {
             let myUserTmp = await User.scope("fulldetails").findByPk(myUser.id);
             if (myUserTmp) myUser = myUserTmp;
             //Depending on the validation method we need to authenticate or not
-            switch (method) {
-                case "no_validation": {
-                    const token = myUser.createToken("short");
-                    res.send({token: token, user:myUser});  
-                    break;
-                }
-                //Validation with email is the default
-                default: {
-                    console.log("SENDING EMAIL VALIDATION !!!");
-                    console.log(myUser);
-                    const link = AppConfig.api.kiiwebExtHost + "/login/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
-                    let html = messages.emailValidationLink(link);
-                    let recipients = [];
-                    recipients.push(myUser.email);
-                    let result = await Email.send(res.locals.language, 'validate-email', messages.authEmailValidateSubject(AppConfig.api.appName), recipients,html);
-                    if (!result) res.send({message: {show:true, text:messages.emailSentError}});
-                    else
-                        res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
-                }
-            }
+            const link = AppConfig.api.kiiwebExtHost + "/"+req.user.language+"/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
+            let html = messages.emailValidationLink(link);
+            let recipients = [];
+            recipients.push(myUser.email);
+            let result = await Email.send(res.locals.language, 'validate-email', messages.authEmailValidateSubject(AppConfig.api.appName), recipients,html);
+            if (!result) 
+                res.send({message: {show:true, text:messages.emailSentError}});
+            else
+                res.send({message: {show:true, text:messages.authEmailValidate(myUser.email)}});  
+
         } catch(error) {
             next(new HttpException(400, error.message, error.errors));
         }
@@ -94,12 +81,48 @@ export class AuthController {
                 body('lastName').custom(CustomValidators.nameValidator('lastName')),
                 body('email').exists().withMessage('exists').isEmail(),
                 body('password').exists().withMessage('exists').custom(CustomValidators.password()),
-                body('terms').exists().withMessage('exists').custom(CustomValidators.checked()),
+                body('terms').exists().withMessage('exists').isBoolean().custom(CustomValidators.checked()),
                 body('newsletter').exists().withMessage('exists').isBoolean(),
                 body('dummy').custom(CustomValidators.dBuserNotPresent(User)),
                 Middleware.validate()
             ]
     }    
+
+    ///////////////////////////////////////////////////////////////////////////
+    //Validate Email when clicking to email link
+    ///////////////////////////////////////////////////////////////////////////
+    /**Validates email account by providing id and key */
+    static emailValidation = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let myUser = await User.scope("full").findByPk(req.body.id);
+            if (!myUser) throw new Error("User not found !");
+            //Check that key matches
+            if (myUser.emailValidationKey != req.body.key) 
+                res.status(400).send({message: messages.authEmailValidateError});
+            else {
+                //Generate new key
+                myUser.isEmailValidated = true;
+                myUser.emailValidationKey = Helper.generateRandomString(30);
+                await myUser.save();
+                //Generate a token
+                let myUserTmp = await User.scope("details").findByPk(myUser.id);
+                if (myUserTmp) myUser = myUserTmp;
+                let token = myUser.createToken("short");
+                myUser = await User.scope("details").findByPk(req.body.id);
+                res.send({user:myUser,token:token,message: {show:true, text:messages.authEmailValidateSuccess}});
+            }
+        } catch(error) {
+            next(new HttpException(500, error.message, error.errors));
+        }
+    }
+    /**Parameter validation */
+    static emailValidationChecks() {
+        return [
+            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(User,'id')),
+            body('key').exists().withMessage('exists').isLength({min:30,max:30}).isAlphanumeric(),
+            Middleware.validate()
+        ]
+    }   
 
 
     ///////////////////////////////////////////////////////////////////////////
@@ -142,7 +165,7 @@ export class AuthController {
         User.scope("details").findByPk(req.user.id).then(user => {
             if (user) {
                 let token = user.createToken('short');
-                res.redirect(AppConfig.api.kiiwebExtHost+"/login/validate/"+token);      
+                res.redirect(AppConfig.api.kiiwebExtHost+"/"+res.locals.language+"/auth/login/validate/"+token);      
             }
         });    
     }
@@ -150,7 +173,7 @@ export class AuthController {
     //When any of the oauth2 gets a fail then redirect to /login/fail
     //Angular should do nothing
     static oauth2Fail =  (req:Request, res:Response,next:NextFunction) => {
-        res.redirect(AppConfig.api.kiiwebExtHost + "/login");
+        res.redirect(AppConfig.api.kiiwebExtHost +"/"+res.locals.language+ "/login");
     };
 
     /**Gets current user stored fields in the system */
@@ -184,7 +207,7 @@ export class AuthController {
             if (myUser)
                 if (req.body.newsletter)
                     if (req.body.newsletter == true) {
-                        await Newsletter.subscribe(myUser.email,myUser.language);
+                        await Newsletter.subscribe(myUser.firstName,myUser.lastName,myUser.email,myUser.language);
                     }            
             let result = await User.scope("details").findByPk(req.user.id);
             res.json(result);
@@ -281,43 +304,7 @@ export class AuthController {
         }
     }    
 
-    ///////////////////////////////////////////////////////////////////////////
-    //Validate Email when clicking to email link
-    ///////////////////////////////////////////////////////////////////////////
 
-    //TODO: Regenerate key each time so that we cannot have somebody trying endpoint indefinitely
-    /**Validates email account by providing id and key */
-    static emailValidation = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let myUser = await User.scope("full").findByPk(req.body.id);
-            if (!myUser) throw new Error("User not found !");
-            //Check that key matches
-            if (myUser.emailValidationKey != req.body.key) 
-                res.status(400).send({message: messages.authEmailValidateError});
-            else {
-                //Generate new key
-                myUser.isEmailValidated = true;
-                myUser.emailValidationKey = Helper.generateRandomString(30);
-                await myUser.save();
-                //Generate a token
-                let myUserTmp = await User.scope("details").findByPk(myUser.id);
-                if (myUserTmp) myUser = myUserTmp;
-                let token = myUser.createToken("short");
-                myUser = await User.scope("details").findByPk(req.body.id);
-                res.send({user:myUser,token:token,message: {show:true, text:messages.authEmailValidateSuccess}});
-            }
-        } catch(error) {
-            next(new HttpException(500, error.message, error.errors));
-        }
-    }
-    /**Parameter validation */
-    static emailValidationChecks() {
-        return [
-            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(User,'id')),
-            body('key').exists().withMessage('exists').isLength({min:30,max:30}).isAlphanumeric(),
-            Middleware.validate()
-        ]
-}   
 
     ///////////////////////////////////////////////////////////////////////////
     // resetPasswordEmail:  Resets the password by sending new one by email
@@ -351,19 +338,7 @@ export class AuthController {
                 Middleware.validate()
             ]
     }    
-    ///////////////////////////////////////////////////////////////////////////
-    // resetPasswordEmail:  Resets the password by sending new one by phone
-    ///////////////////////////////////////////////////////////////////////////
-    static resetPasswordByMobile = async (req: Request, res: Response, next:NextFunction) => {
-        next( new HttpException(400, messages.featureNotAvailable('password reset mobile'), null))
-    }  
-    /**Parameter validation */
-    static resetPasswordByMobileChecks() {
-        return [
-            body('mobile').exists().withMessage('exists').custom(CustomValidators.mobile('mobile')),
-            Middleware.validate()
-        ]
-    }       
+   
 
 
 

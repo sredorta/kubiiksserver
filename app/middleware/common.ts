@@ -18,6 +18,7 @@ import {ValidationException} from '../classes/ValidationException';
 import { User } from '../models/user';
 import passportJWT from "passport-jwt";
 import webPush from 'web-push';
+import { url } from 'inspector';
 
 export let messages = en; //Set default language and export messages
 export let messagesAll : string[] = [];
@@ -50,27 +51,47 @@ export class Middleware {
     }
 
 
-    //Set language based on headers and supported languages in req.language
+    //Set language based on headers or referer because of oauth
     public static language() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
-            //Languages supported
-            const acceptableLanguages = glob.sync(process.cwd() + '/app/i18n/*.ts')
-                    .map((file:any) => path.basename(file, '.ts'))
-                    .filter((language:string) => language !== 'index');
-            let language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
+            console.log(req.url);
+            console.log(req.headers['referer']);
+            let language :string;
+            //GET LANGUAGE FROM REFERER FIRST
+            if (req.url.includes('/callback')) {
+                language = Middleware.getFromUrl(req.headers['referer']);
+            } else {
+                //GET LANGUAGE FROM HEADER
+                const acceptableLanguages = glob.sync(process.cwd() + '/app/i18n/*.ts')
+                        .map((file:any) => path.basename(file, '.ts'))
+                        .filter((language:string) => language !== 'index');
+                    language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
+            }
             res.locals.language = language;  //Store language in the locals
             if (!req.user) 
                 req.user = {};    
             req.user.language = language;   //This is used afterwards !!!!
+
+
             //Override messages so that it uses correct language
             let acc : any = [];
             acc[language] = require(`../i18n/${language}`).messages;
             messages = acc[language];
+            console.log("SETTING LANGUAGE", language);
             next();
         }
     }
 
-
+    private static getFromUrl(url:string | undefined){
+        if (url) {
+            const found = url.match(/\/[a-z][a-z]\//g);
+            if (found)
+                if (found[0]) {
+                    return found[0].replace(/\//gi, '');
+                }
+        }
+        return AppConfig.api.defaultLanguage;
+    }
 
 
 

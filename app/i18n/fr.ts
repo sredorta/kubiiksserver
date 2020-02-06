@@ -4,8 +4,8 @@ export const messages = {
     cathegory: "catégorie",
 
     validationExists: (name = 'field') => `Manque le paramètre '${name}'`,
-    validationDBExists: (name = 'field') => `'${name}' non trouvé dans la base de données`,
-    validationDBMissing: (name = 'field') => `'${name}' déjà enregistré dans notre base de données`,
+    validationDBExists: (name = 'field') => `${name} non trouvé dans la base de données`,
+    validationDBMissing: (name = 'field') => `${name} déjà enregistré dans notre base de données`,
 
     validationMinLength:(name = 'field', value='value') => `Le champ '${name}' doit avoir au moins ${value} caractères`,
     validationMaxLength: (name = 'field', value='value') => `Le champ '${name}' doit avoir moins de  ${value} caractères`,

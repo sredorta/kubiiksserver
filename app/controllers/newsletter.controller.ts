@@ -22,7 +22,7 @@ export class NewsletterController {
             if (news) {
                 res.send({message: {show:true, text:messages.newsletterSubscribed}});
             } else {
-                await Newsletter.create({email:req.body.email,language:res.locals.language});
+                await Newsletter.create({firstName:req.body.firstName,lastName:req.body.lastName,email:req.body.email,language:res.locals.language});
                 res.send({message: {show:true, text:messages.newsletterSubscribed}});
             }
         } catch(error) {
@@ -33,7 +33,10 @@ export class NewsletterController {
     /** Role attach parameter validation */
     static subscribeChecks() {
         return [
-            body('email').exists().withMessage('exists').isEmail(),
+            body('email').exists().withMessage('exists').isEmail().isLength({max:128}),
+            body('firstName').exists().withMessage('exists').isString().isLength({min:2,max:100}),
+            body('lastName').exists().withMessage('exists').isString().isLength({min:2,max:100}),
+
             Middleware.validate()
         ]
     }    

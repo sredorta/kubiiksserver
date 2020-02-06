@@ -284,6 +284,7 @@ export class Routes {
     app.route('/api/auth/get')
       .get(passport.authenticate('jwt',{session: false}),AuthController.getAuthUser);
 
+
     /** updateAuthUser or update current logged in user data */
     app.route('/api/auth/update')
       .post(passport.authenticate('jwt',{session: false}),AuthController.updateAuthUserChecks(),AuthController.updateAuthUser);
@@ -301,11 +302,6 @@ export class Routes {
     /** Reset password and send new one by email*/
     app.route('/api/auth/reset-password/email')
        .post(Middleware.unregistered(),AuthController.resetPasswordByEmailChecks(), AuthController.resetPasswordByEmail);  
-
-    /** Reset password and send new one by mobile*/
-    app.route('/api/auth/reset-password/mobile')
-       .post(Middleware.unregistered(),AuthController.resetPasswordByMobileChecks(), AuthController.resetPasswordByMobile);  
-
     
   
 

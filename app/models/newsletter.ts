@@ -22,6 +22,16 @@ export class Newsletter extends Model<Newsletter> {
     id!:number;
 
     @AllowNull(false)
+    @Unique(false)
+    @Column(DataTypes.STRING(100))
+    firstName!:string;
+
+    @AllowNull(false)
+    @Unique(false)
+    @Column(DataTypes.STRING(100))
+    lastName!:string;
+
+    @AllowNull(false)
     @Unique(true)
     @Column(DataTypes.STRING(128))
     email!:string;
@@ -35,8 +45,8 @@ export class Newsletter extends Model<Newsletter> {
     public static seed() {
         async function _seed() {
             try {
-              await Newsletter.create({email:"sergi.redorta@hotmail.com",language:"fr"});
-              await Newsletter.create({email:"sergi.redorta1@hotmail.com",language:"en"});
+              await Newsletter.create({firstName:"Prénom1",lastName:"Nom1", email:"prenom1.nom1@hotmail.com",language:"fr"});
+              await Newsletter.create({firstName:"Prénom2",lastName:"Nom2", email:"prenom2.nom2@hotmail.com",language:"fr"});
 
             } catch(err) {
                 console.log("ERROR: Could not seed Newsletter !!!")
@@ -45,7 +55,7 @@ export class Newsletter extends Model<Newsletter> {
         return _seed();
     }  
     /**Subscribe email to the newsletter*/
-    static subscribe(email:string,language:string) {
+    static subscribe(firstName:string,lastName:string,email:string,language:string) {
         let myPromise : Promise<boolean>;
         myPromise =  new Promise<boolean>((resolve,reject) => {
           async function _getData() {
@@ -53,7 +63,7 @@ export class Newsletter extends Model<Newsletter> {
                 let found = await Newsletter.findOne({where:{email:email}});
                 if (found) resolve(true);
                 else {
-                    await Newsletter.create({email:email,language:language});
+                    await Newsletter.create({firstName:firstName,lastName:lastName,email:email,language:language});
                     resolve(true);
                 }
             } catch(error) {

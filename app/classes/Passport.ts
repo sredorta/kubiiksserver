@@ -66,12 +66,9 @@ export class Passport {
                         return cb(new HttpException(401, messages.authInvalidCredentials ,null), false);
                     }
                     //Check that account has validated email
-                    let tmp = AppConfig.sharedSettings.find(obj=> obj.key=="validation_method");
-                    if (tmp)
-                        if (tmp.value != "no_validation") {
-                            if (myUser.isEmailValidated!= true)
-                                return cb(new HttpException(401, messages.authAccountNotActive ,null), false);
-                        }
+                    if (myUser.isEmailValidated!= true)
+                        return cb(new HttpException(401, messages.authAccountNotActive ,null), false);
+
                 }
                 myUser.passport = "local";
                 myUser.failCount=0;
@@ -166,7 +163,6 @@ export class Passport {
               language: req.user.language,
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
               emailValidationKey: Helper.generateRandomString(30),
-              mobileValidationKey: Helper.generateRandomNumber(4),
               avatar: profile._json.picture.data.url,
               passport: "facebook",
               facebookId : profile._json.id,
@@ -246,7 +242,6 @@ export class Passport {
               email: profile._json.email,
               language: req.user.language,
               emailValidationKey: Helper.generateRandomString(30),
-              mobileValidationKey: Helper.generateRandomNumber(4),
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
               avatar: profile._json.picture,
               passport:"google",

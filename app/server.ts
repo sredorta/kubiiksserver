@@ -46,6 +46,7 @@ const sequelize = new Sequelize({
     logging: false,
     database: AppConfig.db.database,
     dialect: "mariadb",
+    dialectOptions: {timezone: process.env.db_timezone},
     username: AppConfig.db.username,
     password: AppConfig.db.password,
     modelPaths: [mydir + './models/*'],
@@ -65,7 +66,7 @@ const sequelize = new Sequelize({
 
 async function startServer() {  
    //await sequelize.sync();
-   if (false) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
+   if (true) {  ///////////////////////////////////////////DO NOT FORCE REMOVAL FOR NOW
     await sequelize.sync({force:true});  
     //Seeding part
     await Setting.seed(); //Seed settings from the config.json for FE sharing
