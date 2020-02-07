@@ -90,6 +90,10 @@ export class User extends Model<User> {
   @Column(DataTypes.STRING(100))
   password!:string;
 
+  @AllowNull(true)
+  @Column(DataTypes.STRING(100))
+  passwordResetKey!:string;
+
   @AllowNull(false)
   @Default(0)
   @Column(DataTypes.SMALLINT)

@@ -38,6 +38,7 @@ export const messages = {
     authEmailValidateError: "No s'ha pogut activar el compte, contacta amb l'administrador",
     authEmailValidateSuccess: "S'ha activat el compte",
     authAccountNotActive: "Per accedir s'ha de validar el compte de correu electrònic abans",
+    authEstablisPasswordError: "No s'ha pogut reinicialitzar la contrasenya, contacteu amb l'administrador",
 
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nova contrasenya`,
     emailSentOk:    (name = 'field') => `Un correu electrònic ha sigut enviat a : ${name}`,
@@ -49,6 +50,7 @@ export const messages = {
     emailValidationLink: (name = 'field') => `<p>Valida el teu compte clicant al següent <a href='${name}'>enllaç</a></p>`,
     emailResetPassword: (name = 'field') => `<p>La nova contrasenya és : <span>${name}<span></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Nova contrasenya`,
+    emailResetPasswordNoUser: "Hi ha hagut una demanda de reinicialitzar la contrasenya en aquest compte de correu electronic, en canvi aquest compte no està enregistrat en les nostres bases de dades",
 
     //chat part
     chatWelcome: "Benvingut al xat",

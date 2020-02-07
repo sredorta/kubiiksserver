@@ -45,7 +45,6 @@ export class AuthController {
                 passport: "local",
                 terms:req.body.terms,
                 emailValidationKey: Helper.generateRandomString(30),
-                mobileValidationKey: Helper.generateRandomNumber(4),
                 password: User.hashPassword(req.body.password)
             });
             //If newsletter is check add email to the newsletter
@@ -133,7 +132,7 @@ export class AuthController {
         //Thanks to passports we have the user in req.user if we get here credentials are valid
         try {
             let myUser = await User.scope("details").findByPk(req.user.id);
-            if (!myUser) return next( new HttpException(400, messages.validationNotFound(messages.User), null));
+            if (!myUser) return next( new HttpException(400, messages.authInvalidCredentials, null));
             let token : string = "";
             if (!req.body.keepconnected)
                 token = myUser.createToken("short");
@@ -314,19 +313,29 @@ export class AuthController {
         query["email"] = req.body.email;
         try {
             let myUser = await User.scope("full").findOne({where:{email:req.body.email}});
-            if (!myUser) return next( new HttpException(400, messages.validationNotFound(messages.User),null));
-            const password = Helper.generatePassword();
-            myUser.password = User.hashPassword(password);
-            await myUser.save();
-            //Send the email
-            let html = messages.emailResetPassword(password);
-            let recipients = [];
-            recipients.push(myUser.email);
-            let result = await Email.send(res.locals.language, 'reset-password', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,html);
-            if (!result) res.send({message: {show:true, text:messages.emailSentError}});
-            else
-                res.send({message: {show:true, text:messages.authEmailResetPassword(myUser.email)}});      
-        
+            if (!myUser) {
+                let html = messages.emailResetPasswordNoUser;
+                let recipients = [];
+                recipients.push(req.body.email);
+                let result = await Email.send(res.locals.language, 'reset-password', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,html);
+                if (!result) res.send({message: {show:true, text:messages.emailSentError}});
+                else
+                    res.send({message: {show:true, text:messages.authEmailResetPassword(req.body.email)}});      
+            } else {
+                const password = Helper.generatePassword();
+                myUser.password = User.hashPassword(password);
+                myUser.passwordResetKey = Helper.generateRandomString(50);
+                await myUser.save();
+                //Send the email
+                const link = AppConfig.api.kiiwebExtHost + "/"+req.user.language+"/auth/establish-password?id=" + myUser.id + "&key="+myUser.passwordResetKey;
+                let html = messages.emailResetPassword(link);
+                let recipients = [];
+                recipients.push(myUser.email);
+                let result = await Email.send(res.locals.language, 'reset-password', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,html);
+                if (!result) res.send({message: {show:true, text:messages.emailSentError}});
+                else
+                    res.send({message: {show:true, text:messages.authEmailResetPassword(myUser.email)}});      
+            }
         } catch(error) {
             next(new HttpException(500, messages.emailSentError,null));
         };
@@ -339,6 +348,45 @@ export class AuthController {
             ]
     }    
    
+    ///////////////////////////////////////////////////////////////////////////
+    // establishPassword:  Re-establishes password after reset
+    ///////////////////////////////////////////////////////////////////////////
+    static establishPassword = async (req: Request, res: Response, next:NextFunction) => {
+        let query :any =  {};
+        query["email"] = req.body.email;
+        try {
+            let myUser = await User.scope("fulldetails").findOne({where:{id:req.body.id}});
+            //Check user exists
+            if (!myUser) return next( new HttpException(400, messages.authEstablisPasswordError,null));
+            //Check that the key is ok
+            if (myUser.passwordResetKey != req.body.key) {
+                myUser.passwordResetKey=''; //Reset key as is only one-time enabled
+                await myUser.save();
+                return next( new HttpException(400,  messages.authEstablisPasswordError,null));
+            }
+            myUser.password = User.hashPassword(req.body.password);
+            myUser.passwordResetKey = '';
+            await myUser.save();
+            myUser = await User.scope("details").findByPk(req.body.id);  
+            if (!myUser) return next( new HttpException(400,  messages.authEstablisPasswordError,null));
+            let token : string = "";
+            token = myUser.createToken("short");
+            res.json({token: token, user:myUser});   
+        } catch(error) {
+            console.log(error);
+            next(new HttpException(500, messages.authEstablisPasswordError,null));
+        };
+    }
+    /**Parameter validation */
+    static establishPasswordChecks() {
+            return [
+                body('id').exists().withMessage('exists').isNumeric(),
+                body('key').exists().withMessage('exists').isString().isLength({min:30}),
+                body('password').exists().withMessage('exists').custom(CustomValidators.password()),
+                Middleware.validate()
+            ]
+    }    
+
 
 
 

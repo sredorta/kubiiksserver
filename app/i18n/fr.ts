@@ -38,6 +38,7 @@ export const messages = {
     authEmailValidateError: "Le compte n'a pas pu être activé, contactez l'administrateur du site",
     authEmailValidateSuccess: 'Votre compte est désormais activé',
     authAccountNotActive: 'Vous devez confirmer votre adresse de courriel avant de pouvoir accéder',
+    authEstablisPasswordError: "Impossible de reinitializer votre mot de passe, contactez l'administrateur",
 
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nouveau mot de passe`,
     emailSentOk:    (name = 'field') => `Un courriel a été envoyé à l'adresse : ${name}`,
@@ -47,8 +48,9 @@ export const messages = {
     emailSiteAccess : 'ALLER AU SITE',
     emailDeleteProtected: 'Les modèles de courriel du système ne peuvent pas être effacés',
     emailValidationLink: (name = 'field') => `<p>Merci de valider votre compte en cliquant sur ce <a href='${name}'>lien</a></p>`,
-    emailResetPassword: (name = 'field') => `<p>Votre nouveau mot de passe : <span>${name}<span></p>`,
+    emailResetPassword: (name = 'field') => `<p>Accedez à votre compte en clickant sur ce <a href='${name}'>lien</a></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Demande de nouveau mot de passe`,
+    emailResetPasswordNoUser: "Il y a eu une demande de nouveau mot de passe sur ce compte de courriel electronique, ce compte n'est pas enregistré dans nos bases de données",
 
     //chat part
     chatWelcome: "Bienvenu a notre chat",

@@ -52,19 +52,34 @@ export class Helper {
         return text;
     }
 
-    //Returns if the password passes the quality required (Used in DTO and in generate password)
-    public static passwordPassQualityRequired(value:string) {
-        //TODO improve this password validation check
-        if (value ==undefined) return false;
-        if (value == null) return false;
-        if (value.length<5) return false;
-        if (value.length>50) return false;
-        var re = '(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{5,}';
+    //Returns if the password passes the quality required
+    public static passwordPassQualityRequired(pass:string) {
+        let score :number = 0;    
+        // award every unique letter until 5 repetitions
+        let letters : {[key:string]: number;} = {};
 
-        //return false;
-        if (!value.match(re))
-            return false
-        return true; 
+        for (var i=0; i<pass.length; i++) {
+            letters[pass[i]] = (letters[pass[i]] || 0) + 1;
+            score += 5.0 / letters[pass[i]];
+        }
+    
+        // bonus points for mixing it up
+        var variations : {[key:string] : boolean} = {
+            digits: /\d/.test(pass),
+            lower: /[a-z]/.test(pass),
+            upper: /[A-Z]/.test(pass),
+            nonWords: /\W/.test(pass),
+        }
+    
+        let variationCount = 0;
+        for (var check in variations) {
+            variationCount += (variations[check] == true) ? 1 : 0;
+        }
+        score += (variationCount - 1) * 10;
+        score= score>100?100:score;
+        console.log("PASSWORD SCORE:",score);
+        if (score<60) return false;
+        return true;
     }
     /*Generates random password*/
     public static generatePassword() : string {
@@ -72,6 +87,7 @@ export class Helper {
         let i = 0;
         while(!Helper.passwordPassQualityRequired(password)) {
             password = Helper.generateRandomString(10);
+            console.log("Regenerating password because of low quality !!!!!");
             i++;
         }
         return password;

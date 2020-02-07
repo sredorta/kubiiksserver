@@ -303,6 +303,9 @@ export class Routes {
     app.route('/api/auth/reset-password/email')
        .post(Middleware.unregistered(),AuthController.resetPasswordByEmailChecks(), AuthController.resetPasswordByEmail);  
     
+    /** Re-establish password from email*/
+    app.route('/api/auth/establish-password')
+       .post(Middleware.unregistered(),AuthController.establishPasswordChecks(), AuthController.establishPassword);  
   
 
 

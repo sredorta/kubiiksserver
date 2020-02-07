@@ -38,6 +38,7 @@ export const messages = {
     authEmailValidateError: 'No se ha podido activar la cuenta, contacta con el administrador',
     authEmailValidateSuccess: 'La cuenta ha sido activada',
     authAccountNotActive: 'Tienes que validar la cuenta de correo electrónico antes de poder acceder',
+    authEstablisPasswordError: "No se ha podido reinicializar la contraseña, contacte con el administrador",
 
     authEmailResetPasswordSubject: (name = 'field') => `${name} : Nueva contraseña`,
     emailSentOk:    (name = 'field') => `Un correo electrónico ha sido enviado a : ${name}`,
@@ -49,6 +50,7 @@ export const messages = {
     emailValidationLink: (name = 'field') => `<p>Por favor valida tu cuenta clicando en el siguiente <a href='${name}'>enlace</a></p>`,
     emailResetPassword: (name = 'field') => `<p>Su nueva contraseña : <span>${name}<span></p>`,
     emailResetPasswordSubject: (name = 'field') => `${name} : Nueva contraseña`,
+    emailResetPasswordNoUser: "Ha habido una demanda de reinicializacion de contraseña para esta cuenta de correo electronico, esta cuenta no està en nuestras bases de datos",
 
     //chat part
     chatWelcome: "Bienvenido a nuestro chat",
