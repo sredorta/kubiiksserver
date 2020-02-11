@@ -257,8 +257,10 @@ export class AuthController {
                 myUser.phone = req.body.phone;            
             if (req.body.mobile)
                 myUser.mobile = req.body.mobile;    
+            console.log("AVATAR IS SET TO:", req.body.avatar);    
             if (req.body.avatar) {
-                myUser.avatar = req.body.avatar;  
+                if (req.body.avatar == "none") myUser.avatar = null;
+                else myUser.avatar = req.body.avatar;  
             }  
             if (req.body.language)
                 myUser.language = req.body.language;                          

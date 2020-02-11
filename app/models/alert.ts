@@ -33,16 +33,6 @@ export class Alert extends Model<Alert> {
     @Column(DataTypes.STRING(50))
     type!: string; 
 
-    @AllowNull(true)
-    @Unique(false)
-    @Column(DataTypes.STRING(300))
-    title!: string;     
-
-    @AllowNull(true)
-    @Unique(false)
-    @Column(DataTypes.STRING(1000))
-    message!: string; 
-
     @AllowNull(false)
     @Unique(false)
     @Default(false)
@@ -63,11 +53,73 @@ export class Alert extends Model<Alert> {
     public static seed() {
         async function _seed() {
             try {
-              let myAlert = await Alert.create({id:1,userId:1,type:"email",title:"My new alert",message:"New order has been created for $100 total"});
+              let myAlert = await Alert.create({id:1,userId:1,type:"email"});
               await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
               await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
               await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
               await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:2,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:3,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:4,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:5,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:6,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:7,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:8,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:9,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:10,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+              myAlert = await Alert.create({id:11,userId:1,type:"email"});
+              await AlertTranslation.create({alertId:myAlert.id, iso:"fr",title:"Ma nouvelle alerte en francais",message:"Un message en francais d'alerte"});  
+              await AlertTranslation.create({alertId:myAlert.id, iso:"en",title:"My new alert in english", message:"A message in english for an alert"});    
+              await AlertTranslation.create({alertId:myAlert.id, iso:"es",title:"Mi nueva alerta en español", message:"Un mensaje en español para una alerta"});             
+              await AlertTranslation.create({alertId:myAlert.id, iso:"ca",title:"La meva nova alerta en català", message:"Un missatge per una alerta en català"});             
+
+
             } catch(err) {
                 console.log("ERROR: Could not seed ALERTS !!!")
             }

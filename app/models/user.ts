@@ -69,7 +69,7 @@ export class User extends Model<User> {
 
   @AllowNull(true)
   @Column(DataTypes.STRING(300))
-  avatar!: string;
+  avatar!: string | null;
 
   @AllowNull(false)
   @Default(false)
@@ -301,7 +301,7 @@ export class User extends Model<User> {
   public static seed() {
     async function _seed() {
         /*first user*/
- /*       let myUser : User = new User();
+        let myUser : User = new User();
         myUser = await User.scope("full").create({
           firstName: "Sergi",
           lastName: "Redorta",
@@ -318,7 +318,7 @@ export class User extends Model<User> {
         await myUser.attachRole("admin");
         await myUser.attachRole("kubiiks");
         await myUser.attachRole("chat");
-*/
+
         /*Debug users*/
 /*        myUser = await User.scope("full").create({
           firstName: "gmail",
