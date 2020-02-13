@@ -12,7 +12,7 @@ export class Helper {
     
 
     //Check if sharedSettings key matches a value
-    public static isSharedSettingMatch(key:string, value:string) : boolean {
+    /*public static isSharedSettingMatch(key:string, value:string) : boolean {
         let obj = AppConfig.sharedSettings.find(obj => obj.key == key);
         if (obj)
             if (obj.value == value) 
@@ -27,7 +27,7 @@ export class Helper {
             return obj.value;
         else 
             return undefined;    
-    }
+    }*/
     
     
     //Generate random string of the given length

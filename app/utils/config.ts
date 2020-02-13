@@ -67,15 +67,76 @@ import * as dotenv from "dotenv";
                 "clientSecret": <string>process.env.AUTH_GOOGLE_CLIENT_SECRET
             }
         },
-        "sharedSettings" : [
-            {"key": "profile_firstName", "value":"include"},
-            {"key": "profile_lastName", "value":"include"},
-            {"key": "profile_phone", "value":"optional"},
-            {"key": "profile_mobile", "value":"optional"},            
-            {"key": "validation_method", "value":"email"}, //email or no_validation
-            {"key": "article_cathegories", "value":"content,blog,prix,realisations,realisations-comments,demo,home-features,home-menu"}, //Article cathegories
-        ],
+        "settings": [
+            //Settings that are page independant and always required to load
+            {key:'favicon', type:'main',value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/favicon.jpg"},
+            {key:'appicon512', type:'main',value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/icon-512x512.png"},
+            {key:'appicon192', type:'main',value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/icon-192x192.png"},
+            {key: "popup-show",type: "main",value: "disabled"},
+            //Footer part
+            {key: "facebook", type:"main",value:"https://www.facebook.com/kubiiks/"},
+            {key: "google", type:"main",value:"https://plus.google.com/u/0/118285710646673394875"},
+            {key: "youtube", type:"main",value:"https://youtube.com/user/sergiredorta"},
+            {key: "instagram", type:"main",value:"https://www.instagram.com/sergiredorta/"},
+            {key: "linkedin", type:"main",value:"https://www.linkedin.com/company/kubiiks/"},
+            {key: "twitter", type:"main",value:"https://www.twitter.com"},
+
+            //Seo part
+            {key: "sitename", type:"main",value:"kubiiks"},
+            {key: "url", type:"main",value:<string>process.env.APP_EXTERNAL_HOST},
+            {key: "addressLocality", type:"main", value: "La Gaude"},
+            {key: "addressCountry", type:"main", value: "France"},
+            {key: "addressPostal", type:"main", value: "06610"},
+            {key: "addressStreet", type:"main", value: "6, rue Roger Avon"},
+            {key: "telephone", type:"main", value: "0623133212"},
+            {key: "email", type:"main", value: "sales@kubiiks.com"},
+
+        ]
     }
+/*
+    mySetting = await Setting.create({
+        type: "seo",
+        key: "url",
+        value: 'https://www.kubiiks.com',
+    });
+
+    mySetting = await Setting.create({
+        type: "seo",
+        key: "url_image",
+        value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/logo.jpg"
+    });
+
+    mySetting = await Setting.create({
+      type: "seo",
+      key: "fb_app_id",
+      value: "2088315884799260"
+    });
+
+
+    mySetting = await Setting.create({
+        type: "seo",
+        key: "sitename",
+        value: 'kubiiks'
+    });
+
+
+    mySetting = await Setting.create({
+      type: "general",
+      key: "companyPhone",
+      value: '0423133212'
+    });
+    mySetting = await Setting.create({
+      type: "general",
+      key: "companyAddress",
+      value: "374, chemin de l'escure; 06610 Le Bar sur Loup;France"
+    });
+
+    mySetting = await Setting.create({
+      type: "general",
+      key: "companyEmail",
+      value: 'sales@kubiiks.com'
+    });*/
+
     console.log("-----  API SETTINGS  ------")
     console.log(AppConfig.api);
     console.log(AppConfig.db);

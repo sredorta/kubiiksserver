@@ -23,19 +23,23 @@ export enum SettingType {"shared", "i18n", "social"};
 @Table({timestamps:false})
 export class Setting extends Model<Setting> {
 
+  /**Key that is used for finding the setting */
   @AllowNull(false)
   @Unique(true)
   @Column(DataTypes.STRING(50))
   key!: string;
 
+  /**Contains the context where the setting is needed */
   @AllowNull(false)
   @Column(DataTypes.STRING(50))
   type!: string;
 
+  /**Value of the setting if it's defined no translation are asumed */
   @AllowNull(true)
   @Column(DataTypes.STRING(40000))
   value!: string;
 
+  /**Translations of the value if value is defined null */
   @HasMany(() => SettingTranslation)
   translations!: SettingTranslation[];  
 
@@ -47,7 +51,7 @@ export class Setting extends Model<Setting> {
     return false;    
   }
 
-  /**From array of settings we get the value of the one that matches they given key*/
+  /**From array of settings we get the value of the one that matches the given key*/
   public static getValueFromArray(array:Setting[], key:string) : string | null {
     let result = array.find(obj=> obj.key==key);
     if (result) return result.value;
@@ -77,59 +81,17 @@ export class Setting extends Model<Setting> {
   /**Seeds the table initially */
   public static seed() {
     async function _seed() {
-        let mySetting;
-        for(let item of AppConfig.sharedSettings) {
+      //Create the settings from the config file so that we get the defaults
+        for(let item of AppConfig.settings) {
             await Setting.create({
                 key: item.key,
-                type: "shared",
+                type: item.type,
                 value: item.value
-            });                
+            });              
         }     
 
       //Show or hide popup dialog
-      mySetting = await Setting.create({
-          type: "dialog",
-          key: "popup-show",
-          value: "disabled"
-      });        
-
-
-        /*social*/
-        mySetting = await Setting.create({
-            type: "social",
-            key: "linkFacebook",
-            value: "https://www.facebook.com/kubiiks/"
-        });          
-
-        mySetting = await Setting.create({
-            type: "social",
-            key: "linkGoogleplus",
-            value: "https://plus.google.com/u/0/118285710646673394875",
-        });   
-
-        mySetting = await Setting.create({
-            type: "social",
-            key: "linkInstagram",
-            value: "https://www.instagram.com/sergiredorta/",
-         });  
-
-        mySetting = await Setting.create({
-            type: "social",
-            key: "linkLinkedin",
-            value: "https://www.linkedin.com/company/kubiiks/",
-        });   
-
-        mySetting = await Setting.create({
-            type: "social",
-            key: "linkTwitter",
-            value: "",
-        });   
-
-        mySetting = await Setting.create({
-            type: "social",
-            key: "linkYoutube",
-            value: "https://www.youtube.com/user/sergiredorta",
-       });   
+/*  
 
         mySetting = await Setting.create({
             type: "seo",
@@ -153,66 +115,7 @@ export class Setting extends Model<Setting> {
         await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"descripció en català"});             
           
                
-        mySetting = await Setting.create({
-            type: "seo",
-            key: "url",
-            value: 'https://www.kubiiks.com',
-        });
 
-        mySetting = await Setting.create({
-            type: "seo",
-            key: "url_image",
-            value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/logo.jpg"
-        });
-
-        mySetting = await Setting.create({
-          type: "seo",
-          key: "fb_app_id",
-          value: "2088315884799260"
-        });
-
-
-        mySetting = await Setting.create({
-            type: "seo",
-            key: "sitename",
-            value: 'kubiiks'
-        });
-
-        //General part
-        mySetting = await Setting.create({
-          type: "general",
-          key: "favicon",
-          value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/favicon.jpg"
-        });
-
-        mySetting = await Setting.create({
-          type: "general",
-          key: "appicon512",
-          value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/icon-512x512.png"
-        });
-        mySetting = await Setting.create({
-          type: "general",
-          key: "appicon192",
-          value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/icon-192x192.png"
-        });
-
-
-        mySetting = await Setting.create({
-          type: "general",
-          key: "companyPhone",
-          value: '0423133212'
-        });
-        mySetting = await Setting.create({
-          type: "general",
-          key: "companyAddress",
-          value: "374, chemin de l'escure; 06610 Le Bar sur Loup;France"
-        });
-
-        mySetting = await Setting.create({
-          type: "general",
-          key: "companyEmail",
-          value: 'sales@kubiiks.com'
-        });
 
 
         mySetting = await Setting.create({
@@ -226,7 +129,7 @@ export class Setting extends Model<Setting> {
           key: "gmapZoom",
           value: '14',
         });           
-
+*/
 
     }
     return _seed();

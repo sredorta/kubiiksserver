@@ -90,7 +90,7 @@ export class SettingController {
     static updateDialogChecks() {
         return [
             body('setting.id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(Setting,'id')),
-            body('setting.type').exists().withMessage('exists').contains('dialog'),
+            body('setting.type').exists().withMessage('exists'),
             body('setting.key').exists().withMessage('exists').contains('popup-show'),
             body('setting.value').exists().withMessage('exists').isLength({min:4}),
             Middleware.validate()
