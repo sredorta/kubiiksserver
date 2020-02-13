@@ -141,11 +141,14 @@ export class User extends Model<User> {
         let translated = alert.translations.find((obj:any) => obj.iso == iso);
         if (translated) {
           alert.title = translated.title;
-          if (alert.message== null) alert.message = translated.message; //Only translate if message is null
+          alert.message = translated.message; //Only translate if message is null
         }
+        if (alert.translations) delete alert['translations'];
+
         alerts.push(alert);
       }
     }
+    console.log("WE ARE HERE",element)
     return element
   }
 
@@ -312,12 +315,28 @@ export class User extends Model<User> {
           passport: "local",
           terms: true,
           emailValidationKey: Helper.generateRandomString(30),
-          mobileValidationKey: Helper.generateRandomNumber(4),
-          password: User.hashPassword("Secure0")
+          password: User.hashPassword("Secure0;")
         });
         await myUser.attachRole("admin");
         await myUser.attachRole("kubiiks");
         await myUser.attachRole("chat");
+/*
+        for (let i =0; i<30 ; i++) {
+          myUser=await User.scope("full").create({
+            firstName: "Sergi" + i,
+            lastName: "Redorta",
+            email: "sergi"+i+".redorta@hotmail.com",
+            phone: "0423133212",
+            mobile: "0623133212",
+            language: "fr",
+            passport: "local",
+            terms: true,
+            emailValidationKey: Helper.generateRandomString(30),
+            password: User.hashPassword("Secure1;")
+          });
+          await myUser.attachRole("chat");
+        }*/
+
 
         /*Debug users*/
 /*        myUser = await User.scope("full").create({
