@@ -11,6 +11,23 @@ import { PageTranslation } from '../models/page_translation';
 
 export class PageController {
 
+    /**Gets all alerts of the user */
+    static getAll = async (req: Request, res: Response, next:NextFunction) => {
+            try {
+                let result = [];
+                let myPages = await Page.scope("full").findAll();
+                for (let page of myPages) {
+                    result.push(page.sanitize(res.locals.language));
+                }
+                res.json(result);
+                //let alerts = await Alert.findAll({order: [sequelize.literal('id DESC')]});
+                //for (let alert of alerts) result.push(alert.sanitize(res.locals.language));
+                //res.json(alerts);
+            } catch(error) {
+                next(error);
+            }
+    }
+
 
     /**Update the page setting with the language */
     static update = async (req: Request, res: Response, next:NextFunction) => {

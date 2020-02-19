@@ -83,54 +83,19 @@ export class Setting extends Model<Setting> {
     async function _seed() {
       //Create the settings from the config file so that we get the defaults
         for(let item of AppConfig.settings) {
-            await Setting.create({
+            let tmpS= await Setting.create({
                 key: item.key,
                 type: item.type,
                 value: item.value
             });              
+            if (item.value == null) {
+              if (item.translations) {
+                Object.entries(item.translations).forEach((trans,index)=> {
+                  SettingTranslation.create({settingId:tmpS.id,iso:trans[0],value:trans[1].value})
+                })
+              }
+            }
         }     
-
-      //Show or hide popup dialog
-/*  
-
-        mySetting = await Setting.create({
-            type: "seo",
-            key: "title",
-            value: null
-        });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"Titre en français"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"Title in english"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"Titulo en español"});
-        await SettingTranslation.create({settingId:mySetting.id, iso:"ca",value:"Titol en català"});
-
-
-        mySetting = await Setting.create({
-            type: "seo",
-            key: "description",
-            value: null
-        });
-        await SettingTranslation.create({settingId:mySetting.id, iso:"fr",value:"description en francais"});  
-        await SettingTranslation.create({settingId:mySetting.id, iso:"en",value:"description in english"});    
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"description en español"});   
-        await SettingTranslation.create({settingId:mySetting.id, iso:"es",value:"descripció en català"});             
-          
-               
-
-
-
-        mySetting = await Setting.create({
-          type: "general",
-          key: "gmapLatLng",
-          value: '43.61426,6.959808'
-        });
-
-        mySetting = await Setting.create({
-          type: "general",
-          key: "gmapZoom",
-          value: '14',
-        });           
-*/
-
     }
     return _seed();
   }

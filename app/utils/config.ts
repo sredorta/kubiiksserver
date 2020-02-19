@@ -69,7 +69,7 @@ import * as dotenv from "dotenv";
         },
         "settings": [
             //Settings that are page independant and always required to load
-            {key:'favicon', type:'main',value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/favicon.jpg"},
+            {key:'favicon', type:'main',value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/favicon.png"},
             {key:'appicon512', type:'main',value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/icon-512x512.png"},
             {key:'appicon192', type:'main',value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/icon-192x192.png"},
             {key: "popup-show",type: "main",value: "disabled"},
@@ -81,7 +81,13 @@ import * as dotenv from "dotenv";
             {key: "linkedin", type:"main",value:"https://www.linkedin.com/company/kubiiks/"},
             {key: "twitter", type:"main",value:"https://www.twitter.com"},
 
+            //Contact part
+            {key: "latitude", type:"main",value:"43.61426"},
+            {key: "longitude", type:"main",value:"6.959808"},
+            {key: "zoom", type:"main",value:"14"},
+
             //Seo part
+            {key: "description", type:"main",value:null,translations:{fr:{value:"Ma description"},en:{value:"My description"},es:{value:"Mi descripcion"},ca:{value:"La meva descripció"}}},
             {key: "sitename", type:"main",value:"kubiiks"},
             {key: "url", type:"main",value:<string>process.env.APP_EXTERNAL_HOST},
             {key: "addressLocality", type:"main", value: "La Gaude"},
@@ -90,52 +96,12 @@ import * as dotenv from "dotenv";
             {key: "addressStreet", type:"main", value: "6, rue Roger Avon"},
             {key: "telephone", type:"main", value: "0623133212"},
             {key: "email", type:"main", value: "sales@kubiiks.com"},
-
+            {key: "fb_app_id", type:"main", value: "2088315884799260"},
+            {key:"url_image", type:"main",value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/logo.jpg"}
         ]
     }
-/*
-    mySetting = await Setting.create({
-        type: "seo",
-        key: "url",
-        value: 'https://www.kubiiks.com',
-    });
-
-    mySetting = await Setting.create({
-        type: "seo",
-        key: "url_image",
-        value: AppConfig.api.kiiserverExtHost + "/public/images/defaults/logo.jpg"
-    });
-
-    mySetting = await Setting.create({
-      type: "seo",
-      key: "fb_app_id",
-      value: "2088315884799260"
-    });
 
 
-    mySetting = await Setting.create({
-        type: "seo",
-        key: "sitename",
-        value: 'kubiiks'
-    });
-
-
-    mySetting = await Setting.create({
-      type: "general",
-      key: "companyPhone",
-      value: '0423133212'
-    });
-    mySetting = await Setting.create({
-      type: "general",
-      key: "companyAddress",
-      value: "374, chemin de l'escure; 06610 Le Bar sur Loup;France"
-    });
-
-    mySetting = await Setting.create({
-      type: "general",
-      key: "companyEmail",
-      value: 'sales@kubiiks.com'
-    });*/
 
     console.log("-----  API SETTINGS  ------")
     console.log(AppConfig.api);

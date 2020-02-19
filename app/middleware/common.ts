@@ -177,17 +177,15 @@ export class Middleware {
     public static getUserFromToken() {
         return function (req:Request, res:Response, next: NextFunction) {
             const token = passportJWT.ExtractJwt.fromAuthHeaderWithScheme('Bearer')(req);
-            jwt.verify(token,AppConfig.auth.jwtSecret, (err,decoded) => {
-                if (err) {
-                    req.user = null;
-                    next();
-                } else {
-                    req.user = decoded;
-                    next();
-                }
-            })
-
-
+                jwt.verify(token,AppConfig.auth.jwtSecret, (err,decoded) => {
+                    if (err) {
+                        req.user = undefined;
+                        next();
+                    } else {
+                        req.user = decoded;
+                        next();
+                    }
+                })
         }
     }
 

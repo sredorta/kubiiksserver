@@ -41,7 +41,6 @@ export const NUser = 'Not a model';
 export class User extends Model<User> {
 
 
-
   @AllowNull(true)
   @Column(DataTypes.STRING(50))
   firstName!: string;

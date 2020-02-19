@@ -99,8 +99,12 @@ export class Routes {
     // INIT CONTROLLER PART
     ////////////////////////////////////////////////////////////////
     app.route('/api/initial')
-      .get(Middleware.getUserFromToken(), InitController.get);
+      .post(Middleware.getUserFromToken(), InitController.checks(),InitController.get);
  
+    /**Gets all pages and articles from pages, this is done on serviceWorker only */  
+    app.route('/api/initial/full')
+      .get(Middleware.getUserFromToken(), InitController.getFull);
+
     /////////////////////////////////////////////////////////////////
     // SETTINGS CONTROLLER PART
     //  This table is mapped from the config.json on the server start
@@ -124,6 +128,10 @@ export class Routes {
     ////////////////////////////////////////////////////////////////      
     app.route('/api/page/update')
     .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),PageController.updateChecks(),PageController.update);
+
+    app.route('/api/page/all')
+    .get(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),PageController.getAll);
+
 
     //////////////////////////////////////////////////////////////////
     // Email part
