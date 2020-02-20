@@ -23,10 +23,17 @@ export const NArticle = 'Not a model';
 export class Article extends Model<Article> {
 
   @AllowNull(true)
+  @Default(null)
+  @Column(DataTypes.INTEGER().UNSIGNED)
+  order!: number;
+
+  @AllowNull(true)
+  @Default(null)
   @Column(DataTypes.STRING(50))
   key!: string;
 
   @AllowNull(true)
+  @Default(null)
   @Column(DataTypes.STRING(50))
   page!: string;
 
@@ -99,6 +106,7 @@ export class Article extends Model<Article> {
                 //Create the settings from the config file so that we get the defaults
                 for(let item of AppConfig.articles) {
                   let tmp= await Article.create({
+                      order: item.order,
                       page: item.page,
                       key: item.key,
                       cathegory:item.cathegory

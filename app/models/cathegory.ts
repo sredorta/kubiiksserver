@@ -1,8 +1,10 @@
-import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes,HasMany} from 'sequelize-typescript';
+import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Default, DefaultScope,Scopes,HasMany, BelongsTo, ForeignKey, BelongsToMany} from 'sequelize-typescript';
 import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/config';
 import { SettingTranslation } from './setting_translation';
 import { Article } from './article';
+import { Page } from './page';
+import { PageCathegory } from './page_cathegory';
 
 
 export const CathegoryN = 'Not a model';
@@ -11,7 +13,12 @@ export const NCathegory = 'Not a model';
 
 @Table({timestamps:false})
 export class Cathegory extends Model<Cathegory> {
-
+    
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataTypes.INTEGER().UNSIGNED)
+  id!:number;
+  
   @AllowNull(false)
   @Unique(true)
   @Column(DataTypes.STRING(50))
@@ -21,7 +28,9 @@ export class Cathegory extends Model<Cathegory> {
   @Column(DataTypes.STRING(50))
   role!: string;
 
-
+  //Relations
+  @BelongsToMany(() => Page, () => PageCathegory)
+  pages!: Page[];
 
   /**Seeds the table initially */
   public static seed() {

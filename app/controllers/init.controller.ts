@@ -56,7 +56,6 @@ export class InitController {
     /**Gets all data required for app initialization in one shot */
     static get = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            console.log("REQUESTES FOR PAGE", req.body.page);
             let result : any = {};
             let settings = await Setting.findAll();
             let pages = await Page.findAll({where:{page:req.body.page}});
@@ -66,7 +65,17 @@ export class InitController {
             for (let setting of settings) {
                     result["settings"].push(setting.sanitize(res.locals.language))
             }
+            //We need to add all articles of the page, which means all articles with implicit page equal to req.body.page
+            //And all articles from cathegories that the page owns
             let articles = await Article.findAll({where:{page:req.body.page},order: [sequelize.literal('id DESC')]});
+            for (let page of pages) {
+                for (let cath of page.cathegories) {
+                    let tArticles = await Article.findAll({where:{cathegory:cath.name},order: [sequelize.literal('id DESC')]})
+                    for (let tArticle of tArticles) {
+                        articles.push(tArticle);
+                    }
+                }
+            }
             result["articles"] = [];
             for (let article of articles) 
                 result["articles"].push(article.sanitize(res.locals.language));

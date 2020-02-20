@@ -14,6 +14,7 @@ import { User } from '../models/user';
 import * as converter from 'xml-js';
 import fs from 'fs';
 import { Setting } from '../models/setting';
+import { Cathegory } from '../models/cathegory';
 
 
 export class ArticleController {
@@ -70,18 +71,23 @@ export class ArticleController {
     /**Creates article content on the given cathegory. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static create = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            let myUser = await User.scope("details").findByPk(req.user.id);            
-            if (myUser) {
-                if (req.body.cathegory=="content") {
+            let myUser = await User.scope("details").findByPk(req.user.id); 
+            if (!myUser) throw new Error("User not found !");
+                if (req.body.cathegory=="kubiiks"  && !myUser.hasRole("kubiiks")) {
                     return next(new HttpException(403, messages.articleContentNotCreate, null));
                 }
                 if (req.body.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
                 }
-                if (!(req.body.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                if (!(req.body.cathegory=="content") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
                 }
+                //Find biggest order of the cathegory
+                let max = <number>await Article.max('order',{where:{cathegory:req.body.cathegory}});
                 let myArticle = await Article.create({
+                    key:null,
+                    page:null,
+                    order:max+1,
                     cathegory: req.body.cathegory
                 });
                 if (myArticle) {
@@ -99,7 +105,7 @@ export class ArticleController {
                 let article = await Article.findByPk(myArticle.id);
                 if (!article) throw new Error("Could not find 'article'");
                 res.json(article.sanitize(res.locals.language));                
-            }
+            
         } catch(error) {
             next(error);
         }
@@ -107,7 +113,7 @@ export class ArticleController {
     /**Parameter validation */
     static createChecks() {
         return [
-            body('cathegory').exists().withMessage('exists').not().isEmpty(),
+            body('cathegory').exists().withMessage('exists').custom(CustomValidators.dBExists(Cathegory,"name")),
             Middleware.validate()
         ]
     }
@@ -215,6 +221,71 @@ export class ArticleController {
                 });
             }
         })
+    }
+
+
+    /**Moves article up in order*/
+    static moveUp = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let myArticle = await Article.findByPk(req.body.id);
+            if (!myArticle) throw Error("Article not found !");
+            if (myArticle.order<1) throw Error("Article must have order larger than 1 !");
+            if (myArticle.order==1) {
+                //Do nothing as is already upper
+                res.json([{}]);
+            } else {
+                let myArticlePred = await Article.findOne({where:{order:myArticle.order-1}});
+                if (!myArticlePred) throw Error("Could not find predecessor");
+                myArticlePred.order = myArticle.order;
+                myArticle.order = myArticle.order-1;
+                await myArticle.save();
+                await myArticlePred.save();
+                //Now get all articles of the same cathegory and move up order and return articles
+                let result = [];
+                let articles = [myArticle,myArticlePred];
+                for (let article of articles) result.push(article.sanitize(res.locals.language));
+                res.json(result);
+            }
+
+        } catch(error) {
+            next(error);
+        }
+    }
+
+    /**Moves article down in order*/
+    static moveDown = async (req: Request, res: Response, next:NextFunction) => {
+            try {
+                let myArticle = await Article.findByPk(req.body.id);
+                if (!myArticle) throw Error("Article not found !");
+                let max = await Article.max('order',{where:{cathegory:myArticle.cathegory}})
+                if (myArticle.order<1) throw Error("Article must have order larger than 1 !");
+                if (myArticle.order==max) {
+                    //Do nothing as is already down max
+                    res.json([{}]);
+                } else {
+                    let myArticleNext = await Article.findOne({where:{order:myArticle.order+1}});
+                    if (!myArticleNext) throw Error("Could not find predecessor");
+                    myArticleNext.order = myArticle.order;
+                    myArticle.order = myArticle.order+1;
+                    await myArticle.save();
+                    await myArticleNext.save();
+                    //Now get all articles of the same cathegory and move up order and return articles
+                    let result = [];
+                    let articles = [myArticle,myArticleNext];
+                    for (let article of articles) result.push(article.sanitize(res.locals.language));
+                    res.json(result);
+                }
+            } catch(error) {
+                next(error);
+            }
+    }
+
+    /**Parameter validation for move*/
+    static moveChecks() {
+        return [
+            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Article,'id')),
+            Middleware.validate()
+        ]
     }
 
 }        

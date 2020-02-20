@@ -35,6 +35,7 @@ import { StatController } from '../controllers/stat.controller';
 import { DiskController } from '../controllers/disk.controller';
 import { NewsletterController } from '../controllers/newsletter.controller';
 import { PageController } from '../controllers/page.controller';
+import { CathegoryController } from '../controllers/cathegory.controller';
 
 
 
@@ -131,6 +132,16 @@ export class Routes {
 
     app.route('/api/page/all')
     .get(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),PageController.getAll);
+
+
+    /////////////////////////////////////////////////////////////////
+    // ARTICLE CATHEGORY CONTROLLER
+    // Pages are used for SEO data
+    ////////////////////////////////////////////////////////////////      
+    app.route('/api/article/cathegory/all')
+    .get(passport.authenticate('jwt',{session: false}),CathegoryController.getAll);
+
+
 
 
     //////////////////////////////////////////////////////////////////
@@ -381,9 +392,8 @@ export class Routes {
 
 
     /////////////////////////////////////////////////////////////////
-    // HANDLE BLOG ARTICLES
+    // HANDLE ARTICLES
     //////////////////////////////////////////////////////////////// 
-
     /**Gets all articles */
     app.route('/api/article/all')
       .get(ArticleController.getAll);
@@ -399,6 +409,15 @@ export class Routes {
     /**Updates content article, you need to see admin or content to access here*/ 
     app.route('/api/article/update')
       .post(passport.authenticate('jwt',{session: false}),ArticleController.updateChecks(), ArticleController.update);
+
+    /**Moves article up*/ 
+    app.route('/api/article/order/up')
+      .post(passport.authenticate('jwt',{session: false}),ArticleController.moveChecks(), ArticleController.moveUp);
+
+
+    /**Moves article down*/ 
+    app.route('/api/article/order/down')
+      .post(passport.authenticate('jwt',{session: false}),ArticleController.moveChecks(), ArticleController.moveDown);
 
 
 
