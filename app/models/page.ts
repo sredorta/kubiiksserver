@@ -62,48 +62,16 @@ export class Page extends Model<Page> {
     public static seed() {
         async function _seed() {
             try {
-              let myPage = await Page.create({page:"legal",image:"none"});
-              await PageTranslation.create(({pageId:myPage.id, iso:"fr", title:"Titre legal", description:"Description legal"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"en", title:"Legal title", description:"Legal description"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"es", title:"Titulo legal", description:"Descripcion legal"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"ca", title:"Titol legal", description:"Descripcio legal"}));
-
-              myPage = await Page.create({page:"home",image:"none"});
-              await PageTranslation.create(({pageId:myPage.id, iso:"fr", title:"Titre accueil", description:"Description accueil"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"en", title:"Home title", description:"Home description"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"es", title:"Titulo inicio", description:"Descripcion inicio"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"ca", title:"Titol inici", description:"Descripcio inici"}));
-              
-              myPage = await Page.create({page:"demo",image:"none"});
-              await PageTranslation.create(({pageId:myPage.id, iso:"fr", title:"Titre demo", description:"Description demo"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"en", title:"Demo title", description:"Home description"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"es", title:"Titulo demo", description:"Descripcion demo"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"ca", title:"Titol demo", description:"Descripcio demo"}));
-
-              myPage = await Page.create({page:"realisations",image:"none"});
-              await PageTranslation.create(({pageId:myPage.id, iso:"fr", title:"Titre realisations", description:"Description realizations"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"en", title:"Clients title", description:"Clients description"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"es", title:"Titulo clientes", description:"Descripcion clientes"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"ca", title:"Titol clients", description:"Descripcio clients"}));
-
-              myPage = await Page.create({page:"prices",image:"none"});
-              await PageTranslation.create(({pageId:myPage.id, iso:"fr", title:"Titre prix", description:"Description prix"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"en", title:"Prices title", description:"Prices description"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"es", title:"Titulo precios", description:"Descripcion precios"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"ca", title:"Titol preus", description:"Descripcio preus"}));
- 
-              myPage = await Page.create({page:"blog",image:"none"});
-              await PageTranslation.create(({pageId:myPage.id, iso:"fr", title:"Titre blog", description:"Description blog"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"en", title:"Blog title", description:"Blog description"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"es", title:"Titulo blog", description:"Descripcion blog"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"ca", title:"Titol blog", description:"Descripcio blog"}));
-
-              myPage = await Page.create({page:"contact",image:"none"});
-              await PageTranslation.create(({pageId:myPage.id, iso:"fr", title:"Titre contact", description:"Description contact"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"en", title:"Contact title", description:"Contact description"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"es", title:"Titulo contacto", description:"Descripcion contacto"}));
-              await PageTranslation.create(({pageId:myPage.id, iso:"ca", title:"Titol contact", description:"Descripcio contact"}));
-
+                //Create the settings from the config file so that we get the defaults
+                for(let item of AppConfig.pages) {
+                  let tmpP= await Page.create({
+                      page: item.page,
+                      image: item.image,
+                  });              
+                  Object.entries(item.translations).forEach((trans,index)=> {
+                        PageTranslation.create({pageId:tmpP.id,iso:trans[0],title:trans[1].title,description:trans[1].description})
+                  })
+                }     
               
             } catch(err) {
                 console.log("ERROR: Could not seed PAGES !!!")

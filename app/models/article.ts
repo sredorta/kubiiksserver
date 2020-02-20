@@ -96,165 +96,17 @@ export class Article extends Model<Article> {
   public static seed() {
     async function _seed() {
 
-      /////////////////////////////////////////////////////////////////////////////////////
-      //Legal part
-      ////////////////////////////////////////////////////////////////////////////////////
-      let myArticle = await Article.create({
-        page:"legal",
-        key:"legal-cookies",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu 1 cookies</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content 1 cookies</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido 1 cookies</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut 1 cookies</h1>"});  
-
-      myArticle = await Article.create({
-        page:"legal",
-        key:"legal-user-data",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu 1 user-data</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content 1 user-data</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido 1 user-data</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut user-data</h1>"});                      
-
-
-
-      /////////////////////////////////////////////////////////////////////////////////////
-      //Home part
-      ////////////////////////////////////////////////////////////////////////////////////
-      myArticle = await Article.create({
-        page:"home",
-        key:"dialog-initial",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"Dialogue initiale",description:"Dialogue initial qui apparait apres 5s",content:"<h1>Mon dialoge</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"Initial dialog",description:"Initial dialog that appears after 5s",content:"<h1>My dialog</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"Dialogo inicial",description:"Dialogo inicial que aparece after 5s",content:"<h1>Mi dialogo</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"Diàleg inicial",description:"Diàleg inicial que apareix despres de 5s",content:"<h1>El meu dialeg</h1>"});                      
-
-      myArticle = await Article.create({
-        page:"home",
-        key:"home-header",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu 1</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content 1</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido 1</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut</h1>"});                      
-
-      myArticle = await Article.create({
-        page:"home",
-        key:null,
-        cathegory: "home-features",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"home-features titre 1",description:" features description fr 1",content:"<h1>home-features contenu 1</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"home-features title 1",description:" features description en 1",content:"<h1>home-features content 1</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"home-features titulo 1",description:"features descripcion es 1",content:"<h1>home-features conteido 1</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"home-features titol 1",description:"features descripcion es 1",content:"<h1>home-features conteido 1</h1>"});             
-
-      myArticle = await Article.create({
-        page:"home",
-        key:null,
-        cathegory: "home-features",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"home-features titre 2",description:" features description fr 2",content:"<h1>home-features contenu 2</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"home-features title 2",description:" features description en 2",content:"<h1>home-features content 2</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"home-features titulo 2",description:"features descripcion es 2",content:"<h1>home-features conteido 2</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"home-features titol 2",description:"features descripcion es 2",content:"<h1>home-features conteido 2</h1>"});             
-
-      myArticle = await Article.create({
-        page:"home",
-        key:"home-footer",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu pied de page</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content footer</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido pie de pagina</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut peu de pagina</h1>"});                      
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // BLOG PART
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      myArticle = await Article.create({
-        page:"blog",
-        key:"blog-header",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu 1</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content 1</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido 1</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut</h1>"});                      
-
-      myArticle = await Article.create({
-        page:"blog",
-        key:null,
-        cathegory: "blog-item",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"blog-item titre 1",description:"blog description fr 1",content:"<h1>blog-item contenu 1</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"blog-item title 1",description:"blog description en 1",content:"<h1>blog-item content 1</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"blog-item titulo 1",description:"blog descripcion es 1",content:"<h1>blog-item contenido 1</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"blog-item titol 1",description:"blog descripcion ca 1",content:"<h1>blog-item contingut 1</h1>"});             
-
-      myArticle = await Article.create({
-        page:"blog",
-        key:null,
-        cathegory: "blog-item",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"blog-item titre 2",description:"blog description fr 2",content:"<h1>blog-item contenu 2</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"blog-item title 2",description:"blog description en 2",content:"<h1>blog-item content 2</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"blog-item titulo 2",description:"blog descripcion es 2",content:"<h1>blog-item conteido 2</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"blog-item titol 2",description:"blog descripcion ca 2",content:"<h1>blog-item conteido 2</h1>"});             
-
-      myArticle = await Article.create({
-        page:"blog",
-        key:"blog-footer",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu pied de page</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content footer</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido pie de pagina</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut peu de pagina</h1>"});                      
-
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      // CONTACT PART
-      /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-      myArticle = await Article.create({
-        page:"contact",
-        key:"contact-header",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu 1</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content 1</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido 1</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut</h1>"});                      
-
-      myArticle = await Article.create({
-        page:"contact",
-        key:"contact-footer",
-        cathegory: "kubiiks",
-        image:null
-      });                    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"fr",title:"titre 1",description:"description fr 1",content:"<h1>contenu pied de page</h1>"});  
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"en",title:"title 1",description:"description en 1",content:"<h1>content footer</h1>"});    
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"es",title:"titulo 1",description:"descripcion es 1",content:"<h1>contenido pie de pagina</h1>"});             
-      await ArticleTranslation.create({articleId:myArticle.id, iso:"ca",title:"titol 1",description:"descripcio ca 1",content:"<h1>contingut peu de pagina</h1>"});                      
-
+                //Create the settings from the config file so that we get the defaults
+                for(let item of AppConfig.articles) {
+                  let tmp= await Article.create({
+                      page: item.page,
+                      key: item.key,
+                      cathegory:item.cathegory
+                  });              
+                  Object.entries(item.translations).forEach((trans,index)=> {
+                        ArticleTranslation.create({articleId:tmp.id,iso:trans[0],title:trans[1].title,description:trans[1].description, content: trans[1].content})
+                  })
+                }   
 
     }
     return _seed();

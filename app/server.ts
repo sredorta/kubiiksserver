@@ -28,6 +28,7 @@ import { IJwtPayload } from "./controllers/auth.controller";
 import { SocketHandler } from "./socket";
 import { Newsletter } from "./models/newsletter";
 import { Page } from "./models/page";
+import { Cathegory } from "./models/cathegory";
 
 
 export let sockets :SocketHandler;
@@ -70,6 +71,7 @@ async function startServer() {
     await sequelize.sync({force:true});  
     //Seeding part
     await Setting.seed(); //Seed settings from the config.json for FE sharing
+    await Cathegory.seed();
     await Page.seed();
     await Role.seed();
     await User.seed();
