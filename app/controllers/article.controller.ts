@@ -2,7 +2,7 @@ import {Request, Response, NextFunction, RequestHandler} from 'express';
 import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
 import { CustomValidators } from '../classes/CustomValidators';
-import sequelize from 'sequelize';
+import sequelize, { Sequelize } from 'sequelize';
 import nodemailer from 'nodemailer';
 import {body} from 'express-validator/check';
 
@@ -15,6 +15,7 @@ import * as converter from 'xml-js';
 import fs from 'fs';
 import { Setting } from '../models/setting';
 import { Cathegory } from '../models/cathegory';
+import { Helper } from '../classes/Helper';
 
 
 export class ArticleController {
@@ -95,14 +96,15 @@ export class ArticleController {
                     order:max+1,
                     cathegory: req.body.cathegory
                 });
+                let messagesAll = Helper.translations();
                 if (myArticle) {
                     for (let lang of Middleware.languagesSupported()) {
                         await ArticleTranslation.create({
                             'iso': lang,
                             'articleId': myArticle.id,
-                            'title': messages.articleNewTitle,
-                            'description': messages.articleNewDescription,
-                            'content': messages.articleNewContent
+                            'title': messagesAll[lang].articleNewTitle,
+                            'description': messagesAll[lang].articleNewDescription,
+                            'content': messagesAll[lang].articleNewContent
                         });                        
                     } 
                     ArticleController.updateSiteMap(myArticle);
@@ -254,10 +256,16 @@ export class ArticleController {
                 //Do nothing as is already upper
                 res.json([{}]);
             } else {
-                let myArticlePred = await Article.findOne({where:{order:myArticle.order-1}});
+                let myArticlePred = await Article.findOne({where: Sequelize.and({cathegory:myArticle.cathegory,order:myArticle.order-1})});
                 if (!myArticlePred) throw Error("Could not find predecessor");
-                myArticlePred.order = myArticle.order;
-                myArticle.order = myArticle.order-1;
+                
+                console.log("CURRENT: " + myArticle.id+ "Assinged order: ",myArticle.order-1);
+                console.log("PRED: " + myArticlePred.id+ "Assinged order: "+ myArticle.order);
+
+                myArticlePred.order = Number(myArticle.order);
+                myArticle.order = Number(myArticle.order-1);
+
+
                 await myArticle.save();
                 await myArticlePred.save();
                 //Now get all articles of the same cathegory and move up order and return articles
@@ -297,7 +305,7 @@ export class ArticleController {
                     //Do nothing as is already down max
                     res.json([{}]);
                 } else {
-                    let myArticleNext = await Article.findOne({where:{order:myArticle.order+1}});
+                    let myArticleNext = await Article.findOne({where:Sequelize.and({cathegory:myArticle.cathegory,order:myArticle.order+1})});
                     if (!myArticleNext) throw Error("Could not find predecessor");
                     myArticleNext.order = myArticle.order;
                     myArticle.order = myArticle.order+1;
