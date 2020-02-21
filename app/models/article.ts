@@ -2,6 +2,7 @@ import {Table, Column, Model, PrimaryKey, AutoIncrement, AllowNull, Unique, Defa
 import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/config';
 import { ArticleTranslation } from './article_translation';
+import { Cathegory } from './cathegory';
 
 
 export const ArticleN = 'Not a model';
@@ -40,6 +41,11 @@ export class Article extends Model<Article> {
   @AllowNull(false)
   @Column(DataTypes.STRING(50))
   cathegory!: string;
+
+  @AllowNull(false)
+  @Default('kubiiks')
+  @Column(DataTypes.STRING(50))
+  disk!: string;
 
   @AllowNull(true)
   @Column(DataTypes.STRING(300))
@@ -105,11 +111,15 @@ export class Article extends Model<Article> {
 
                 //Create the settings from the config file so that we get the defaults
                 for(let item of AppConfig.articles) {
+                  let disk = 'kubiiks';
+                  let myCath = await Cathegory.findOne({where:{name:item.cathegory}});
+                  if (myCath) disk = myCath.role;
                   let tmp= await Article.create({
                       order: item.order,
                       page: item.page,
                       key: item.key,
-                      cathegory:item.cathegory
+                      cathegory:item.cathegory,
+                      disk: disk
                   });              
                   Object.entries(item.translations).forEach((trans,index)=> {
                         ArticleTranslation.create({articleId:tmp.id,iso:trans[0],title:trans[1].title,description:trans[1].description, content: trans[1].content})

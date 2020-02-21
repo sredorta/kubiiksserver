@@ -42,14 +42,15 @@ export class ArticleController {
             let article = await Article.findByPk(req.body.id);
             let myUser = await User.scope("details").findByPk(req.user.id);            
             if (article && myUser) {
-                if (article.cathegory=="content") {
-                    return next(new HttpException(403, messages.articleContentNotDelete, null));
-                }
-                if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                //Protection rights     
+                if (article.disk=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
                 }
-                if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                if (article.disk=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+                }
+                if (article.disk=="kubiiks" && !myUser.hasRole("kubiiks")) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
                 }
                 let articleTmp = new Article(JSON.parse(JSON.stringify(article)));
                 await article.destroy();
@@ -72,14 +73,18 @@ export class ArticleController {
     static create = async (req: Request, res: Response, next:NextFunction) => {
         try {
             let myUser = await User.scope("details").findByPk(req.user.id); 
+            let myCath = await Cathegory.findOne({where:{name:req.body.cathegory}});
+            if (!myCath) throw new Error("Cathegory not found !");
             if (!myUser) throw new Error("User not found !");
-                if (req.body.cathegory=="kubiiks"  && !myUser.hasRole("kubiiks")) {
-                    return next(new HttpException(403, messages.articleContentNotCreate, null));
+            console.log("CATHEGORY", myCath.name, myCath.role);
+                if (myCath.role=="kubiiks"  && !myUser.hasRole("kubiiks")) {
+                    return next(new HttpException(403,  messages.authTokenInvalidRole('kubiiks'), null));
                 }
-                if (req.body.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                if (myCath.role=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                    console.log("WE ARE HERE !!!!");
                     return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
                 }
-                if (!(req.body.cathegory=="content") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                if (myCath.role=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
                 }
                 //Find biggest order of the cathegory
@@ -131,13 +136,13 @@ export class ArticleController {
             let myUser = await User.scope("details").findByPk(req.user.id);   
             if (!myUser) return new Error("Could not find current user !");    
             //Protection rights     
-            if (article.cathegory=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+            if (article.disk=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
                 return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
             }
-            if (!(article.cathegory=="blog") && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+            if (article.disk=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
                 return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
             }
-            if (article.cathegory=="content" && !myUser.hasRole("kubiiks")) {
+            if (article.disk=="kubiiks" && !myUser.hasRole("kubiiks")) {
                 return next(new HttpException(403, messages.authTokenInvalidRole('kubiiks'), null));
             }
             //update part    

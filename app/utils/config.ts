@@ -100,8 +100,12 @@ import * as dotenv from "dotenv";
             {key:"url_image", type:"main",value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/logo.jpg"}
         ],
         cathegories: [
+            {name: "kubiiks", role:"kubiiks"}, //Default articles cathegory
             {name: "home-features", role:"kubiiks"},
-            {name: "blog-item", role:"blog"}
+            {name: "blog-item", role:"blog"},
+            {name: "realisations", role:"content"},
+            {name: "testimonials", role:"content"},
+
         ],
         pages: [
             {page:"legal",image:"none", translations: {
@@ -234,6 +238,32 @@ import * as dotenv from "dotenv";
             }},
             {page:"contact", key:"contact-footer",cathegory:"kubiiks", translations: {
                 fr: {title:"Titre", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            //REALISTATIONS
+            {order:1,cathegory:"realisations", translations: {
+                fr: {title:"Titre realisations 1", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},         
+            {order:2,cathegory:"realisations", translations: {
+                fr: {title:"Titre realisations 2", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            //TESTIMONIALS
+            {order:1,cathegory:"testimonials", translations: {
+                fr: {title:"Titre testimonials 1", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},         
+            {order:2,cathegory:"testimonials", translations: {
+                fr: {title:"Titre testimonials 2", description:"Description", content:"<p>Contenu</p>"},
                 en: {title:"Title", description:"Description", content:"<p>Content</p>"},
                 es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
                 ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
