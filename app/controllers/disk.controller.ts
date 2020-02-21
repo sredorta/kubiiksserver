@@ -479,6 +479,11 @@ export class DiskController {
         ]
     }  
 
+    /**Uploads image to kubiiks folder and returns imageUrl for angular-editor*/
+    static uploadImageToKubiiks = async (req: Request, res: Response, next:NextFunction) => {
+        res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/kubiiks/" + req.file.filename});  
+    }    
+
     /**Uploads image to content folder and returns imageUrl for angular-editor*/
     static uploadImageToContent = async (req: Request, res: Response, next:NextFunction) => {
         res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/content/" + req.file.filename});  

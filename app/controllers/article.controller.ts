@@ -234,6 +234,21 @@ export class ArticleController {
         try {
             let myArticle = await Article.findByPk(req.body.id);
             if (!myArticle) throw Error("Article not found !");
+            let myUser = await User.scope("details").findByPk(req.user.id); 
+            if (!myUser) throw Error("User not found !");
+            let myCath = await Cathegory.findOne({where:{name:myArticle.cathegory}});
+            if (!myCath) throw Error("Cathegory not found !");
+            if (myCath.role=="kubiiks"  && !myUser.hasRole("kubiiks")) {
+                return next(new HttpException(403,  messages.authTokenInvalidRole('kubiiks'), null));
+            }
+            if (myCath.role=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                console.log("WE ARE HERE !!!!");
+                return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+            }
+            if (myCath.role=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+            }
+
             if (myArticle.order<1) throw Error("Article must have order larger than 1 !");
             if (myArticle.order==1) {
                 //Do nothing as is already upper
@@ -262,6 +277,20 @@ export class ArticleController {
             try {
                 let myArticle = await Article.findByPk(req.body.id);
                 if (!myArticle) throw Error("Article not found !");
+                let myUser = await User.scope("details").findByPk(req.user.id); 
+                if (!myUser) throw Error("User not found !");
+                let myCath = await Cathegory.findOne({where:{name:myArticle.cathegory}});
+                if (!myCath) throw Error("Cathegory not found !");
+                if (myCath.role=="kubiiks"  && !myUser.hasRole("kubiiks")) {
+                    return next(new HttpException(403,  messages.authTokenInvalidRole('kubiiks'), null));
+                }
+                if (myCath.role=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
+                    console.log("WE ARE HERE !!!!");
+                    return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
+                }
+                if (myCath.role=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
+                    return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
+                }
                 let max = await Article.max('order',{where:{cathegory:myArticle.cathegory}})
                 if (myArticle.order<1) throw Error("Article must have order larger than 1 !");
                 if (myArticle.order==max) {

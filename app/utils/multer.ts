@@ -30,10 +30,20 @@ const storageVideosBlog = multer.diskStorage({
 }); 
 
 
-/**Images of product */  
+/**Images of default folder */  
 const storageDefaults = multer.diskStorage({    
   destination: function(req, file, cb) {
     cb(null, join(process.cwd(), 'app/public/images/defaults'));
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.originalname);
+  }
+}); 
+
+/**Images of kubiiks folder */  
+const storageImagesKubiiks = multer.diskStorage({    
+  destination: function(req, file, cb) {
+    cb(null, join(process.cwd(), 'app/public/images/kubiiks'));
   },
   filename: function(req, file, cb) {
     cb(null, file.originalname);
@@ -131,7 +141,7 @@ function getFilesizeInBytes(filename:string) {
 const uploadsVideosContent = multer({ storage: storageVideosContent,limits:{fileSize:MAX_VIDEO_SIZE}, fileFilter: videoFilter });
 const uploadsVideosBlog = multer({ storage: storageVideosBlog,limits:{fileSize:MAX_VIDEO_SIZE}, fileFilter: videoFilter });
 
-
+const uploadsImagesKubiiks = multer({ storage: storageImagesKubiiks,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter });
 const uploadsImagesContent = multer({ storage: storageImagesContent,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter });
 const uploadsImagesBlog = multer({ storage: storageImagesBlog ,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter});
 const uploadsImagesEmail = multer({ storage: storageImagesEmail,limits:{fileSize:MAX_IMAGE_SIZE}, fileFilter: imageFilter });
@@ -144,6 +154,7 @@ const uploadsImagesProducts = multer({ storage: storageImagesProducts,limits:{fi
 const uploads = {
     videosContent:     uploadsVideosContent,
     videosBlog: uploadsVideosBlog,
+    imagesKubiiks:   uploadsImagesKubiiks,
     imagesContent :   uploadsImagesContent,
     imagesBlog:       uploadsImagesBlog,
     imagesEmail:      uploadsImagesEmail,

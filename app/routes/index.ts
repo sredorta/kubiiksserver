@@ -222,10 +222,14 @@ export class Routes {
     app.route('/api/disk/images/all')
       .post(DiskController.getImagesChecks(),DiskController.getImages);   
 
-
     /**Uploads to avatar folder */ 
     app.route('/api/disk/images/upload/avatar')
       .post(passport.authenticate('jwt',{session: false}),uploads.imagesAvatar.single('file'), DiskController.uploadImageToAvatar);
+
+    /**Uploads to kubiiks folder */ 
+    app.route('/api/disk/images/upload/kubiiks')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasKubiiksRights(),uploads.imagesKubiiks.single('file'), DiskController.uploadImageToKubiiks);
+
 
     /**Uploads to content folder */ 
     app.route('/api/disk/images/upload/content')

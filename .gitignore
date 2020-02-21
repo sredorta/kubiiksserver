@@ -6,14 +6,8 @@ build/
 .env.test
 server.crt
 server.key
-app/public/images/avatar/*
-app/public/images/blog/*
-app/public/images/content/*
-app/public/images/email/*
-app/public/images/products/*
-app/public/videos/blog/*
-app/public/videos/content/*
-app/public/videos/defaults/*
+app/public/**
+
 
 
 
