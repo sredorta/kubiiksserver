@@ -18,7 +18,7 @@ export class Cathegory extends Model<Cathegory> {
   @AutoIncrement
   @Column(DataTypes.INTEGER().UNSIGNED)
   id!:number;
-  
+
   @AllowNull(false)
   @Unique(true)
   @Column(DataTypes.STRING(50))
@@ -27,6 +27,13 @@ export class Cathegory extends Model<Cathegory> {
   @AllowNull(false)
   @Column(DataTypes.STRING(50))
   role!: string;
+
+  @AllowNull(false)
+  @Unique(false)
+  @Default(false)
+  @Column(DataTypes.BOOLEAN)
+  hasPage!: string; 
+
 
   //Relations
   @BelongsToMany(() => Page, () => PageCathegory)
@@ -40,6 +47,7 @@ export class Cathegory extends Model<Cathegory> {
             await Cathegory.create({
                 name: item.name,
                 role: item.role,
+                hasPage:item.hasPage
             });              
         }     
     }

@@ -100,11 +100,12 @@ import * as dotenv from "dotenv";
             {key:"url_image", type:"main",value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/logo.jpg"}
         ],
         cathegories: [
-            {name: "kubiiks", role:"kubiiks"}, //Default articles cathegory
-            {name: "home-features", role:"kubiiks"},
-            {name: "blog-item", role:"blog"},
-            {name: "realisations", role:"content"},
-            {name: "testimonials", role:"content"},
+            {name: "kubiiks", role:"kubiiks", hasPage:false}, //Default articles cathegory
+            {name: "content", role:"content", hasPage:false},
+            {name: "home-features", role:"kubiiks", hasPage:false},
+            {name: "blog-item", role:"blog", hasPage:true},
+            {name: "realisations", role:"content",hasPage:false},
+            {name: "testimonials", role:"content",hasPage:false},
 
         ],
         pages: [
@@ -122,7 +123,7 @@ import * as dotenv from "dotenv";
                 es: {title:"Titulo inicio", description:"Descripcion inicio"},
                 ca: {title:"Titol inici", description:"Descripcio inici"}
                 },
-                cathegories:["home-features"]
+                cathegories:["home-features", "realisations"]
             },
             {page:"blog",image:"none", translations: {
                 fr: {title:"Titre blog", description:"Description blog"},
@@ -142,6 +143,13 @@ import * as dotenv from "dotenv";
             },
         ],
         articles: [
+            //Initial dialog required in all pages
+            {page:"all", key:"dialog-initial",cathegory:"content", translations: {
+                fr: {title:"Dialogue initiale", description:"Dialogue initial qui apparait apres 5s", content:"<p>Mon dialogue</p>"},
+                en: {title:"Initial dialog", description:"Initial dialog that appears after 5s", content:"<p>My dialog</p>"},
+                es: {title:"Dialogo inicial", description:"Dialogo inicial que aparece after 5s", content:"<p>Mi dialogo</p>"},
+                ca: {title:"Diàleg inicial", description:"Diàleg inicial que apareix despres de 5s", content:"<p>El meu diàleg</p>"},
+            }},
             //Legal
             {page:"legal", key:"legal-cookies",cathegory:"kubiiks", translations: {
                 fr: {title:"Information cookies", description:"Information utilisation cookies", content:"<p>Information sur l'utilisation des cookies</p>"},
@@ -156,12 +164,6 @@ import * as dotenv from "dotenv";
                 ca: {title:"Informacio dades personals", description:"Informacio sobre l'utilitzacio de dades personals", content:"<p>Informacio de l'utilitzacio de dades personals</p>"},
             }},
             //Home
-            {page:"home", key:"dialog-initial",cathegory:"content", translations: {
-                fr: {title:"Dialogue initiale", description:"Dialogue initial qui apparait apres 5s", content:"<p>Mon dialogue</p>"},
-                en: {title:"Initial dialog", description:"Initial dialog that appears after 5s", content:"<p>My dialog</p>"},
-                es: {title:"Dialogo inicial", description:"Dialogo inicial que aparece after 5s", content:"<p>Mi dialogo</p>"},
-                ca: {title:"Diàleg inicial", description:"Diàleg inicial que apareix despres de 5s", content:"<p>El meu diàleg</p>"},
-            }},
             {page:"home", key:"home-header",cathegory:"kubiiks", translations: {
                 fr: {title:"Titre", description:"Description", content:"<p>Contenu</p>"},
                 en: {title:"Title", description:"Description", content:"<p>Content</p>"},

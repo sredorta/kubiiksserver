@@ -81,13 +81,13 @@ export class UserController {
     static updateChecks() {
         return [
             body('user.id').exists().withMessage('exists').isNumeric().custom(CustomValidators.dBExists(User,'id')),
-            body('firstName').optional().custom(CustomValidators.nameValidator('firstName')),
-            body('lastName').optional().custom(CustomValidators.nameValidator('lastName')),
+            body('firstName').optional().custom(CustomValidators.nameValidator()),
+            body('lastName').optional().custom(CustomValidators.nameValidator()),
             body('email').optional().isEmail(),
-            body('phone').optional().custom(CustomValidators.phone('phone')),
-            body('mobile').optional().custom(CustomValidators.mobile('mobile')),
+            body('phone').optional().custom(CustomValidators.phone()),
+            body('mobile').optional().custom(CustomValidators.mobile()),
             body('isEmailValidated').optional().isBoolean(),
-            body('avatar').optional().isURL(),
+            body('avatar').optional().custom(CustomValidators.avatar()),
             Middleware.validate()
         ]
     }

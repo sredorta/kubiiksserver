@@ -42,27 +42,21 @@ export class CustomValidators extends Error {
 
     
     /**Does firstName and lastName validation based on shared data validation*/
-    static nameValidator(field:string) {
+    static nameValidator() {
         return (value:any) => {
             //firstName checking
-            if (value!=undefined) {
+            if (value) {
                    if (!validator.isLength(value,{min:2})) return Promise.reject(<IValidationMessage>{type:'minlength',value:'2'});
                    if (!validator.isLength(value,{max:50})) return Promise.reject(<IValidationMessage>{type:'maxlength',value:'50'});                
-            } else {   
-                if (Helper.isSharedSettingMatch(field, "include")) 
-                    return Promise.reject(<IValidationMessage>{type:'exists'});
-            }
+            } 
             return Promise.resolve(); //End of validation success
         }
     }
 
     /**checks correct phone format and if is optional or not depending on shared*/
-    static phone(field:string) {
+    static phone() {
         return (value:any, {req} : {req:Request}) => {
-            if (!value) {
-                if (Helper.isSharedSettingMatch(field, "include")) 
-                    return Promise.reject({type:'exists'});
-            } else {
+            if (value) {
                 //TODO: Add locals handling here !!!!
                 if (value.length!= 10) return Promise.reject({type:'phone'});
                 let re = /^\d+$/;
@@ -76,12 +70,9 @@ export class CustomValidators extends Error {
     }
 
     /**checks correct mobile format and if is optional or not depending on shared*/
-    static mobile(field:string) {
+    static mobile() {
         return (value:any, {req} : {req:Request}) => {
-            if (!value) {
-                if (Helper.isSharedSettingMatch(field, "include")) 
-                    return Promise.reject({type:'exists'});
-            } else {
+            if(value) {
                 //TODO: Add locals handling here !!!!
                 if (value.length!= 10) return Promise.reject({type:'mobile'});
                 let re = /^\d+$/;
@@ -93,7 +84,17 @@ export class CustomValidators extends Error {
             return Promise.resolve();
          }
     }
-
+    /**checks correct mobile format and if is optional or not depending on shared*/
+    static avatar() {
+        return (value:string, {req} : {req:Request}) => {
+            if(value) {
+                console.log("CHECKING AVATAR",value);
+                if (!value.includes('https://')) return Promise.reject({type:'avatar'});
+            }
+            //Correct
+            return Promise.resolve();
+         }
+    }
 
     /**Boolean that is true */
     static checked() {

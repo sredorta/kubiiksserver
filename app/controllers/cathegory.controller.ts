@@ -28,9 +28,11 @@ export class CathegoryController {
             let myUser = await User.scope("details").findByPk(req.user.id);
             let result = [];
             if (!myUser) throw new Error("User not found !"); 
+            result = cathegories.filter(obj => obj.name != "content");  //Always remove content cathegory
+
             //Filter cathegories depending on role of user
             if (myUser.hasRole("kubiiks")) {
-                 result = cathegories;
+                //No filter
             } else if (myUser.hasRole("admin")) {
                 result = cathegories.filter(obj => obj.role != "kubiiks");
             } else {

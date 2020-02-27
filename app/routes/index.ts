@@ -398,6 +398,11 @@ export class Routes {
     /////////////////////////////////////////////////////////////////
     // HANDLE ARTICLES
     //////////////////////////////////////////////////////////////// 
+
+    /**Gets one article by id */
+    app.route('/api/article/id')
+    .post(ArticleController.getByIdChecks(),ArticleController.getById);
+
     /**Gets all articles */
     app.route('/api/article/all')
       .get(ArticleController.getAll);

@@ -76,8 +76,8 @@ export class AuthController {
     /**Parameter validation */
     static signupChecks() {
             return [
-                body('firstName').custom(CustomValidators.nameValidator('firstName')),
-                body('lastName').custom(CustomValidators.nameValidator('lastName')),
+                body('firstName').custom(CustomValidators.nameValidator()),
+                body('lastName').custom(CustomValidators.nameValidator()),
                 body('email').exists().withMessage('exists').isEmail(),
                 body('password').exists().withMessage('exists').custom(CustomValidators.password()),
                 body('terms').exists().withMessage('exists').isBoolean().custom(CustomValidators.checked()),
@@ -224,8 +224,8 @@ export class AuthController {
     /**Parameter validation */
     static oauth2UpdateFieldsChecks() {
         return [
-            body('firstName').custom(CustomValidators.nameValidator('firstName')),
-            body('lastName').custom(CustomValidators.nameValidator('lastName')),
+            body('firstName').custom(CustomValidators.nameValidator()),
+            body('lastName').custom(CustomValidators.nameValidator()),
             body('email').exists().withMessage('exists').isEmail(),
             //body('phone').custom(CustomValidators.phone('phone')),
             //body('mobile').custom(CustomValidators.mobile('mobile')),
@@ -254,22 +254,22 @@ export class AuthController {
     static updateAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //Sending back user
         try {
+            console.log("UPDATING AUTH USER !!!",req.body.avatar);
             let myUser = await User.scope("fulldetails").findByPk(req.user.id);
             if (!myUser) throw new Error("User not found !"); 
-            if (req.body.firstName)
+            //if (req.body.firstName)
                 myUser.firstName = req.body.firstName;
-            if (req.body.lastName)
+            //if (req.body.lastName)
                 myUser.lastName = req.body.lastName;
-            if (req.body.email)
+            //if (req.body.email)
                 myUser.email = req.body.email;
-            if (req.body.phone)
+            //if (req.body.phone)
                 myUser.phone = req.body.phone;            
-            if (req.body.mobile)
+            //if (req.body.mobile)
                 myUser.mobile = req.body.mobile;    
-            if (req.body.avatar) {
-                if (req.body.avatar == "none") myUser.avatar = null;
-                else myUser.avatar = req.body.avatar;  
-            }  
+            //if (req.body.avatar) {
+                myUser.avatar = req.body.avatar;  
+            //}  
             if (req.body.language)
                 myUser.language = req.body.language;                          
             if (req.body.passwordOld) {
@@ -289,14 +289,13 @@ export class AuthController {
     /**Parameter validation */
     static updateAuthUserChecks() {
         return [
-            body('firstName').optional().custom(CustomValidators.nameValidator('firstName')),
-            body('lastName').optional().custom(CustomValidators.nameValidator('lastName')),
-            body('email').optional().isEmail(),
-            body('phone').optional().custom(CustomValidators.phone('phone')),
-            body('mobile').optional().custom(CustomValidators.mobile('mobile')),
+            body('firstName').exists().withMessage('exists').isString().isLength({min:2}),
+            body('lastName').exists().withMessage('exists').isString().isLength({min:2}),
+            body('email').exists().withMessage('exists').isEmail(),
+            body('phone').exists().withMessage('exists').custom(CustomValidators.phone()),
+            body('mobile').exists().withMessage('exists').custom(CustomValidators.mobile()),
             body('password').optional().custom(CustomValidators.passwordUpdate()),
-            body('password').optional().custom(CustomValidators.passwordUpdate()),
-            body('avatar').optional().isString(),         
+            body('avatar').exists().withMessage('exists').custom(CustomValidators.avatar()),         
             body('dummy').custom(CustomValidators.dBuserNotPresentExceptMe(User)),
             Middleware.validate()
         ]

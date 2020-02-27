@@ -61,6 +61,12 @@ export class Article extends Model<Article> {
   @Column(DataTypes.BOOLEAN)
   public!: boolean;  
 
+  @AllowNull(false)
+  @Unique(false)
+  @Default(false)
+  @Column(DataTypes.BOOLEAN)
+  hasPage!: string; 
+
   @HasMany(() => ArticleTranslation, {
     onUpdate: "CASCADE",
     onDelete: "CASCADE",
@@ -113,13 +119,15 @@ export class Article extends Model<Article> {
                 for(let item of AppConfig.articles) {
                   let disk = 'kubiiks';
                   let myCath = await Cathegory.findOne({where:{name:item.cathegory}});
+                  if (!myCath) throw new Error("Cathegory not found, could not feed article : " + item.cathegory);
                   if (myCath) disk = myCath.role;
                   let tmp= await Article.create({
                       order: item.order,
                       page: item.page,
                       key: item.key,
                       cathegory:item.cathegory,
-                      disk: disk
+                      disk: disk,
+                      hasPage: myCath.hasPage
                   });              
                   Object.entries(item.translations).forEach((trans,index)=> {
                         ArticleTranslation.create({articleId:tmp.id,iso:trans[0],title:trans[1].title,description:trans[1].description, content: trans[1].content})

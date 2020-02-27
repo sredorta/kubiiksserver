@@ -22,6 +22,27 @@ export class ArticleController {
 
 
     constructor() {}
+    /**Gets article by id */
+    static getById = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let article = await Article.findOne({where: {id:req.body.id}});
+            if (article) {
+            res.json(article.sanitize(res.locals.language));
+            } else {
+                res.json(new Article());
+            }
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static getByIdChecks() {
+        return [
+            body('id').exists().withMessage('exists').isNumeric(),
+            Middleware.validate()
+        ]
+    }    
+
 
     /**Gets all articles for all cathegories, admin or blog rights required */
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
@@ -94,6 +115,7 @@ export class ArticleController {
                     key:null,
                     page:null,
                     order:max+1,
+                    hasPage: myCath.hasPage,
                     cathegory: req.body.cathegory
                 });
                 let messagesAll = Helper.translations();

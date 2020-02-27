@@ -39,14 +39,7 @@ export class InitController {
                 result["articles"].push(article.sanitize(res.locals.language));
             result["pages"] = [];
             for (let page of pages) 
-             result["pages"].push(page.sanitize(res.locals.language));
-
-            if (req.user)    
-                 myUser = await User.scope("details").findByPk(req.user.id);
-                 if (myUser)
-                    result["user"] = myUser.sanitize(res.locals.language);
-            else    
-                result["user"] = null;    
+             result["pages"].push(page.sanitize(res.locals.language));  
             res.json(result);
         } catch(error) {
             next(error);
@@ -76,19 +69,17 @@ export class InitController {
                     }
                 }
             }
+            //Get articles that are required in all pages first
+            let articlesAll = await Article.findAll({where:{page:"all"},order: [sequelize.literal('id DESC')]});
+            for (let tArticle of articlesAll) {
+                articles.push(tArticle);
+            }
             result["articles"] = [];
             for (let article of articles) 
                 result["articles"].push(article.sanitize(res.locals.language));
             result["pages"] = [];
             for (let page of pages) 
-             result["pages"].push(page.sanitize(res.locals.language));
-
-            if (req.user)    
-                 myUser = await User.scope("details").findByPk(req.user.id);
-                 if (myUser)
-                    result["user"] = myUser.sanitize(res.locals.language);
-            else    
-                result["user"] = null;    
+             result["pages"].push(page.sanitize(res.locals.language));  
             res.json(result);
         } catch(error) {
             next(error);

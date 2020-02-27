@@ -67,6 +67,7 @@ export class User extends Model<User> {
   language!:string;
 
   @AllowNull(true)
+  @Default(null)
   @Column(DataTypes.STRING(300))
   avatar!: string | null;
 
