@@ -149,19 +149,41 @@ export class Email extends Model<Email> {
             let urlBase = AppConfig.api.kiiserverExtHost + "/public/images/defaults/";
             let result :any = new Email();
             //Get phone from settings
-            let tmp = await Setting.findOne({where:{key:"companyPhone"}});
+            let tmp = await Setting.findOne({where:{key:"telephone"}});
             if (!tmp) {
-                reject("Could not find Setting 'companyPhone'");
+                reject("Could not find Setting 'telephone'");
                 return;
             }
             result.footer.push({icon:urlBase + "phone.png",value:tmp.value});
             //Get address from settings
-            tmp = await Setting.findOne({where:{key:"companyAddress"}});
+            let companyAddress = [];
+            tmp = await Setting.findOne({where:{key:"addressStreet"}});
             if (!tmp) {
-                reject("Could not find Setting 'companyPhone'");
+                reject("Could not find Setting 'addressStreet'");
                 return;
             }
-            result.footer.push({icon:urlBase + "address.png",value:tmp.value});
+            companyAddress.push(tmp.value);
+            tmp = await Setting.findOne({where:{key:"addressLocality"}});
+            if (!tmp) {
+                reject("Could not find Setting 'addressLocality'");
+                return;
+            }
+            companyAddress.push(tmp.value);
+
+            tmp = await Setting.findOne({where:{key:"addressPostal"}});
+            if (!tmp) {
+                reject("Could not find Setting 'addressPostal'");
+                return;
+            }
+            companyAddress.push(tmp.value);
+
+            tmp = await Setting.findOne({where:{key:"addressCountry"}});
+            if (!tmp) {
+                reject("Could not find Setting 'addressCountry'");
+                return;
+            }
+            companyAddress.push(tmp.value);
+            result.footer.push({icon:urlBase + "address.png",value:companyAddress});
             
             //Get site url
             tmp = await Setting.findOne({where:{key:"url"}});

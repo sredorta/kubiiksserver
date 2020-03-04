@@ -40,7 +40,6 @@ export const NUser = 'Not a model';
 @Table({})
 export class User extends Model<User> {
 
-
   @AllowNull(true)
   @Column(DataTypes.STRING(50))
   firstName!: string;
@@ -148,7 +147,6 @@ export class User extends Model<User> {
         alerts.push(alert);
       }
     }
-    console.log("WE ARE HERE",element)
     return element
   }
 
@@ -190,6 +188,10 @@ export class User extends Model<User> {
      _getData(title,body);
    });
    return myPromise;
+  }
+
+  public static getEmptyInstance() {
+    return User.build({id:0}); //Return an user that doesn't exist
   }
 
 

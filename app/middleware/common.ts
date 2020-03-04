@@ -77,7 +77,7 @@ export class Middleware {
             let acc : any = [];
             acc[language] = require(`../i18n/${language}`).messages;
             messages = acc[language];
-            console.log("SETTING LANGUAGE", language);
+            //console.log("SETTING LANGUAGE", language);
             next();
         }
     }

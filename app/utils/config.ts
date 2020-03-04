@@ -99,13 +99,18 @@ import * as dotenv from "dotenv";
             {key: "fb_app_id", type:"main", value: "2088315884799260"},
             {key:"url_image", type:"main",value:<string>process.env.API_EXTERNAL_HOST + "/public/images/defaults/logo.jpg"}
         ],
+        //CATHEGORIES
+        //  role: Required role to edit
+        //  hasPage: If it has a dedicated page
+        //  initialCount: Count that is download on initial load before full load
         cathegories: [
             {name: "kubiiks", role:"kubiiks", hasPage:false}, //Default articles cathegory
-            {name: "content", role:"content", hasPage:false},
+            {name: "content", role:"content", hasPage:false}, //For things like dialog...
             {name: "home-features", role:"kubiiks", hasPage:false},
-            {name: "blog-item", role:"blog", hasPage:true},
-            {name: "realisations", role:"content",hasPage:false},
-            {name: "testimonials", role:"content",hasPage:false},
+            {name: "blog-item", role:"blog", hasPage:true, initialCount:10},
+            {name: "realisations", role:"content",hasPage:false,initialCount:7},
+            {name: "testimonials", role:"content",hasPage:false,initialCount:5},
+            {name: "demo-features", role:"content",hasPage:false,initialCount:5},
 
         ],
         pages: [
@@ -133,14 +138,30 @@ import * as dotenv from "dotenv";
                 },
                 cathegories:["blog-item"]
             },
+            {page:"blog-item-page",image:"none", translations: {
+                fr: {title:"Titre blog page", description:"Description blog page"},
+                en: {title:"Blog title page", description:"Blog description page"},
+                es: {title:"Titulo blog page", description:"Descripcion blog page"},
+                ca: {title:"Titol blog page", description:"Descripcio blog page"}
+                },
+                cathegories:["testimonials"]
+            },            
             {page:"contact",image:"none", translations: {
                 fr: {title:"Titre contact", description:"Description contact"},
                 en: {title:"Contact title", description:"Contact description"},
                 es: {title:"Titulo contact", description:"Descripcion contact"},
-                ca: {title:"Titol contact", description:"Descripcio cotnacte"}
+                ca: {title:"Titol contact", description:"Descripcio contacte"}
                 },
-                cathegories:[]
+                cathegories:["testimonials"]
             },
+            {page:"demo",image:"none", translations: {
+                fr: {title:"Titre demo", description:"Description demo"},
+                en: {title:"Demo title", description:"Demo description"},
+                es: {title:"Titulo demo", description:"Descripcion demo"},
+                ca: {title:"Titol demo", description:"Descripcio demo"}
+                },
+                cathegories:["demo-features"]
+            },           
         ],
         articles: [
             //Initial dialog required in all pages
@@ -149,6 +170,13 @@ import * as dotenv from "dotenv";
                 en: {title:"Initial dialog", description:"Initial dialog that appears after 5s", content:"<p>My dialog</p>"},
                 es: {title:"Dialogo inicial", description:"Dialogo inicial que aparece after 5s", content:"<p>Mi dialogo</p>"},
                 ca: {title:"Diàleg inicial", description:"Diàleg inicial que apareix despres de 5s", content:"<p>El meu diàleg</p>"},
+            }},
+            //Initial dialog required in all pages
+            {page:"all", key:"newsletter",cathegory:"kubiiks", translations: {
+                fr: {title:"Buletins d'information", description:"Description buletins d'information", content:"<p>Buletins d'information</p>"},
+                en: {title:"Newsletter", description:"Newsletter description", content:"<p>Newsletter</p>"},
+                es: {title:"Boletines informativos", description:"Descripcion boletines informativos", content:"<p>Boletines informativos</p>"},
+                ca: {title:"Butlletins d'informació", description:"Descripció butlletins informatius", content:"<p>Butlletins d'informació</p>"},
             }},
             //Legal
             {page:"legal", key:"legal-cookies",cathegory:"kubiiks", translations: {
@@ -231,8 +259,32 @@ import * as dotenv from "dotenv";
                 es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
                 ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
             }},
+            {order:3,cathegory:"blog-item", translations: {
+                fr: {title:"Titre blog-item 3", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            {order:4,cathegory:"blog-item", translations: {
+                fr: {title:"Titre blog-item 4", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},                        
             //CONTACT
             {page:"contact", key:"contact-header",cathegory:"kubiiks", translations: {
+                fr: {title:"Titre", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            {page:"contact", key:"contact-form",cathegory:"kubiiks", translations: {
+                fr: {title:"Titre", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            {page:"contact", key:"contact-address",cathegory:"kubiiks", translations: {
                 fr: {title:"Titre", description:"Description", content:"<p>Contenu</p>"},
                 en: {title:"Title", description:"Description", content:"<p>Content</p>"},
                 es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
@@ -257,6 +309,18 @@ import * as dotenv from "dotenv";
                 es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
                 ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
             }},
+            {order:3,cathegory:"realisations", translations: {
+                fr: {title:"Titre realisations 3", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            {order:4,cathegory:"realisations", translations: {
+                fr: {title:"Titre realisations 4", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
             //TESTIMONIALS
             {order:1,cathegory:"testimonials", translations: {
                 fr: {title:"Titre testimonials 1", description:"Description", content:"<p>Contenu</p>"},
@@ -270,6 +334,37 @@ import * as dotenv from "dotenv";
                 es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
                 ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
             }},
+            //DEMO
+            {page:"demo", key:"demo-header",cathegory:"content", translations: {
+                fr: {title:"Titre", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            {page:"demo", key:"demo-footer",cathegory:"content", translations: {
+                fr: {title:"Titre", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},
+            {order:1,cathegory:"demo-features", translations: {
+                fr: {title:"Titre demo-features 1", description:"Voila une description ", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},         
+            {order:2,cathegory:"demo-features", translations: {
+                fr: {title:"Titre demo-features 2", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},  
+            {order:3,cathegory:"demo-features", translations: {
+                fr: {title:"Titre demo-features 3", description:"Description", content:"<p>Contenu</p>"},
+                en: {title:"Title", description:"Description", content:"<p>Content</p>"},
+                es: {title:"Titulo", description:"Descripcion", content:"<p>Contenido</p>"},
+                ca: {title:"Titol", description:"Descripció", content:"<p>Contingut</p>"},
+            }},  
         ]
     }
 

@@ -166,7 +166,7 @@ export class CustomValidators extends Error {
                 query.push({mobile:req.body.mobile});
        
             return MyClass.findOne({
-                where: [{id:{[Op.not]:req.user.id}},{[Op.or]: query}]
+                where: [{id:{[Op.not]:req.auth.id}},{[Op.or]: query}]
                 }).then((user:any) => {
                 if (user) {
                     return Promise.reject(<IValidationMessage>{type:'dbmissing',class:MyClass.name});

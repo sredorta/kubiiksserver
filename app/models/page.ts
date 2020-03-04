@@ -88,33 +88,6 @@ export class Page extends Model<Page> {
     return myPromise;
   }
 
-  /**Detaches a specif cathegory form the page */
-/*  public detachRole(role: string | number) : Promise<boolean> {
-    let myPromise : Promise<boolean>;
-    let obj = this;
-    myPromise =  new Promise<boolean>((resolve,reject) => {
-      async function _removeRole() {
-          let myRole;
-          if (typeof role == "string")
-            myRole = await Role.findOne({where:{"name":role}});
-          else 
-            myRole = await Role.findByPk(role);
-
-          if (!myRole) {
-            reject("Role could not be found");
-          } else {
-            await obj.$remove('Role',[myRole]); 
-            resolve(true);
-          }
-      }
-      _removeRole();
-    });
-    return myPromise;
-  }*/
-
-
-
-
 
     //Seeds the table with all pages
     public static seed() {

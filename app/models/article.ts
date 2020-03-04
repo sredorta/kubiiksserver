@@ -3,6 +3,8 @@ import {DataTypes} from 'sequelize';
 import {AppConfig} from '../utils/config';
 import { ArticleTranslation } from './article_translation';
 import { Cathegory } from './cathegory';
+import { Page } from './page';
+import { PageTranslation } from './page_translation';
 
 
 export const ArticleN = 'Not a model';
@@ -51,11 +53,6 @@ export class Article extends Model<Article> {
   @Column(DataTypes.STRING(300))
   image!: string;
 
-  @AllowNull(true)
-  @Default(null)
-  @Column(DataTypes.STRING(300))
-  backgroundImage!: string;
-
   @AllowNull(false)
   @Default(true) //TODO: CHANGE TO FALSE
   @Column(DataTypes.BOOLEAN)
@@ -100,21 +97,11 @@ export class Article extends Model<Article> {
     else return this.image;
   }
 
-  /**Gets well formatted bacgkround image for emails */
-  getBackgroundImage() {
-    /*if (!this.backgroundImage) {
-      return "none";
-      //if (this.backgroundImage == "none") return "none";
-      //  return AppConfig.api.host +":"+ AppConfig.api.port + "/public/images/defaults/no-photo-available.jpg";
-    } else */
-        return this.backgroundImage;
-  }
 
 
   /**Seeds the table initially */
   public static seed() {
     async function _seed() {
-
                 //Create the settings from the config file so that we get the defaults
                 for(let item of AppConfig.articles) {
                   let disk = 'kubiiks';

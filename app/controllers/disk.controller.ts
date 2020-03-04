@@ -174,8 +174,6 @@ export class Disk {
                 //Find in articles
                 found = await Article.findOne({where:{image:{[Op.like]:'%'+file.basename+'%'}}});
                 if (found) resolve(true);
-                found = await Article.findOne({where:{backgroundImage:{[Op.like]:'%'+file.basename+'%'}}});
-                if (found) resolve(true);
                 found = await ArticleTranslation.findOne({where:{content:{[Op.like]:'%'+file.basename+'%'}}});
                 if (found) resolve(true);
 

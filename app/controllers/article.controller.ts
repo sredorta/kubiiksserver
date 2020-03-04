@@ -103,7 +103,6 @@ export class ArticleController {
                     return next(new HttpException(403,  messages.authTokenInvalidRole('kubiiks'), null));
                 }
                 if (myCath.role=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
-                    console.log("WE ARE HERE !!!!");
                     return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
                 }
                 if (myCath.role=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
@@ -171,7 +170,6 @@ export class ArticleController {
             }
             //update part    
             article.public = req.body.article.public;
-            article.backgroundImage = req.body.article.backgroundImage;
             article.image = req.body.article.image;
             await article.save();
             trans.title = req.body.article.title==null?"":req.body.article.title;
@@ -198,7 +196,6 @@ export class ArticleController {
             body('article.title').exists().withMessage('exists'),
             body('article.description').exists().withMessage('exists'),
             body('article.image').exists().withMessage('exists'),
-            body('article.backgroundImage').exists().withMessage('exists'),
             body('article.public').exists().withMessage('exists').isBoolean(),
 
             //TODO: Add here all required checks !!!
@@ -266,7 +263,6 @@ export class ArticleController {
                 return next(new HttpException(403,  messages.authTokenInvalidRole('kubiiks'), null));
             }
             if (myCath.role=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
-                console.log("WE ARE HERE !!!!");
                 return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
             }
             if (myCath.role=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
@@ -315,7 +311,6 @@ export class ArticleController {
                     return next(new HttpException(403,  messages.authTokenInvalidRole('kubiiks'), null));
                 }
                 if (myCath.role=="blog" && !(myUser.hasRole("blog") || myUser.hasRole("admin"))) {
-                    console.log("WE ARE HERE !!!!");
                     return next(new HttpException(403, messages.authTokenInvalidRole('blog'), null));
                 }
                 if (myCath.role=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {

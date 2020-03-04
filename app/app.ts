@@ -7,10 +7,18 @@ import {Middleware} from "./middleware/common";
 import {Passport} from "./classes/Passport";
 import ExpressValidator from "express-validator";
 import { Server } from 'http';
+import { User  as UserAuth} from './models/user';
+
+//Add in all express requests the auth-user which always is created but might be created with null
+declare global {
+    namespace Express {
+      interface Request {
+        auth: UserAuth
+      }
+    }
+}
 
 class App {
-
-
 
     public app: express.Application;
     public routePrv: Routes = new Routes();

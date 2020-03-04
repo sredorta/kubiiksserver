@@ -18,6 +18,8 @@ import { Page } from '../models/page';
 
 export class InitController {
 
+
+
     constructor() {}
 
     /**Gets all data required for app initialization in one shot */
@@ -27,7 +29,11 @@ export class InitController {
             let result : any = {};
             let settings = await Setting.findAll();
             let pages = await Page.findAll();
+            //We need to get user as it is used when we change language and alerts need translation
             let myUser = null;
+            if (req.user.id) {
+                myUser = await User.scope("details").findByPk(req.user.id);
+            }
             if (settings) 
                 result["settings"] = [];
             for (let setting of settings) {
@@ -40,6 +46,7 @@ export class InitController {
             result["pages"] = [];
             for (let page of pages) 
              result["pages"].push(page.sanitize(res.locals.language));  
+             if (myUser) result["user"] = myUser.sanitize(res.locals.language);
             res.json(result);
         } catch(error) {
             next(error);
@@ -49,6 +56,7 @@ export class InitController {
     /**Gets all data required for app initialization in one shot */
     static get = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            console.log("ASKING FOR ARTICLE ID", req.body.articleId);
             let result : any = {};
             let settings = await Setting.findAll();
             let pages = await Page.findAll({where:{page:req.body.page}});
@@ -63,7 +71,7 @@ export class InitController {
             let articles = await Article.findAll({where:{page:req.body.page},order: [sequelize.literal('id DESC')]});
             for (let page of pages) {
                 for (let cath of page.cathegories) {
-                    let tArticles = await Article.findAll({where:{cathegory:cath.name},order: [sequelize.literal('id DESC')]})
+                    let tArticles = await Article.findAll({where:{cathegory:cath.name},order: [sequelize.literal('id DESC')],limit:cath.initalCount})
                     for (let tArticle of tArticles) {
                         articles.push(tArticle);
                     }
@@ -73,6 +81,11 @@ export class InitController {
             let articlesAll = await Article.findAll({where:{page:"all"},order: [sequelize.literal('id DESC')]});
             for (let tArticle of articlesAll) {
                 articles.push(tArticle);
+            }
+            //Add article if articleId was asked
+            if (req.body.articleId>0) {
+                let tmp = await Article.findOne({where:{id:req.body.articleId}})
+                if (tmp) articles.push(tmp);
             }
             result["articles"] = [];
             for (let article of articles) 
@@ -88,7 +101,8 @@ export class InitController {
     /** Role attach parameter validation */
     static checks() {
             return [
-                body('page').exists().withMessage('exists').custom(CustomValidators.dBExists(Page,"page")),
+                body('page').exists().withMessage('exists'),
+                body('articleId').exists().withMessage('exists').isNumeric(),
                 Middleware.validate()
             ]
     }   

@@ -14,6 +14,8 @@ import {HttpException} from '../classes/HttpException';
 import {User} from '../models/user';
 import { isNamedExports } from 'typescript';
 import { IJwtPayload } from '../controllers/auth.controller';
+import { request } from 'https';
+import app from '../app';
 
 
 
@@ -83,18 +85,22 @@ export class Passport {
     public static jwt() {
         passport.use('jwt',new passportJWT.Strategy({
             jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey : AppConfig.auth.jwtSecret
+            secretOrKey : AppConfig.auth.jwtSecret,
+            passReqToCallback: true
         },
-        async function (jwtPayload: IJwtPayload, cb) {
+        async function (req:Request,jwtPayload: IJwtPayload, cb:passportJWT.VerifiedCallback) {
             try {
                 const myUser = await User.findByPk(jwtPayload.id);
                 if (!myUser) {
+                    req.auth = User.getEmptyInstance();
                     return cb(new HttpException(401, messages.authTokenInvalid, null), false);
                 }
+                req.auth = new User(req.user);
                 //TODO: Validate that all required fields are present if not, return error
                 return cb(null, myUser);
             }
             catch (error) {
+                req.auth = User.getEmptyInstance();
                 return cb(error);
             }
 
@@ -156,6 +162,8 @@ export class Passport {
             }
             //EQUIVALENT TO SIGNUP
             //We got a new user so we register him
+
+
             myUser = await User.create({
               firstName: profile._json.first_name,
               lastName: profile._json.last_name,

@@ -30,6 +30,12 @@ export class Cathegory extends Model<Cathegory> {
 
   @AllowNull(false)
   @Unique(false)
+  @Default(100)
+  @Column(DataTypes.INTEGER().UNSIGNED)
+  initalCount!: number;
+
+  @AllowNull(false)
+  @Unique(false)
   @Default(false)
   @Column(DataTypes.BOOLEAN)
   hasPage!: string; 
@@ -47,7 +53,8 @@ export class Cathegory extends Model<Cathegory> {
             await Cathegory.create({
                 name: item.name,
                 role: item.role,
-                hasPage:item.hasPage
+                hasPage:item.hasPage,
+                initalCount: item.initialCount?item.initialCount:100
             });              
         }     
     }

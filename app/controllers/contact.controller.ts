@@ -43,7 +43,7 @@ export class ContactController {
                 let myAlert = await Alert.create({userId:myUser.id, type:"email", title:null,  message:req.body.subject + '\n' + req.body.message, isRead:false});
                 if (!myAlert) throw Error("Could not create alert");
                 for (let iso of Middleware.languagesSupported()) {
-                    await AlertTranslation.create({alertId:myAlert.id,iso:iso,title:messagesAll[iso].notificationContactEmail,message:null})
+                    await AlertTranslation.create({alertId:myAlert.id,iso:iso,title:messagesAll[iso].notificationContactEmail,message:req.body.subject + '\n' + req.body.message})
                 }
                 //Send through socket the updated user with the new alerts so that FE can update
                 sockets.updateAuth(myUser.id);
@@ -52,6 +52,7 @@ export class ContactController {
             }
 
             //Now we send and email to thank the contact
+            console.log("SENDING EMAIL TO", recipients)
             let result = await Email.send(res.locals.language, 'contact-reply', 'RE:' + req.body.subject, recipients, req.body.message);
             res.send({message: {show:true, text:messages.messageSent}});
 
