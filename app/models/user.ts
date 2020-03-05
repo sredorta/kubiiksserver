@@ -191,7 +191,8 @@ export class User extends Model<User> {
   }
 
   public static getEmptyInstance() {
-    return User.build({id:0}); //Return an user that doesn't exist
+    console.log(JSON.stringify(User.build({})))
+    return User.build({}); //Return an user that doesn't exist
   }
 
 

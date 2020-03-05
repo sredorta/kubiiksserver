@@ -24,7 +24,8 @@ export const NArticle = 'Not a model';
   })
 @Table({timestamps:true})
 export class Article extends Model<Article> {
-
+  id!:number;
+  
   @AllowNull(true)
   @Default(null)
   @Column(DataTypes.INTEGER().UNSIGNED)

@@ -61,6 +61,7 @@ export class ArticleController {
     /**Deletes article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static delete = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let article = await Article.findByPk(req.body.id);
             let myUser = await User.scope("details").findByPk(req.user.id);            
             if (article && myUser) {
@@ -94,6 +95,7 @@ export class ArticleController {
     /**Creates article content on the given cathegory. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static create = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let myUser = await User.scope("details").findByPk(req.user.id); 
             let myCath = await Cathegory.findOne({where:{name:req.body.cathegory}});
             if (!myCath) throw new Error("Cathegory not found !");
@@ -149,6 +151,7 @@ export class ArticleController {
     /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static update = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let article = await Article.findByPk(req.body.article.id);
             if (!article) return new Error("Could not find article with id : " + req.body.article.id);
             let trans = article.translations.find(obj => obj.iso == res.locals.language);
@@ -253,6 +256,7 @@ export class ArticleController {
     /**Moves article up in order*/
     static moveUp = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let myArticle = await Article.findByPk(req.body.id);
             if (!myArticle) throw Error("Article not found !");
             let myUser = await User.scope("details").findByPk(req.user.id); 
@@ -301,6 +305,8 @@ export class ArticleController {
     /**Moves article down in order*/
     static moveDown = async (req: Request, res: Response, next:NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
+
                 let myArticle = await Article.findByPk(req.body.id);
                 if (!myArticle) throw Error("Article not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id); 

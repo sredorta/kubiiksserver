@@ -19,6 +19,7 @@ import { User } from '../models/user';
 import passportJWT from "passport-jwt";
 import webPush from 'web-push';
 import { url } from 'inspector';
+import { objectExpression } from 'babel-types';
 
 export let messages = en; //Set default language and export messages
 export let messagesAll : string[] = [];
@@ -51,6 +52,7 @@ export class Middleware {
     }
 
 
+
     //Set language based on headers or referer because of oauth
     public static language() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
@@ -68,10 +70,6 @@ export class Middleware {
                     language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
             }
             res.locals.language = language;  //Store language in the locals
-            if (!req.user) 
-                req.user = {};    
-            req.user.language = language;   //This is used afterwards !!!!
-
 
             //Override messages so that it uses correct language
             let acc : any = [];
@@ -175,17 +173,34 @@ export class Middleware {
 
     /**Gets logged in user without exiting so that initial data loading can work registered or not */
     public static getUserFromToken() {
-        return function (req:Request, res:Response, next: NextFunction) {
-            const token = passportJWT.ExtractJwt.fromAuthHeaderWithScheme('Bearer')(req);
-                jwt.verify(token,AppConfig.auth.jwtSecret, (err,decoded) => {
-                    if (err) {
-                        req.user = undefined;
-                        next();
-                    } else {
-                        req.user = decoded;
-                        next();
-                    }
-                })
+        return async function (req:Request, res:Response, next: NextFunction) {
+            try {
+                const token = passportJWT.ExtractJwt.fromAuthHeaderWithScheme('Bearer')(req);
+                if (token)
+                    jwt.verify(token,AppConfig.auth.jwtSecret, (err,decoded) => {
+                        if (err) {
+                            req.user = undefined;
+                            next();
+                        } else {
+                            if (typeof decoded == "object") {
+                                let tmp = <any>decoded;
+                                if (tmp.id) {
+                                    req.user = {id:tmp.id};
+                                    req.language = res.locals.language;
+                                }
+                            }
+                            next();
+                        }
+                    })
+                else {
+                    req.user=undefined;
+                    next();
+                }    
+            } catch(error) {
+                console.log(error);
+                req.user=undefined;
+                next();
+            }
         }
     }
 
@@ -218,6 +233,7 @@ export class Middleware {
     public static hasKubiiksRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (myUser.roles.findIndex(obj => obj.name == 'kubiiks') >= 0)
@@ -236,6 +252,7 @@ export class Middleware {
     public static hasAdminRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (myUser.hasRole("admin"))
@@ -254,6 +271,7 @@ export class Middleware {
     public static hasContentRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("content") )
@@ -272,6 +290,7 @@ export class Middleware {
     public static hasEmailRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("email") )
@@ -290,6 +309,7 @@ export class Middleware {
     public static hasStatsRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("stats") )
@@ -308,6 +328,7 @@ export class Middleware {
     public static hasBlogRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("blog") )
@@ -326,6 +347,7 @@ export class Middleware {
     public static hasUsersRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
             try {
+                if(!req.user) throw new Error("User not found !");
                 let myUser = await User.scope("details").findByPk(req.user.id);
                 if (myUser) {
                     if (await myUser.hasRole("users") )

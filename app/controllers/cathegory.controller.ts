@@ -23,7 +23,7 @@ export class CathegoryController {
     /**Gets all cathegories of articles filtered with the role of the user */
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            
+            if(!req.user) throw new Error("User not found !");
             let cathegories = await Cathegory.findAll();
             let myUser = await User.scope("details").findByPk(req.user.id);
             let result = [];

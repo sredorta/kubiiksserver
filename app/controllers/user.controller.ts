@@ -27,6 +27,7 @@ export class UserController {
     /**Remove user by id */
     static delete = async(req: Request, res: Response, next: NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             if (req.user.id == req.body.id) {
                 throw new HttpException(400, messages.validationSelfUser ,null);
             }

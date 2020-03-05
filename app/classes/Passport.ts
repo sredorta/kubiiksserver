@@ -92,15 +92,12 @@ export class Passport {
             try {
                 const myUser = await User.findByPk(jwtPayload.id);
                 if (!myUser) {
-                    req.auth = User.getEmptyInstance();
                     return cb(new HttpException(401, messages.authTokenInvalid, null), false);
                 }
-                req.auth = new User(req.user);
                 //TODO: Validate that all required fields are present if not, return error
                 return cb(null, myUser);
             }
             catch (error) {
-                req.auth = User.getEmptyInstance();
                 return cb(error);
             }
 
@@ -168,7 +165,7 @@ export class Passport {
               firstName: profile._json.first_name,
               lastName: profile._json.last_name,
               email: profile._json.email,
-              language: req.user.language,
+              language: req.language,
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
               emailValidationKey: Helper.generateRandomString(30),
               avatar: profile._json.picture.data.url,
@@ -248,7 +245,7 @@ export class Passport {
               firstName: profile._json.given_name,
               lastName: profile._json.family_name,
               email: profile._json.email,
-              language: req.user.language,
+              language: req.language,
               emailValidationKey: Helper.generateRandomString(30),
               password: User.hashPassword(Helper.generatePassword()), //Generate a random password just in case
               avatar: profile._json.picture,

@@ -32,6 +32,7 @@ export class NotificationController {
     /**Gets the onPush notification settings and stores it in the user */
     static settings  = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let myUser = await User.scope("full").findByPk(req.user.id);
             if (!myUser) throw new Error("Cannot find auth user !");
             myUser.onPush = JSON.stringify(req.body.onPush);

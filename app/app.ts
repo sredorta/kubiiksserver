@@ -8,12 +8,18 @@ import {Passport} from "./classes/Passport";
 import ExpressValidator from "express-validator";
 import { Server } from 'http';
 import { User  as UserAuth} from './models/user';
+import { Role } from './models/role';
+import { Alert } from './models/alert';
 
-//Add in all express requests the auth-user which always is created but might be created with null
+//Define user interface
 declare global {
     namespace Express {
+      interface User {
+          id:number;        
+      }
       interface Request {
-        auth: UserAuth
+        user?: User | undefined;
+        language:string;
       }
     }
 }

@@ -41,14 +41,14 @@ export class AuthController {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
                 email: req.body.email,
-                language: req.user.language,
+                language: res.locals.language,
                 passport: "local",
                 terms:req.body.terms,
                 emailValidationKey: Helper.generateRandomString(30),
                 password: User.hashPassword(req.body.password)
             });
             //If newsletter is check add email to the newsletter
-            if (req.body.newsletter == true) Newsletter.subscribe(req.body.firstName,req.body.lastName,req.body.email,req.user.language);
+            if (req.body.newsletter == true) Newsletter.subscribe(req.body.firstName,req.body.lastName,req.body.email,myUser.language);
 
             //Attach admin role if required
             if (myUser.id ==1) {
@@ -58,7 +58,7 @@ export class AuthController {
             let myUserTmp = await User.scope("fulldetails").findByPk(myUser.id);
             if (myUserTmp) myUser = myUserTmp;
             //Depending on the validation method we need to authenticate or not
-            const link = AppConfig.api.kiiwebExtHost + "/"+req.user.language+"/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
+            const link = AppConfig.api.kiiwebExtHost + "/"+myUser.language+"/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
             let html = messages.emailValidationLink(link);
             let recipients = [];
             recipients.push(myUser.email);
@@ -132,6 +132,7 @@ export class AuthController {
     static login = async (req:Request, res:Response,next:NextFunction) => {
         //Thanks to passports we have the user in req.user if we get here credentials are valid
         try {
+            if(!req.user) throw new Error("User not found !");
             let myUser = await User.scope("details").findByPk(req.user.id);
             if (!myUser) return next( new HttpException(400, messages.authInvalidCredentials, null));
             let token : string = "";
@@ -162,6 +163,7 @@ export class AuthController {
     //Angular should recover the token from the page and redirect to home afterwards if all fields are ok, if not ask user to enter fields
     static oauth2Success =  (req:Request, res:Response,next:NextFunction) => {      
         //We just need to create a token and provide it
+        if(!req.user) throw new Error("User not found !");
         User.scope("details").findByPk(req.user.id).then(user => {
             if (user) {
                 let token = user.createToken('short');
@@ -204,6 +206,7 @@ export class AuthController {
 
     /**Updates the current user with the given parameters */
     static oauth2UpdateFields = async (req:Request, res:Response,next:NextFunction) => {
+        if(!req.user) throw new Error("User not found !");
         //Check that we got the terms accepted
         let myUser = await User.findByPk(req.user.id);
         if (!myUser) {
@@ -242,6 +245,7 @@ export class AuthController {
     static getAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //Sending back user
         try {
+            if(!req.user) throw new Error("User not found !");
             let myUser = await User.scope("details").findByPk(req.user.id);
             if (myUser)
                 res.json(myUser.sanitize(res.locals.language));
@@ -254,7 +258,7 @@ export class AuthController {
     static updateAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //Sending back user
         try {
-            console.log("UPDATING AUTH USER !!!",req.body.avatar);
+            if(!req.user) throw new Error("User not found !");
             let myUser = await User.scope("fulldetails").findByPk(req.user.id);
             if (!myUser) throw new Error("User not found !"); 
             //if (req.body.firstName)
@@ -304,6 +308,7 @@ export class AuthController {
     static deleteAuthUser = async (req: Request, res: Response, next:NextFunction) => {
         //Sending back user
         try {
+            if(!req.user) throw new Error("User not found !");
             let myUser = await User.findByPk(req.user.id);
             if (!myUser) throw new Error("User not found !"); 
             myUser.destroy(); 
@@ -337,7 +342,7 @@ export class AuthController {
                 myUser.passwordResetKey = Helper.generateRandomString(50);
                 await myUser.save();
                 //Send the email
-                const link = AppConfig.api.kiiwebExtHost + "/"+req.user.language+"/auth/establish-password?id=" + myUser.id + "&key="+myUser.passwordResetKey;
+                const link = AppConfig.api.kiiwebExtHost + "/"+res.locals.language+"/auth/establish-password?id=" + myUser.id + "&key="+myUser.passwordResetKey;
                 let html = messages.emailResetPassword(link);
                 let recipients = [];
                 recipients.push(myUser.email);

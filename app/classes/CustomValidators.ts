@@ -157,6 +157,7 @@ export class CustomValidators extends Error {
     /**Does all database verifications to see if user is not already in the db*/
     static dBuserNotPresentExceptMe(MyClass:any) {
         return (value:any, {req} : {req:Request}) => {
+            if(!req.user) return Promise.reject(<IValidationMessage>{type:'dbmissing',class:MyClass.name});
             let query : any[] = [];
             if (req.body.email != undefined && req.body.email!= null)
                 query.push({email:req.body.email});
@@ -166,7 +167,7 @@ export class CustomValidators extends Error {
                 query.push({mobile:req.body.mobile});
        
             return MyClass.findOne({
-                where: [{id:{[Op.not]:req.auth.id}},{[Op.or]: query}]
+                where: [{id:{[Op.not]:req.user.id}},{[Op.or]: query}]
                 }).then((user:any) => {
                 if (user) {
                     return Promise.reject(<IValidationMessage>{type:'dbmissing',class:MyClass.name});

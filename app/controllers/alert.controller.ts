@@ -24,6 +24,7 @@ export class AlertController {
     /**Gets all alerts of the user */
     static getAll = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let result = [];
             let myAlerts = await Alert.findAll({order: [sequelize.literal('id DESC')],where:{userId:req.user.id}});
             res.json(myAlerts);
@@ -39,6 +40,7 @@ export class AlertController {
     /**Gets article by id with all translations. Admin or content required (if cathegory not blog) or admin or blog required (if cathegory blog) */
     static update = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let alert = await Alert.findByPk(req.body.alert.id);
             if (!alert) throw new Error("Could not find alert with id : " + req.body.article.id);
             //Check that alert is owned by current user
@@ -69,6 +71,7 @@ export class AlertController {
     /**Deletes notification */
     static delete = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let alert = await Alert.findByPk(req.body.id);
             if (!alert) throw new Error("Could not find alert with id : " + req.body.article.id);
             //Check that alert is owned by current user

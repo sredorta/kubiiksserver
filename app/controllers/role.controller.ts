@@ -73,6 +73,7 @@ export class RoleController {
     /**Static detach role from user */
     static detach = async(req: Request, res: Response, next: NextFunction) => {
         try {
+            if(!req.user) throw new Error("User not found !");
             let canModifyKubiiks : boolean = false;
             if (req.user) {
                 let authUser = await User.scope("details").findByPk(req.user.id);

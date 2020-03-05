@@ -31,7 +31,7 @@ export class InitController {
             let pages = await Page.findAll();
             //We need to get user as it is used when we change language and alerts need translation
             let myUser = null;
-            if (req.user.id) {
+            if (req.user && req.user.id) {
                 myUser = await User.scope("details").findByPk(req.user.id);
             }
             if (settings) 
@@ -60,7 +60,6 @@ export class InitController {
             let result : any = {};
             let settings = await Setting.findAll();
             let pages = await Page.findAll({where:{page:req.body.page}});
-            let myUser = null;
             if (settings) 
                 result["settings"] = [];
             for (let setting of settings) {
