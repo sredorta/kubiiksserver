@@ -32,25 +32,10 @@ export class EmailTranslation extends Model<EmailTranslation> {
   @Column(DataTypes.STRING(500))
   description!: string; 
 
-  /**Title of the email. Typically this is the company name */
+  /**JSON data of the email */
   @AllowNull(false)
-  @Column(DataTypes.STRING(100))
-  title!: string;
-
-  /**Subtitle of the email. Typically we add here: Validate your email account... */
-  @AllowNull(false)
-  @Column(DataTypes.STRING(500))
-  subtitle!: string;  
-
-  /**Flexible content that se put just after the real header */
-  @AllowNull(false)
-  @Column(DataTypes.STRING(5000))
-  header!: string;
-
-  /**Flexible main content*/
-  @AllowNull(false)
-  @Column(DataTypes.STRING(5000))
-  content!: string;
+  @Column(DataTypes.STRING(25000))
+  data!: string;  
 
   /**Email that this translation belongs to */
   @BelongsTo(() => Email)

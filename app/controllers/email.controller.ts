@@ -46,6 +46,7 @@ export class EmailController {
     /**Gets all email templates */
     public static getAll = async (req: Request, res: Response, next:NextFunction) => {
         try {
+            if (!req.user) throw new Error("User not found");
             let result = [];
             let emails = await Email.findAll({order: [sequelize.literal('id DESC')]});
             let myUser = await User.scope("details").findByPk(req.user.id);
@@ -64,42 +65,6 @@ export class EmailController {
         }
     }
 
-    /**Returns the html of the current email in all languages for previewing*/
-    public static preview = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            //Build an email model without saving so that we can use for preview
-            let myEmail = Email.build(req.body.email, {
-                isNewRecord: false,
-                include: [EmailTranslation]
-             });
-            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
-            //Create translation[0] with current data
-            let myTrans = await EmailTranslation.build({
-                id: 1000,
-                emailId: myEmail.id,
-                iso: res.locals.language,
-                title: req.body.email.title,
-                subtitle:req.body.email.subtitle,
-                description:req.body.email.description,
-                content:req.body.email.content,
-                header:req.body.email.header
-            });
-            if (!myTrans) throw new HttpException(500, messages.validationDBMissing('email'),null);
-            myEmail.translations = [];
-            myEmail.translations.push(myTrans);     
-            let result = await myEmail.getHtml(res.locals.language);
-            res.json(result);
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static previewChecks() {
-        return [
-            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            Middleware.validate()
-        ]
-    }    
 
     /**Updates email template */
     static update = async (req: Request, res: Response, next:NextFunction) => {
@@ -111,10 +76,7 @@ export class EmailController {
              if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null);           
              let myTrans = await EmailTranslation.findOne({where:{emailId:myEmail.id,iso:res.locals.language}});
              if (!myTrans) throw new Error("Translation not found !!");
-             myTrans.header = req.body.email.header;
-             myTrans.content = req.body.email.content;
-             myTrans.title =req.body.email.title;
-             myTrans.subtitle=req.body.email.subtitle;
+             myTrans.data = req.body.email.data;
             await myTrans.save();
 
             await myEmail.save();
@@ -130,14 +92,73 @@ export class EmailController {
         return [
             body('email').exists().withMessage('exists'),
             body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            body('email.header').exists().withMessage('exists'),
-            body('email.content').exists().withMessage('exists'),
+            body('email.data').exists().withMessage('exists'),
+            Middleware.validate()
+        ]
+    }  
 
-            //TODO: Add here all required checks !!!
+    /**Creates email template based on reference. Admin or content required */
+    static create = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let myReferenceEmail = await Email.findOne({where:{name:"reference"}});
+            if (!myReferenceEmail) 
+                return next(new HttpException(500, "Reference email not found", null));
+            //Update the name
+            let myRef =  JSON.parse(JSON.stringify(myReferenceEmail));
+            delete myRef.id;
+            delete myRef.createdAt;
+            delete myRef.updatedAt;
+            myRef.isProtected = false;
+            myRef.name = req.body.name;
+            let myNewEmail = await Email.create(myRef);
+            for (let trans of myReferenceEmail.translations) {
+                let myTrans = JSON.parse(JSON.stringify(trans));
+                delete myTrans.id;
+                myTrans.emailId = myNewEmail.id;
+                myTrans.description = req.body.description;
+                await EmailTranslation.create(myTrans)
+            }
+            let result = await Email.findByPk(myNewEmail.id);
+            if (!result) return next(new HttpException(500, "Result not found", null));
+            res.json(result.sanitize(res.locals.language));                
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static createChecks() {
+        return [
+            body('name').exists().withMessage('exists').isLength({min:5}),
+            body('name').exists().withMessage('exists').custom(CustomValidators.dBMissing(Email,'name')),
+            body('description').exists().withMessage('exists').isLength({min:5,max:200}),
+            Middleware.validate()
+        ]
+    }
 
+
+    /**Returns the html of the current email*/
+    public static preview = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let myEmail = await Email.findByPk(req.body.email.id);
+            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
+            //Create translation[0] with current data
+            let myTrans = myEmail.translations.find(obj=>obj.iso == res.locals.language);
+            if (!myTrans) throw new Error("Translation not found !");  
+            let result = await myEmail.getHtml(myTrans);
+            res.json(result);
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static previewChecks() {
+        return [
+            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
             Middleware.validate()
         ]
     }    
+
+  
 
     /**Sends email */
     static sendTest = async (req: Request, res: Response, next:NextFunction) => {
@@ -315,43 +336,7 @@ export class EmailController {
     }    
 
 
-    /**Creates email template based on reference. Admin or content required */
-    static create = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let myReferenceEmail = await Email.findOne({where:{name:"reference"}});
-            if (!myReferenceEmail) 
-                return next(new HttpException(500, "Reference email not found", null));
-            //Update the name
-            let myRef =  JSON.parse(JSON.stringify(myReferenceEmail));
-            delete myRef.id;
-            delete myRef.createdAt;
-            delete myRef.updatedAt;
-            myRef.isProtected = false;
-            myRef.name = req.body.name;
-            let myNewEmail = await Email.create(myRef);
-            for (let trans of myReferenceEmail.translations) {
-                let myTrans = JSON.parse(JSON.stringify(trans));
-                delete myTrans.id;
-                myTrans.emailId = myNewEmail.id;
-                myTrans.description = req.body.description;
-                await EmailTranslation.create(myTrans)
-            }
-            let result = await Email.findByPk(myNewEmail.id);
-            if (!result) return next(new HttpException(500, "Result not found", null));
-            res.json(result.sanitize(res.locals.language));                
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static createChecks() {
-        return [
-            body('name').exists().withMessage('exists').isLength({min:5}),
-            body('name').exists().withMessage('exists').custom(CustomValidators.dBMissing(Email,'name')),
-            body('description').exists().withMessage('exists').isLength({min:5,max:200}),
-            Middleware.validate()
-        ]
-    }
+
 
     /**Deletes email template by id with all translations. Admin or content required */
     static delete = async (req: Request, res: Response, next:NextFunction) => {
