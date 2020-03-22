@@ -192,14 +192,17 @@ export enum EItemType {
     /**Textarea content in case of text */
     textarea:string;
   
-    /**URL of the link or of the image */
+    /**URL of the link*/
     url:string;
+
+    /**URL of the image */
+    imageUrl:string;
   
     /**Button text */
     txtBtn:string;
   
     /**Type of button: link,flat or stroked */
-    typeBtn: 'link' | 'flat' | 'stroked';
+    typeBtn: 'link' | 'flat' | 'stroked' | 'image_button';
   
     /**Color of the text of the button */
     colorBtn:string;
@@ -282,69 +285,19 @@ export class EmailBuilder {
               text-decoration: none !important;
             }
     
-            .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {
+            p, span, font, td, div {
               line-height: 100%;
             }
-    
-            [owa] .email-row .email-col {
-              display: table-cell;
-              float: none !important;
-              vertical-align: top;
+
+            .block {
+                width:320px !important;
             }
-    
-            .ie-container .email-col-100, .ie-container .email-row, [owa] .email-col-100, [owa] .email-row { width: 500px !important; }
-            .ie-container .email-col-17, [owa] .email-col-17 { width: 85px !important; }
-            .ie-container .email-col-25, [owa] .email-col-25 { width: 125px !important; }
-            .ie-container .email-col-33, [owa] .email-col-33 { width: 165px !important; }
-            .ie-container .email-col-50, [owa] .email-col-50 { width: 250px !important; }
-            .ie-container .email-col-67, [owa] .email-col-67 { width: 335px !important; }
-    
-            @media only screen and (min-width: 520px) {
-            .email-row { width: 500px !important; }
-            .email-row .email-col { vertical-align: top; }
-            .email-row .email-col-100 { width: 500px !important; }
-            .email-row .email-col-67 { width: 335px !important; }
-            .email-row .email-col-50 { width: 250px !important; }
-            .email-row .email-col-33 { width: 165px !important; }
-            .email-row .email-col-25 { width: 125px !important; }
-            .email-row .email-col-17 { width: 85px !important; }
+            @media screen and (min-width: 701px) {
+                .block {
+                    width: 700px!important;
+                }
             }
-    
-            @media (max-width: 520px) {
-            .email-row-container {
-              padding-left: 0px !important;
-              padding-right: 0px !important;
-            }
-            .email-row .email-col {
-              min-width: 320px !important;
-              max-width: 100% !important;
-              display: block !important;
-            }
-            .email-row { width: calc(100% - 40px) !important; }
-            .email-col { width: 100% !important; }
-            .email-col > div { margin: 0 auto; }
-            .no-stack .email-col { min-width: 0 !important; display: table-cell !important; }
-            .no-stack .email-col-50 { width: 50% !important; }
-            .no-stack .email-col-33 { width: 33% !important; }
-            .no-stack .email-col-67 { width: 67% !important; }
-            .no-stack .email-col-25 { width: 25% !important; }
-            .no-stack .email-col-17 { width: 17% !important; }
-            }
-    
-            @media (max-width: 480px) {
-            .hide-mobile {
-              display: none !important;
-              max-height: 0px;
-              overflow: hidden;
-            }
-            }
-    
-            @media (min-width: 980px) {
-            .hide-desktop {
-              display: none !important;
-              max-height: none !important;
-            }
-            }
+
     
       </style>
       </head>
@@ -353,12 +306,22 @@ export class EmailBuilder {
 
     _addBody() {
         this.html = this.html + `
-          <body class="email-body" style="margin: 0px;padding: 0px;-webkit-text-size-adjust: 100%;>
-          <table align="center" width=${this.json.width} cellspacing="0" cellpadding="0" style="width:${this.json.width}px;vertical-align: top;max-width:${this.json.width}px;margin: 0 auto;background-color: ${this.json.bgColor};">
+          <body class="email-body" style="margin: 0px;padding: 0px;-webkit-text-size-adjust: 100%;">
+            <!--[if (gte mso 9)|(IE)]>
+                <table width="700" align="center" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td>
+                            <![endif]-->
+          <table align="center" width="100%" cellspacing="0" cellpadding="0" style="vertical-align: top;margin: 0 auto;background-color: ${this.json.bgColor};">
             <tbody>
                 ${this._addContent()}
             </tbody>
           </table>
+                    <!--[if (gte mso 9)|(IE)]>
+                    </td>
+                </tr>
+            </table>
+            <![endif]-->
           </body>
           </html>
           `;
@@ -371,7 +334,7 @@ export class EmailBuilder {
         this.json.blocks.forEach(block => {
             result = result.concat(
                     `
-                    <table align="center" width="100%" cellspacing="0" cellpadding="0" style="width:${this.json.width}px;vertical-align: top;max-width:${this.json.width}px;margin: 0 auto;background-color: ${this.json.bgColor};">
+                    <table class="block" align="center" width="100%" cellspacing="0" cellpadding="0" style="vertical-align: top;margin: 0 auto;background-color: ${this.json.bgColor};">
                     <tbody>
                     <tr style="${this._getStyle(block.id)}">
                     `);
@@ -412,22 +375,26 @@ export class EmailBuilder {
             case EWidgetType.BUTTON: {
               switch(widget.typeBtn) {
                 case 'flat':
-                  return `<a href="${widget.url}"  target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color:${widget.colorBtn};background:${widget.bgColorBtn}; border-radius: 8px; -webkit-border-radius: 8px; -moz-border-radius: 8px; width: auto; padding:${padding}; mso-border-alt: none;">
+                  return `<div><a href="${widget.url}"  target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color:${widget.colorBtn};background:${widget.bgColorBtn}; border-radius: 8px; -webkit-border-radius: 8px; -moz-border-radius: 8px; width: auto; padding:${padding}; mso-border-alt: none;">
                         <span style="line-height:120%;"><span>${widget.txtBtn}</span></span>
-                    </a>`;
+                    </a></div>`;
                 case 'stroked':
                     return `<a href="${widget.url}" target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color:${widget.colorBtn};border:${border} solid ${widget.colorBtn}; border-radius: 8px; -webkit-border-radius: 8px; -moz-border-radius: 8px; width: auto; padding:${padding}; mso-border-alt: none;">
                         <span style="line-height:120%;"><span>${widget.txtBtn}</span></span>
                     </a>`;
+                case 'image_button':
+                    return `<div><a href="${widget.url}" target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;width: auto; padding: 10px 20px; mso-border-alt: none;">
+                          <img src=${widget.imageUrl} style="height:auto;max-width:${widget.imgWidth}px;width:100%" title=${widget.txtBtn} alt=${widget.txtBtn}>
+                      </a></div>`;
                 default:
-                    return `<a href="${widget.url}" target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color:${widget.colorBtn};width: auto; padding: 0px ${paddingY}; mso-border-alt: none;">
+                    return `<div><a href="${widget.url}" target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;color:${widget.colorBtn};width: auto; padding: 0px ${paddingY}; mso-border-alt: none;">
                         <span style="line-height:120%;"><span>${widget.txtBtn}</span></span>
-                    </a>`;
+                    </a></div>`;
               }
             }
             case EWidgetType.IMAGE: {
               return `
-              <img src=${widget.url} style="display:block;height:auto;max-width:${widget.imgWidth}px;width:100%" title=${widget.imgAlt} alt=${widget.imgAlt}>
+              <img src=${widget.imageUrl} style="display:block;height:auto;max-width:${widget.imgWidth}px;width:100%" title=${widget.imgAlt} alt=${widget.imgAlt}>
               `;
             }
             default: return "";

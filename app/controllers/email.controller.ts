@@ -135,6 +135,27 @@ export class EmailController {
         ]
     }
 
+    /**Deletes email template by id with all translations. Admin or content required */
+    static delete = async (req: Request, res: Response, next:NextFunction) => {
+        try {
+            let email = await Email.findByPk(req.body.id);
+            if (!email) 
+                return next(new HttpException(500, "Email template could not be found", null));
+            if (email.isProtected == true)
+                return next(new HttpException(400, messages.emailDeleteProtected, null));
+            await email.destroy();
+            res.send({message: "success"}); 
+        } catch(error) {
+            next(error);
+        }
+    }
+    /**Parameter validation */
+    static deleteChecks() {
+        return [
+            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
+            Middleware.validate()
+        ]
+    }    
 
     /**Returns the html of the current email*/
     public static preview = async (req: Request, res: Response, next:NextFunction) => {
@@ -160,31 +181,19 @@ export class EmailController {
 
   
 
-    /**Sends email */
+    /**Sends email to logged in user for testing*/
     static sendTest = async (req: Request, res: Response, next:NextFunction) => {
         //TODO: Get post parameter of template email, additionalHTML
         try {
+            if (!req.user) throw new Error("User not found !");
             let myUser = await User.findByPk(req.user.id);
             if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null));
-            let myEmail = Email.build(req.body.email, {
-                isNewRecord: false,
-                include: [EmailTranslation]
-             });
-            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
-
-            let myTrans = EmailTranslation.build({
-                id: 1000,
-                emailId: myEmail.id,
-                iso: res.locals.language,
-                title: req.body.email.title,
-                subtitle: req.body.email.subtitle,
-                header: req.body.email.header,
-                content: req.body.email.content
-            }, {isNewRecord:false});
-            myEmail.translations = [];
-            myEmail.translations.push(myTrans);
-
-            let html = await myEmail.getHtml(res.locals.language, '<p> -- TEST EMAIL -- </p>');
+            let myEmail = await Email.findByPk(req.body.email.id);
+            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
+            //Create translation[0] with current data
+            let myTrans = myEmail.translations.find(obj=>obj.iso == res.locals.language);
+            if (!myTrans) throw new Error("Translation not found !");  
+            let html = await myEmail.getHtml(myTrans);
             if (!html)  return next(new HttpException(500, messages.emailSentError,null));
             const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
             let myEmailT = {
@@ -198,7 +207,6 @@ export class EmailController {
             res.send({message: {show:true, text:messages.emailSentOk(myUser.email)}});  
         } catch (error) {
             next(new HttpException(500, messages.emailSentError,null));
-
         }
     }
    /**Parameter validation */
@@ -206,9 +214,6 @@ export class EmailController {
         return [
             body('email').exists().withMessage('exists'),
             body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            body('email.title').exists().withMessage('exists'),
-            body('email.subtitle').exists().withMessage('exists'),
-
             //TODO: Add here all required checks !!!
             Middleware.validate()
         ]
@@ -338,27 +343,7 @@ export class EmailController {
 
 
 
-    /**Deletes email template by id with all translations. Admin or content required */
-    static delete = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let email = await Email.findByPk(req.body.id);
-            if (!email) 
-                return next(new HttpException(500, "Email template could not be found", null));
-            if (email.isProtected == true)
-                return next(new HttpException(400, messages.emailDeleteProtected, null));
-            await email.destroy();
-            res.send({message: "success"}); 
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static deleteChecks() {
-        return [
-            body('id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            Middleware.validate()
-        ]
-    }    
+
 
 
 }

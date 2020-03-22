@@ -53,7 +53,7 @@ export class ContactController {
 
             //Now we send and email to thank the contact
             console.log("SENDING EMAIL TO", recipients)
-            let result = await Email.send(res.locals.language, 'contact-reply', 'RE:' + req.body.subject, recipients, req.body.message);
+            let result = await Email.send(res.locals.language, 'contact-reply', 'RE:' + req.body.subject, recipients);
             res.send({message: {show:true, text:messages.messageSent}});
 
         } catch(error) {
