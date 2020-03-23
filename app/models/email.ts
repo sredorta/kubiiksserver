@@ -170,6 +170,15 @@ export class Email extends Model<Email> {
         await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes como respuesta automatica al formulario de contacto",data:defaultData});             
         await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat com a resposta automàtica al formulari de contacte",data:defaultData});             
 
+        myEmail = await Email.create({
+          name: "newsletter-example",
+          isProtected: false  
+        });                    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele d'exemple pour un bulletin d'information",data:defaultData});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Newsletter model example",data:defaultData});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo de ejemplo de un buletin informativo",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model d'exemple d'un butlletí d'informació",data:defaultData});             
+
     }
     return _seed();
   }

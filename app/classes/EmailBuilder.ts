@@ -394,7 +394,7 @@ export class EmailBuilder {
                         <span style="line-height:120%;"><span>${widget.txtBtn}</span></span>
                     </a>`;
                 case 'image_button':
-                    return `<div><a href="${widget.url}" target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;width: auto; padding: 10px 20px; mso-border-alt: none;">
+                    return `<div><a href="${widget.url}" target="_self" onclick="return false;" style="display: inline-block;text-decoration: none;-webkit-text-size-adjust: none;text-align: center;width: auto; padding: 5px; mso-border-alt: none;">
                           <img src=${widget.imageUrl} style="height:auto;max-width:${widget.imgWidth}px;width:100%" title=${widget.txtBtn} alt=${widget.txtBtn}>
                       </a></div>`;
                 default:
