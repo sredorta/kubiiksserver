@@ -70,6 +70,7 @@ export class Middleware {
                     language = (req.acceptsLanguages(acceptableLanguages) || AppConfig.api.defaultLanguage) as string;
             }
             res.locals.language = language;  //Store language in the locals
+            req.language = language;
 
             //Override messages so that it uses correct language
             let acc : any = [];

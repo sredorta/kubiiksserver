@@ -342,7 +342,7 @@ export class User extends Model<User> {
 
 
         /*Debug users*/
-        myUser = await User.scope("full").create({
+/*        myUser = await User.scope("full").create({
           firstName: "gmail",
           lastName: "Red",
           email: "sergi.redorta@gmail.com",
@@ -356,7 +356,7 @@ export class User extends Model<User> {
           password: User.hashPassword("Secure0;")
         });
         await myUser.attachRole("email");
-        await myUser.attachRole("chat");
+        await myUser.attachRole("chat");*/
 
 
         
