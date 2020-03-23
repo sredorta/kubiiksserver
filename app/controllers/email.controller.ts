@@ -190,6 +190,8 @@ export class EmailController {
             if (req.body.options.users) {
                 let myUsers = await User.findAll();
                 for (let user of myUsers) {
+                    console.log("HERE",sentList);
+                    console.log("INDEX FOUND",sentList.indexOf(user.email));
                     if (sentList.indexOf(user.email)<0) {
                         let myTrans = myEmail.translations.find(obj=>obj.iso == user.language);
                         if (!myTrans) throw new Error("Translation not found");
@@ -204,7 +206,7 @@ export class EmailController {
                                         html: html
                         }
                         await transporter.sendMail(myEmailT);     
-                        sentList.push(myUser.email); 
+                        sentList.push(user.email); 
                     }          
                 }
             }
@@ -212,6 +214,8 @@ export class EmailController {
             if (req.body.options.newsletters) {
                 let myUsers = await Newsletter.findAll();
                 for (let user of myUsers) {
+                    console.log("HERE",sentList);
+                    console.log("INDEX FOUND",sentList.indexOf(user.email));
                     if (sentList.indexOf(user.email)<0) {
                         let myTrans = myEmail.translations.find(obj=>obj.iso == user.language);
                         if (!myTrans) throw new Error("Translation not found");
@@ -226,7 +230,7 @@ export class EmailController {
                                         html: html
                         }
                         await transporter.sendMail(myEmailT);     
-                        sentList.push(myUser.email); 
+                        sentList.push(user.email); 
                     }          
                 }
             }            

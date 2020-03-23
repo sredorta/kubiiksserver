@@ -495,8 +495,6 @@ export class EmailBuilder {
           alignment = `vertical-align:${elem.vAlign};text-align:${elem.hAlign}`;
         }
         style = style.concat(fonts,background,width,padding,alignment);
-    
-        console.log("Final style",style);
         return style;
       }
     
