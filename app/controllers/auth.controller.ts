@@ -59,10 +59,10 @@ export class AuthController {
             if (myUserTmp) myUser = myUserTmp;
             //Depending on the validation method we need to authenticate or not
             const link = AppConfig.api.kiiwebExtHost + "/"+myUser.language+"/auth/validate-email?id=" + myUser.id + "&key="+myUser.emailValidationKey;
-            let html = messages.emailValidationLink(link);
+            
             let recipients = [];
             recipients.push(myUser.email);
-            let result = await Email.send(res.locals.language, 'validate-email', messages.authEmailValidateSubject(AppConfig.api.appName), recipients,html);
+            let result = await Email.send(res.locals.language, 'validate-email', messages.authEmailValidateSubject(AppConfig.api.appName), recipients,{emailValidationKey:link});
             if (!result) 
                 res.send({message: {show:true, text:messages.emailSentError}});
             else
@@ -332,7 +332,7 @@ export class AuthController {
                 let html = messages.emailResetPasswordNoUser;
                 let recipients = [];
                 recipients.push(req.body.email);
-                let result = await Email.send(res.locals.language, 'reset-password', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,html);
+                let result = await Email.send(res.locals.language, 'reset-password-noaccount', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,{});
                 if (!result) res.send({message: {show:true, text:messages.emailSentError}});
                 else
                     res.send({message: {show:true, text:messages.authEmailResetPassword(req.body.email)}});      
@@ -343,10 +343,9 @@ export class AuthController {
                 await myUser.save();
                 //Send the email
                 const link = AppConfig.api.kiiwebExtHost + "/"+res.locals.language+"/auth/establish-password?id=" + myUser.id + "&key="+myUser.passwordResetKey;
-                let html = messages.emailResetPassword(link);
                 let recipients = [];
                 recipients.push(myUser.email);
-                let result = await Email.send(res.locals.language, 'reset-password', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,html);
+                let result = await Email.send(res.locals.language, 'reset-password', messages.emailResetPasswordSubject(AppConfig.api.appName), recipients,{resetPasswordKey:link});
                 if (!result) res.send({message: {show:true, text:messages.emailSentError}});
                 else
                     res.send({message: {show:true, text:messages.authEmailResetPassword(myUser.email)}});      

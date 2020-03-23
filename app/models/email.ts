@@ -68,9 +68,9 @@ export class Email extends Model<Email> {
   }  
 
   /**Returns the html of the final email */
-  public async getHtml(translation:EmailTranslation) {
+  public async getHtml(translation:EmailTranslation,replacements:any) {
     try {
-        let builder = new EmailBuilder(translation);
+        let builder = new EmailBuilder(translation,replacements);
         let html = builder.getHtml();
         return html;
     } catch (error) {
@@ -79,17 +79,22 @@ export class Email extends Model<Email> {
     }
   }
 
+  public getTitle(translation:EmailTranslation) {
+    let json = JSON.parse(translation.data);
+    if (!json.title) json.title = "";
+    return json.title;
+  }
 
 
 
   /**Sends email to email recipients with a certain template, additional html if any, subject... */
-  public static async send(iso:string, template:string, subject:string, to:string[]) {
+  public static async send(iso:string, template:string, subject:string, to:string[],replacements:any) {
       try {
             let myEmail = await Email.findOne({where:{name:template}});
             if (!myEmail) throw new Error("Email template not found");
             let myTrans = myEmail.translations.find(obj => obj.iso == iso);
             if (!myTrans) throw new Error("Translation not found !");
-            let builder = new EmailBuilder(myTrans);
+            let builder = new EmailBuilder(myTrans,replacements);
             let html = builder.getHtml();
             const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
             let myEmailT = {
@@ -122,38 +127,48 @@ export class Email extends Model<Email> {
             name: "reference",
             isProtected: true  
         });                    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele de courriel de reference pour tous les nouveaux modeles",title:"Mon titre",data:defaultData});  
-        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Reference email template for all new models",title:"My title",data:defaultData});    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo de referencia para todos los nuevos modelos",title:"Mi titulo",data:defaultData});             
-        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model de referència per tots els nous models", title:"El meu titol",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele de courriel de reference pour tous les nouveaux modeles. Utilize les liens 'unsubscribeNewsletter'",data:defaultData});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Reference email template for all new models. Uses the links 'unsubscribeNewsletter'",data:defaultData});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo de referencia para todos los nuevos modelos. Utiliza los enlaces 'unsubscribeNewsletter'",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model de referència per tots els nous models. Utilitza els enllaços 'unsubscribeNewsletter", data:defaultData});             
 
 
         myEmail = await Email.create({
             name: "validate-email",
             isProtected: true  
         });                    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la validation de compte de courriel client",title:"titre 1",data:defaultData});  
-        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer to validate account",title:"title 1",data:defaultData});    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes para validar su cuenta de correo",title:"titulo 1",data:defaultData});             
-        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat als clients per validar el compte de correu electronic",title:"titol 1",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la validation de compte de courriel client. Utilizer un lien 'emailValidationKey'",data:defaultData});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer to validate account. Use a link 'emailValidationKey'",data:defaultData});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes para validar su cuenta de correo. Utilizar un enlace 'emailValidationKey'",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat als clients per validar el compte de correu electronic. Utilitzar un enllaç 'emailValidationKey'",data:defaultData});             
 
         myEmail = await Email.create({
           name: "reset-password",
           isProtected: true  
         });                    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la demande de nouveau mot de passe",title:"titre 1",data:defaultData});  
-        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer when new password has been asked",title:"title 1",data:defaultData});    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes cuando piden un nuevo password",title:"titulo 1",data:defaultData});             
-        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat als clients quan demanen un nou password",title:"titol1",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la demande de nouveau mot de passe. Utilizer un lien 'resetPasswordKey'",data:defaultData});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer when new password has been asked. Use a link 'resetPasswordKey'",data:defaultData});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes cuando piden un nuevo password. Utilizar un enlace 'resetPasswordKey'",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat als clients quan demanen un nou password. Utilitzar un enllaç 'resetPasswordKey'",data:defaultData});             
+
+        myEmail = await Email.create({
+          name: "reset-password-noaccount",
+          isProtected: true  
+        });                    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé lors de la demande de nouveau mot de passe sur un compte de courriel inéxistant",data:defaultData});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer when new password has been asked to missing account",data:defaultData});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes cuando piden un nuevo password en una cuenta inexistente",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat als clients quan demanen un nou password en un compte que no existeix",data:defaultData});             
+
 
         myEmail = await Email.create({
           name: "contact-reply",
           isProtected: true  
         });                    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé comme réponse automatique au formulaire de contact",title:"titre 1",data:defaultData});  
-        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer as automatic reply of contact form",title:"title 1",data:defaultData});    
-        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes como respuesta automatica al formulario de contacto",title:"titulo 1",data:defaultData});             
-        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat com a resposta automàtica al formulari de contacte",title:"titol",subtitle:"subititol",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"fr",description:"Modele envoyé comme réponse automatique au formulaire de contact",data:defaultData});  
+        await EmailTranslation.create({emailId:myEmail.id, iso:"en",description:"Model sent to customer as automatic reply of contact form",data:defaultData});    
+        await EmailTranslation.create({emailId:myEmail.id, iso:"es",description:"Modelo enviado a los clientes como respuesta automatica al formulario de contacto",data:defaultData});             
+        await EmailTranslation.create({emailId:myEmail.id, iso:"ca",description:"Model enviat com a resposta automàtica al formulari de contacte",data:defaultData});             
 
     }
     return _seed();

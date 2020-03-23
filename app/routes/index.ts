@@ -152,20 +152,12 @@ export class Routes {
       .get(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(),EmailController.getAll);
 
     /**Returns the html of the email template */  
-    app.route('/api/email/preview')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(),EmailController.previewChecks(),EmailController.preview);
-
-    /**Returns the html of the email template */  
     app.route('/api/email/update')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(),EmailController.updateChecks(),EmailController.update);
 
     /**Checks that email service is up and running */
     app.route('/api/email/check')
       .get(EmailController.emailCheck);
-
-    /**Sends email to current loggedin user for testing purposes */
-    app.route('/api/email/send-test')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(), EmailController.sendTestChecks(),EmailController.sendTest);  
 
     /**Creates a new email template */
     app.route('/api/email/create')
@@ -175,17 +167,10 @@ export class Routes {
     app.route('/api/email/delete')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(), EmailController.deleteChecks(),EmailController.delete);  
 
-    /**Sends email to the given recipients with additional html if any and template */
+    /**Sends email to the given recipients */
     app.route('/api/email/send')
       .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(), EmailController.sendChecks(),EmailController.send);      
 
-    /**Sends email to one recipients with given template */
-    app.route('/api/email/send-to')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(), EmailController.sendToChecks(),EmailController.sendTo);      
-
-    /**Sends email to all users registered with given template */
-    app.route('/api/email/send-to-all')
-      .post(passport.authenticate('jwt',{session: false}),Middleware.hasEmailRights(), EmailController.sendToAllChecks(),EmailController.sendToAll);      
 
     /////////////////////////////////////////////////////////////////
     // STATS CONTROLLER PART

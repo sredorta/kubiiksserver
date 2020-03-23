@@ -218,13 +218,12 @@ export enum EItemType {
   }
 
 
-
-
 export class EmailBuilder {
     private json: IEmailData;
     private html:string = "";
-    constructor(trans:EmailTranslation) {
-        this.json = <IEmailData>JSON.parse(trans.data);
+    constructor(trans:EmailTranslation,replacements:any) {
+        this.json = this._initialize(trans.data,replacements);
+        //Do all replacements on the json
         this._addHeading();
         this._addStyle();
         this._addBody();
@@ -232,6 +231,18 @@ export class EmailBuilder {
 
     getHtml() {
         return this.html;
+    }
+
+    /**Does any required replacement in the json*/
+    private _initialize(data:string,replacements:any) {
+        let dataR : string = data;
+        Object.keys(replacements).forEach( (key:string)=> {
+            let value :string = replacements[key];
+            if (value.includes('http://')) key = "http://"+key;
+            if (value.includes('https://')) key = "https://"+key;
+            dataR = dataR.replace(key,value);
+        })
+        return <IEmailData>JSON.parse(dataR);
     }
 
     private _addHeading() {

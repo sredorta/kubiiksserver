@@ -342,22 +342,22 @@ export class User extends Model<User> {
 
 
         /*Debug users*/
-/*        myUser = await User.scope("full").create({
+        myUser = await User.scope("full").create({
           firstName: "gmail",
           lastName: "Red",
           email: "sergi.redorta@gmail.com",
           phone: null,
           mobile: "0623133222",
-          language: "ca",
+          language: "en",
           passport: "local",
           terms: true,
           emailValidationKey: Helper.generateRandomString(30),
           mobileValidationKey: Helper.generateRandomNumber(4),
-          password: User.hashPassword("Secure0")
+          password: User.hashPassword("Secure0;")
         });
         await myUser.attachRole("email");
         await myUser.attachRole("chat");
-*/
+
 
         
         /*        await myUser.attachRole("chat");

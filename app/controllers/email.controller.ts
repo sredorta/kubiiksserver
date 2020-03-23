@@ -157,94 +157,80 @@ export class EmailController {
         ]
     }    
 
-    /**Returns the html of the current email*/
-    public static preview = async (req: Request, res: Response, next:NextFunction) => {
-        try {
-            let myEmail = await Email.findByPk(req.body.email.id);
-            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
-            //Create translation[0] with current data
-            let myTrans = myEmail.translations.find(obj=>obj.iso == res.locals.language);
-            if (!myTrans) throw new Error("Translation not found !");  
-            let result = await myEmail.getHtml(myTrans);
-            res.json(result);
-        } catch(error) {
-            next(error);
-        }
-    }
-    /**Parameter validation */
-    static previewChecks() {
-        return [
-            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            Middleware.validate()
-        ]
-    }    
-
-  
-
-    /**Sends email to logged in user for testing*/
-    static sendTest = async (req: Request, res: Response, next:NextFunction) => {
-        //TODO: Get post parameter of template email, additionalHTML
-        try {
-            if (!req.user) throw new Error("User not found !");
-            let myUser = await User.findByPk(req.user.id);
-            if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null));
-            let myEmail = await Email.findByPk(req.body.email.id);
-            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
-            //Create translation[0] with current data
-            let myTrans = myEmail.translations.find(obj=>obj.iso == res.locals.language);
-            if (!myTrans) throw new Error("Translation not found !");  
-            let html = await myEmail.getHtml(myTrans);
-            if (!html)  return next(new HttpException(500, messages.emailSentError,null));
-            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-            let myEmailT = {
-                            from: AppConfig.emailSmtp.sender,
-                            to: myUser.email,
-                            subject: "TEST EMAIL",
-                            text: htmlToText.fromString(html),
-                            html: html
-            }
-            await transporter.sendMail(myEmailT);
-            res.send({message: {show:true, text:messages.emailSentOk(myUser.email)}});  
-        } catch (error) {
-            next(new HttpException(500, messages.emailSentError,null));
-        }
-    }
-   /**Parameter validation */
-   static sendTestChecks() {
-        return [
-            body('email').exists().withMessage('exists'),
-            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            //TODO: Add here all required checks !!!
-            Middleware.validate()
-        ]
-    }    
 
 
-    /**Sends email to the required recipients and the additionalHTML and template*/
+    /**Sends email to the required recipients  template*/
     static send = async (req: Request, res: Response, next:NextFunction) => {
         //TODO: Get post parameter of template email, additionalHTML
         try {
-            
+            if (!req.user) throw new Error("User not found");
             let myUser = await User.findByPk(req.user.id);
             if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null));
-            let myEmail = Email.build(req.body.email, {
-                isNewRecord: false,
-                include: [EmailTranslation]
-             });
-            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
-
-            let html = await myEmail.getHtml(res.locals.language, '<p> -- TEST EMAIL -- </p>');
-            if (!html)  return next(new HttpException(500, messages.emailSentError,null));
-            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-            let myEmailT = {
-                            from: AppConfig.emailSmtp.sender,
-                            to: req.body.to,
-                            subject: req.body.subject,
-                            text: htmlToText.fromString(html),
-                            html: html
+            let myEmail = await Email.findByPk(req.body.email.id);
+            if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
+            let sentList : string[] = [];
+            //When self is checked
+            if (req.body.options.self) {
+                let myTrans = myEmail.translations.find(obj=>obj.iso == res.locals.language);
+                if (!myTrans) throw new Error("Translation not found");
+                let html = await myEmail.getHtml(myTrans, {unsubscribeNewsletter:AppConfig.api.kiiwebExtHost + "/"+myUser.language+"/auth/unsubscribe?email="+myUser.email});
+                if (!html)  return next(new HttpException(500, messages.emailSentError,null));
+                const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+                let myEmailT = {
+                                from: AppConfig.emailSmtp.sender,
+                                to: myUser.email,
+                                subject: myEmail.getTitle(myTrans),
+                                text: htmlToText.fromString(html),
+                                html: html
+                }
+                await transporter.sendMail(myEmailT);     
+                sentList.push(myUser.email);           
             }
-            await transporter.sendMail(myEmailT);
-            res.send({message: {show:true, text:messages.emailSentOk(myUser.email)}});  
+            //When send email to all users
+            if (req.body.options.users) {
+                let myUsers = await User.findAll();
+                for (let user of myUsers) {
+                    if (sentList.indexOf(user.email)<0) {
+                        let myTrans = myEmail.translations.find(obj=>obj.iso == user.language);
+                        if (!myTrans) throw new Error("Translation not found");
+                        let html = await myEmail.getHtml(myTrans, {unsubscribeNewsletter:AppConfig.api.kiiwebExtHost + "/"+user.language+"/auth/unsubscribe?email="+user.email});
+                        if (!html)  return next(new HttpException(500, messages.emailSentError,null));
+                        const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+                        let myEmailT = {
+                                        from: AppConfig.emailSmtp.sender,
+                                        to: user.email,
+                                        subject: myEmail.getTitle(myTrans),
+                                        text: htmlToText.fromString(html),
+                                        html: html
+                        }
+                        await transporter.sendMail(myEmailT);     
+                        sentList.push(myUser.email); 
+                    }          
+                }
+            }
+            //When send email to all newsletters
+            if (req.body.options.newsletters) {
+                let myUsers = await Newsletter.findAll();
+                for (let user of myUsers) {
+                    if (sentList.indexOf(user.email)<0) {
+                        let myTrans = myEmail.translations.find(obj=>obj.iso == user.language);
+                        if (!myTrans) throw new Error("Translation not found");
+                        let html = await myEmail.getHtml(myTrans, {unsubscribeNewsletter:AppConfig.api.kiiwebExtHost + "/"+user.language+"/auth/unsubscribe?email="+user.email});
+                        if (!html)  return next(new HttpException(500, messages.emailSentError,null));
+                        const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
+                        let myEmailT = {
+                                        from: AppConfig.emailSmtp.sender,
+                                        to: user.email,
+                                        subject: myEmail.getTitle(myTrans),
+                                        text: htmlToText.fromString(html),
+                                        html: html
+                        }
+                        await transporter.sendMail(myEmailT);     
+                        sentList.push(myUser.email); 
+                    }          
+                }
+            }            
+            res.send({message: {show:true, text:messages.emailSentOkAll(sentList.length.toString())}});  
         } catch (error) {
             next(new HttpException(500, messages.emailSentError,null));
 
@@ -253,92 +239,18 @@ export class EmailController {
    /**Parameter validation */
    static sendChecks() {
         return [
-            body('to').exists().withMessage('exists').isArray(),
-            body('to.*').isEmail(),
-            body('subject').exists().withMessage('exists').not().isEmpty(),
-
-
+            body('email').exists().withMessage('exists'),
             body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            body('email.translations').exists().withMessage('exists'),
-            //TODO: Add here all required checks !!!
+            body('options').exists().withMessage('exists'),
+            body('options.self').exists().withMessage('exists').isBoolean(),
+            body('options.users').exists().withMessage('exists').isBoolean(),
+            body('options.newsletters').exists().withMessage('exists').isBoolean(),
             Middleware.validate()
         ]
     }    
 
 
 
-    /**Sends email to one email recipient using a specific template*/
-    static sendTo = async (req: Request, res: Response, next:NextFunction) => {
-        //TODO: Get post parameter of template email, additionalHTML
-        try {
-            let myEmail = await Email.findByPk(req.body.email.id);
-            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
-            let html = await myEmail.getHtml(res.locals.language, req.body.additionalHtml);
-            if (!html)  return next(new HttpException(500, messages.emailSentError,null));
-            let header = await myEmail.getHeader(res.locals.language);
-
-            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-            let myEmailT = {
-                            from: AppConfig.emailSmtp.sender,
-                            to: req.body.to,
-                            subject: htmlToText.fromString(header, {uppercaseHeadings:false}),
-                            text: htmlToText.fromString(html),
-                            html: html
-            }
-            await transporter.sendMail(myEmailT);
-            res.send({message: {show:true, text:messages.emailSentOk(req.body.to)}}); 
-        } catch (error) {
-            next(new HttpException(500, messages.emailSentError,null));
-        }
-    }
-   /**Parameter validation */
-   static sendToChecks() {
-        return [
-            body('to').exists().withMessage('exists').isEmail(),
-            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            Middleware.validate()
-        ]
-    }    
-
-    
-
-    /**Sends email to all registered users to the newsletter using a specific template*/
-    static sendToAll = async (req: Request, res: Response, next:NextFunction) => {
-        //TODO: Get post parameter of template email, additionalHTML
-        try {
-            
-            let myEmail = await Email.findByPk(req.body.email.id);
-            if (!myEmail) return next(new HttpException(500, messages.emailSentError,null));
-            const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
-            let users = await Newsletter.findAll();
-            for (let user of users) {
-                let html = await myEmail.getHtml(user.language);
-                if (!html)  return next(new HttpException(500, messages.emailSentError,null));
-                let header = await myEmail.getHeader(user.language);
-                let myEmailT = {
-                                from: AppConfig.emailSmtp.sender,
-                                to: user.email,
-                                subject: htmlToText.fromString(header, {uppercaseHeadings:false}),
-                                text: htmlToText.fromString(html),
-                                html: html
-                }
-                await transporter.sendMail(myEmailT);
-            }
-
-            res.send({message: {show:true, text:messages.emailSentOkAll(users.length.toString())}}); 
-        } catch (error) {
-            next(new HttpException(500, messages.emailSentError,null));
-
-        }
-    }
-   /**Parameter validation */
-   static sendToAllChecks() {
-        return [
-            body('email.id').exists().withMessage('exists').custom(CustomValidators.dBExists(Email,'id')),
-            //TODO: Add here all required checks !!!
-            Middleware.validate()
-        ]
-    }    
 
 
 
