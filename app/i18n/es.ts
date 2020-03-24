@@ -69,6 +69,11 @@ export const messages = {
     articleNewDescription: 'Mi descripción',
     articleNewContent:  '<p>Mi contenido</p>',
 
+    notificationNewTitle: 'Mi titulo de notificacion',
+    notificationNewBody: 'Contenido de mi notificacion',
+    notificationSendOk: 'Notificacion enviada correctamente',
+
+
     apiRouteNotFound: 'El servidor no encontró la petición',
 
     newsletterSubscribed: "A partir de ahora va a recibir los boletines informativos",

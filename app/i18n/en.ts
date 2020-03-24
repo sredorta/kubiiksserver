@@ -73,6 +73,10 @@ export const messages = {
     articleNewDescription: 'My description',
     articleNewContent:  '<p>My content</p>',
 
+    notificationNewTitle: 'My notification title',
+    notificationNewBody: 'My notification content',
+    notificationSendOk: 'Notification sent correctly',
+
     apiRouteNotFound: 'The server could not find the requested action',
 
     newsletterSubscribed: 'You are now registered to the newsletter',

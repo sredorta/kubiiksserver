@@ -36,6 +36,7 @@ import { DiskController } from '../controllers/disk.controller';
 import { NewsletterController } from '../controllers/newsletter.controller';
 import { PageController } from '../controllers/page.controller';
 import { CathegoryController } from '../controllers/cathegory.controller';
+import { OnpushController } from '../controllers/onpush.controller';
 
 
 
@@ -96,6 +97,27 @@ export class Routes {
     /**Stores onPush notification of session if accepted */
     app.route('/api/notification/settings/session')
       .post(NotificationController.settingsSessionChecks(), NotificationController.settingsSession);
+
+    /**Get all onPush notifications templates */
+    app.route('/api/notification/all')
+      .get(OnpushController.getAll);
+
+    /**Updates notification template */  
+    app.route('/api/notification/update')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasNotificationRights(),OnpushController.updateChecks(),OnpushController.update);
+
+    /**Creates a new email template */
+    app.route('/api/notification/create')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasNotificationRights(), OnpushController.createChecks(),OnpushController.create);  
+
+    /**Deletes a notification template */
+    app.route('/api/notification/delete')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasNotificationRights(), OnpushController.deleteChecks(),OnpushController.delete);  
+
+    /**Sends email to the given recipients */
+    app.route('/api/notification/send')
+      .post(passport.authenticate('jwt',{session: false}),Middleware.hasNotificationRights(), OnpushController.sendChecks(),OnpushController.send);      
+
 
 
 

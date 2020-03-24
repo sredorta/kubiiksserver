@@ -51,6 +51,7 @@ export class Role extends Model<Role> {
               await Role.create({name:"users"});     //Allows access to users
               await Role.create({name:"chat"});      //Allows user to admin chat
               await Role.create({name:"email"});     //Allows user to send emails
+              await Role.create({name:"notification"});//Allows user to send notifications
               await Role.create({name:"stats"});     //Allows user to see stats
             } catch(err) {
                 console.log("ERROR: Could not seed USERS !!!")

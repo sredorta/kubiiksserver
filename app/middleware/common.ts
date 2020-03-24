@@ -305,7 +305,24 @@ export class Middleware {
             }
         }
     }   
-
+    /** Checks that the registered user has notification role or is an administrator if not errors */     
+    public static hasNotificationRights() {
+        return async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+            try {
+                if(!req.user) throw new Error("User not found !");
+                let myUser = await User.scope("details").findByPk(req.user.id);
+                if (myUser) {
+                    if (await myUser.hasRole("notification") )
+                        next();
+                    else
+                        next(new HttpException(403, messages.authTokenInvalidRole('notification'), null));
+                } else
+                    next(new HttpException(403, messages.authTokenInvalidRole('notification'), null));
+            } catch(error) {
+                next(new HttpException(403, messages.authTokenInvalidRole('notification'), null));
+            }
+        }
+    }   
     /** Checks that the registered user has stats role or is an administrator if not errors */     
     public static hasStatsRights() {
         return async (req:express.Request, res:express.Response, next:express.NextFunction) => {

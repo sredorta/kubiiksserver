@@ -70,6 +70,10 @@ export const messages = {
     articleNewDescription: 'Ma description',
     articleNewContent:  '<p>Mon contenu</p>',
 
+    notificationNewTitle: 'Mon titre de notification',
+    notificationNewBody: 'Contenu de ma notification',
+    notificationSendOk: 'Notification envoyée',
+
     apiRouteNotFound: "Le serveur n'a pas trouvé la requête demandé",
 
     newsletterSubscribed: "Vous êtes désormais enregistré pour recevoir nos bulletins d'information",
