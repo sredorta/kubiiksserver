@@ -29,6 +29,7 @@ import { SocketHandler } from "./socket";
 import { Newsletter } from "./models/newsletter";
 import { Page } from "./models/page";
 import { Cathegory } from "./models/cathegory";
+import { Onpush } from "./models/onpush";
 
 
 export let sockets :SocketHandler;
@@ -79,6 +80,7 @@ async function startServer() {
     await Email.seed();
     await Alert.seed();
     await Newsletter.seed();
+    await Onpush.seed();
    }
     app.use(function(err:Error, req:Request, res:Response, next:NextFunction) {
         console.log("--> STACK ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!! --> DEBUG REQUIRED !!!");

@@ -12,6 +12,7 @@ import { Alert } from './alert';
 import  webPush from 'web-push';
 import { isNamedExports, visitLexicalEnvironment } from 'typescript';
 import { Setting } from './setting';
+import { objectExpression } from 'babel-types';
 
 
 
@@ -159,6 +160,8 @@ export class User extends Model<User> {
       async function _getData(title:string,body:string) {
         try {
           if (myObj.onPush) {
+            let myUser = await User.scope("details").findByPk(myObj.id); //To avoid sending sensible data
+            if (myUser) myUser = myUser.sanitize(myUser.language);
             let urlBase = AppConfig.api.kiiserverExtHost + "/public/images/defaults/";
             //Get baseURL from settings
             const subscription = JSON.parse(myObj.onPush);
@@ -171,6 +174,7 @@ export class User extends Model<User> {
                 action:AppConfig.api.kiiwebExtHost,
                 data: {
                   url: AppConfig.api.kiiwebExtHost,
+                  user: myUser
                 }
               }
             });

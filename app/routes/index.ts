@@ -90,9 +90,12 @@ export class Routes {
     // ON PUSH NOTIFICATIONS
     ////////////////////////////////////////////////////////////////
     /**Stores onPush notification data to user if accepted */
-    app.route('/api/notification/settings')
-    .post(passport.authenticate('jwt',{session: false}),NotificationController.settingsChecks(), NotificationController.settings);
+    app.route('/api/notification/settings/user')
+      .post(passport.authenticate('jwt',{session: false}),NotificationController.settingsUserChecks(), NotificationController.settingsUser);
     
+    /**Stores onPush notification of session if accepted */
+    app.route('/api/notification/settings/session')
+      .post(NotificationController.settingsSessionChecks(), NotificationController.settingsSession);
 
 
 

@@ -13,6 +13,7 @@ import { ArticleTranslation } from '../models/article_translation';
 import { User } from '../models/user';
 import { Setting } from '../models/setting';
 import  webPush from 'web-push';
+import { Onpushsession } from '../models/onpushsession';
 
 
 
@@ -30,20 +31,22 @@ export class NotificationController {
           */
 
     /**Gets the onPush notification settings and stores it in the user */
-    static settings  = async (req: Request, res: Response, next:NextFunction) => {
+    static settingsUser  = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            if(!req.user) throw new Error("User not found !");
-            let myUser = await User.scope("full").findByPk(req.user.id);
-            if (!myUser) throw new Error("Cannot find auth user !");
-            myUser.onPush = JSON.stringify(req.body.onPush);
-            await myUser.save();
+            //Add notification data to user if we are loggedin
+            if(req.user) {
+                let myUser = await User.scope("full").findByPk(req.user.id);
+                if (!myUser) throw new Error("Cannot find auth user !");
+                myUser.onPush = JSON.stringify(req.body.onPush);
+                await myUser.save();
+            }
             res.json(true);
         } catch(error) {
             next(error);
         }
     }
-    /** Role attach parameter validation */
-    static settingsChecks() {
+    /** Validation for settingsUser*/
+    static settingsUserChecks() {
         return [
             body('onPush.endpoint').exists().withMessage('exists').isURL(),
             body('onPush.keys').exists().withMessage('exists'),
@@ -51,6 +54,37 @@ export class NotificationController {
             body('onPush.keys.auth').exists().withMessage('exists').isString().isLength({min:15}),
             Middleware.validate()
         ]
+    } 
+
+
+    /**Gets the onPush notification settings and stores it in the user */
+    static settingsSession  = async (req: Request, res: Response, next:NextFunction) => {
+            try {
+                //Add notification data to notifications table
+                console.log("ADDING SESSION NOTIFICATION !",req.body.session,req.body.onPush);
+                let notif = await Onpushsession.findOne({where:{session:req.body.session}});
+                if (!notif) {
+                    await Onpushsession.create({session:req.body.session, language:res.locals.language, onPush: JSON.stringify(req.body.onPush)})
+                } else {
+                    //Update language
+                    notif.language = res.locals.language;
+                    await notif.save();
+                }
+                res.json(true);
+            } catch(error) {
+                next(error);
+            }
+    }
+    /** Validation for settingsSession */
+    static settingsSessionChecks() {
+            return [
+                body('session').exists().withMessage('exists').isString().isLength({min:8}),
+                body('onPush.endpoint').exists().withMessage('exists').isURL(),
+                body('onPush.keys').exists().withMessage('exists'),
+                body('onPush.keys.p256dh').exists().withMessage('exists').isString().isLength({min:80}),
+                body('onPush.keys.auth').exists().withMessage('exists').isString().isLength({min:15}),
+                Middleware.validate()
+            ]
     } 
 
 }
