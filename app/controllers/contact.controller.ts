@@ -45,8 +45,6 @@ export class ContactController {
                 for (let iso of Middleware.languagesSupported()) {
                     await AlertTranslation.create({alertId:myAlert.id,iso:iso,title:messagesAll[iso].notificationContactEmail,message:req.body.subject + '\n' + req.body.message})
                 }
-                //Send through socket the updated user with the new alerts so that FE can update
-                sockets.updateAuth(myUser.id);
                 //Send push notif to all admins !!!
                 await myUser.notify(messagesAll[myUser.language].notificationContactEmail, req.body.subject + '\n' + req.body.message);
             }

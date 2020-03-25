@@ -127,9 +127,7 @@ export class OnpushController {
                 let iso = myUser.language;
                 let myNotifTrans = myNotif.translations.find(obj=> obj.iso == iso);
                 if (myNotifTrans) {
-                    let result = await myUser.notify(myNotifTrans.title,myNotifTrans.body);
-                    console.log("SENDING NOTIFICATION !",myUser);
-
+                    await myUser.notify(myNotifTrans.title,myNotifTrans.body);
                 }
             } else if(req.body.options == 'users') {
                 let users = await User.scope("full").findAll();

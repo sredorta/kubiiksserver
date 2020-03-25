@@ -153,18 +153,19 @@ export class User extends Model<User> {
 
   /**Sends onPush notification to user if any subscription */
   public async notify(title:string,body:string) {
-
     let myPromise : Promise<boolean>;
     let myObj = this;
     myPromise =  new Promise<boolean>((resolve,reject) => {
       async function _getData(title:string,body:string) {
         try {
-          if (myObj.onPush) {
+          //Get first the current user with full details to make sure we have onPush data
+          let user = await User.scope("fulldetails").findByPk(myObj.id);
+          if (user && user.onPush) {
             let myUser = await User.scope("details").findByPk(myObj.id); //To avoid sending sensible data
             if (myUser) myUser = myUser.sanitize(myUser.language);
             let urlBase = AppConfig.api.kiiserverExtHost + "/public/images/defaults/";
             //Get baseURL from settings
-            const subscription = JSON.parse(myObj.onPush);
+            const subscription = JSON.parse(user.onPush);
             const payload = JSON.stringify({
               notification: {
                 title: title,
@@ -181,6 +182,7 @@ export class User extends Model<User> {
             await webPush.sendNotification(subscription,payload);
             resolve(true);
           } else {
+            console.log("ONPUSH: skipped on push as onPush user data is not available");
             resolve(false);
           }
 

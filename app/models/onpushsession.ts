@@ -60,6 +60,7 @@ export class Onpushsession extends Model<Onpushsession> {
             await webPush.sendNotification(subscription,payload);
             resolve(true);
           } else {
+            console.log("ONPUSH: skipped on push as onPush user data is not available");
             resolve(false);
           }
 
