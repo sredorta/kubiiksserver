@@ -142,6 +142,7 @@ export class SocketHandler  {
     private addConnection(connection:ISocketConnection) {
       this.connections.push(connection);
       console.log("SOCKET: Added connection");
+      connection.socket.emit(SocketEvents.AUTHENTICATE); //Ask new connection to authenticate
     }
 
     /**Disconnects user by removing it from the list of connections */
@@ -159,6 +160,8 @@ export class SocketHandler  {
     /**Authenticates the user if he has a token */
     private loadOnAuthenticate(socket:socketio.Socket) {
       socket.on(SocketEvents.AUTHENTICATE,(data:ISocketAuth) => {
+        console.log("SOCKET: RECIEVED AUTH",data);
+
           let userId : null | number = null;
           try {
               const payload = <IJwtPayload>jwt.verify(data.token,AppConfig.auth.jwtSecret);
@@ -173,9 +176,11 @@ export class SocketHandler  {
                   if (user) {
                       connection.user = user;
                       if(user.hasRole('chat')) {
+                          console.log("SOCKET: ADDED USER TO ADMIN",user.id)
                           socket.join(SocketRooms.CHAT_ADMIN);
                       }
                       if (user.hasRole('admin')) {
+                        console.log("SOCKET: ADDED USER TO ADMIN",user.id)
                           socket.join(SocketRooms.ADMIN);
                       }
                       this.updateConnection(connection);    
