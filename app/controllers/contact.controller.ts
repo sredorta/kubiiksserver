@@ -50,12 +50,10 @@ export class ContactController {
             }
 
             //Now we send and email to thank the contact
-            console.log("SENDING EMAIL TO", recipients)
             let result = await Email.send(res.locals.language, 'contact-reply', 'RE:' + req.body.subject, recipients,{});
             res.send({message: {show:true, text:messages.messageSent}});
 
         } catch(error) {
-            console.log(error);
             next(new HttpException(500, messages.emailSentError,null));
         }        
         //TODO: PUSH NOTIFICATION TO ADMIN USERS !!!!

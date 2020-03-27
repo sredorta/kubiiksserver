@@ -77,7 +77,6 @@ export class Helper {
         }
         score += (variationCount - 1) * 10;
         score= score>100?100:score;
-        console.log("PASSWORD SCORE:",score);
         if (score<60) return false;
         return true;
     }
@@ -87,7 +86,6 @@ export class Helper {
         let i = 0;
         while(!Helper.passwordPassQualityRequired(password)) {
             password = Helper.generateRandomString(10);
-            console.log("Regenerating password because of low quality !!!!!");
             i++;
         }
         return password;

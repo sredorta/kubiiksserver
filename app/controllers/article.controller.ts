@@ -100,7 +100,6 @@ export class ArticleController {
             let myCath = await Cathegory.findOne({where:{name:req.body.cathegory}});
             if (!myCath) throw new Error("Cathegory not found !");
             if (!myUser) throw new Error("User not found !");
-            console.log("CATHEGORY", myCath.name, myCath.role);
                 if (myCath.role=="kubiiks"  && !myUser.hasRole("kubiiks")) {
                     return next(new HttpException(403,  messages.authTokenInvalidRole('kubiiks'), null));
                 }
@@ -281,9 +280,6 @@ export class ArticleController {
                 let myArticlePred = await Article.findOne({where: Sequelize.and({cathegory:myArticle.cathegory,order:myArticle.order-1})});
                 if (!myArticlePred) throw Error("Could not find predecessor");
                 
-                console.log("CURRENT: " + myArticle.id+ "Assinged order: ",myArticle.order-1);
-                console.log("PRED: " + myArticlePred.id+ "Assinged order: "+ myArticle.order);
-
                 myArticlePred.order = Number(myArticle.order);
                 myArticle.order = Number(myArticle.order-1);
 

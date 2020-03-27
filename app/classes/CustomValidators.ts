@@ -88,7 +88,6 @@ export class CustomValidators extends Error {
     static avatar() {
         return (value:string, {req} : {req:Request}) => {
             if(value) {
-                console.log("CHECKING AVATAR",value);
                 if (!value.includes('https://')) return Promise.reject({type:'avatar'});
             }
             //Correct

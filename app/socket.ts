@@ -141,7 +141,6 @@ export class SocketHandler  {
     /**Adds connection to the list */
     private addConnection(connection:ISocketConnection) {
       this.connections.push(connection);
-      console.log("SOCKET: Added connection");
       connection.socket.emit(SocketEvents.AUTHENTICATE); //Ask new connection to authenticate
     }
 
@@ -154,13 +153,11 @@ export class SocketHandler  {
             this.connections.splice(index,1);
         }
         });
-      console.log("SOCKET: Removed connection");
     }
 
     /**Authenticates the user if he has a token */
     private loadOnAuthenticate(socket:socketio.Socket) {
       socket.on(SocketEvents.AUTHENTICATE,(data:ISocketAuth) => {
-        console.log("SOCKET: RECIEVED AUTH",data);
 
           let userId : null | number = null;
           try {
@@ -176,11 +173,9 @@ export class SocketHandler  {
                   if (user) {
                       connection.user = user;
                       if(user.hasRole('chat')) {
-                          console.log("SOCKET: ADDED USER TO ADMIN",user.id)
                           socket.join(SocketRooms.CHAT_ADMIN);
                       }
                       if (user.hasRole('admin')) {
-                        console.log("SOCKET: ADDED USER TO ADMIN",user.id)
                           socket.join(SocketRooms.ADMIN);
                       }
                       this.updateConnection(connection);    
@@ -216,7 +211,6 @@ export class SocketHandler  {
   /**Sends data to the chat room others*/
   private loadOnChatData(socket:socketio.Socket) {
     socket.on(SocketEvents.CHAT_DATA, (data:IChatData) => {
-        console.log("loadOnChatData",data);
         switch(data.type) {   
           case ChatDataType.CreateRoom:
             if (!this.isChatAdminUser(socket)) {
@@ -238,7 +232,6 @@ export class SocketHandler  {
                   }
                   socket.emit(SocketEvents.CHAT_DATA, {room:data.room, type:ChatDataType.Message, object:{message:myMessage}});
             } else {
-              console.log("NOT CREATING ROOM, YOU ARE ADMIN !!!!")
             }
             break;
           case ChatDataType.FirstMessage:
@@ -316,7 +309,6 @@ export class SocketHandler  {
               }
               let userChatAdmin = await User.scope("details").findByPk(user.id);
               if (userChatAdmin) {
-                console.log("SOCKET: ONPUSH NOTIFY ", userChatAdmin.id);
                 userChatAdmin.notify(messagesAll[user.language].notificationNewChat,data.object.message.message);
               }
           }

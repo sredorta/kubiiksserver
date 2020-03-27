@@ -387,7 +387,6 @@ export class AuthController {
             token = myUser.createToken("short");
             res.json({token: token, user:myUser.sanitize(res.locals.language)});   
         } catch(error) {
-            console.log(error);
             next(new HttpException(500, messages.authEstablisPasswordError,null));
         };
     }

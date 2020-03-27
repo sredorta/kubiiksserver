@@ -104,7 +104,6 @@ export class Page extends Model<Page> {
                   })
                   //Add cathegories
                   Object.entries(item.cathegories).forEach((cathegory,index)=> {
-                        console.log("Adding cathegory",cathegory);
                         tmpP.attachCathegory(cathegory[1]);
                   })
                 }     

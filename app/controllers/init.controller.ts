@@ -25,7 +25,6 @@ export class InitController {
     /**Gets all data required for app initialization in one shot */
     static getFull = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            console.log("REQUESTES FOR ALL PAGES !!!!!!!!!!!!!!");
             let result : any = {};
             let settings = await Setting.findAll();
             let pages = await Page.findAll();
@@ -56,7 +55,6 @@ export class InitController {
     /**Gets all data required for app initialization in one shot */
     static get = async (req: Request, res: Response, next:NextFunction) => {
         try {
-            console.log("ASKING FOR ARTICLE ID", req.body.articleId);
             let result : any = {};
             let settings = await Setting.findAll();
             let pages = await Page.findAll({where:{page:req.body.page}});

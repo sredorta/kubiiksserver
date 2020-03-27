@@ -56,8 +56,6 @@ export class Middleware {
     //Set language based on headers or referer because of oauth
     public static language() {
         return function (req:express.Request, res:express.Response, next:express.NextFunction) {
-            console.log(req.url);
-            console.log(req.headers['referer']);
             let language :string;
             //GET LANGUAGE FROM REFERER FIRST
             if (req.url.includes('/callback')) {

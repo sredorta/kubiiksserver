@@ -134,7 +134,6 @@ export class Passport {
         profileFields: ['id', 'emails', 'name', "link","locale",'photos',"timezone"]
       },
       function(req, accessToken, refreshToken, profile, cb) {
-          console.log("IN PASSPORT !!!!!!!!!!!!!!!");
         //Now we need to see if user already exists in database and if not then add it
         async function _work() {
             //Check that we got all the required minimum fields

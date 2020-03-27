@@ -197,7 +197,6 @@ export class User extends Model<User> {
   }
 
   public static getEmptyInstance() {
-    console.log(JSON.stringify(User.build({})))
     return User.build({}); //Return an user that doesn't exist
   }
 
@@ -215,11 +214,9 @@ export class User extends Model<User> {
   /**Generates a token */
   public createToken(time: "short" | "long"  | "admin") {
     if (this.hasAnyRole()) time = "admin";
-    console.log("CREATING TOKEN :",time);
     let expires = AppConfig.auth.accessShort;
     switch (time) {
        case "admin": 
-          console.log("Creating token with access of 100d !");
           expires = AppConfig.auth.accessAdmin;
           break;
        case "long":

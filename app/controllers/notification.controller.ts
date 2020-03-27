@@ -61,7 +61,6 @@ export class NotificationController {
     static settingsSession  = async (req: Request, res: Response, next:NextFunction) => {
             try {
                 //Add notification data to notifications table
-                console.log("ADDING SESSION NOTIFICATION !",req.body.session,req.body.onPush);
                 let notif = await Onpushsession.findOne({where:{session:req.body.session}});
                 if (!notif) {
                     await Onpushsession.create({session:req.body.session, language:res.locals.language, onPush: JSON.stringify(req.body.onPush)})
