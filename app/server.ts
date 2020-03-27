@@ -54,6 +54,7 @@ const sequelize = new Sequelize({
     modelPaths: [mydir + './models/*'],
     modelMatch: (filename, member) => {
       filename = filename.replace("_", "");
+      //console.log("FILENAME",filename);
       return filename === member.toLowerCase();
     },
     pool: {

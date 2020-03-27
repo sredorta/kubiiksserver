@@ -7,6 +7,7 @@ export const NArticleTranslation = 'Not a model';
 
 @DefaultScope({
     //attributes: ["id","key","type","value"]
+    attributes: {exclude : []},
   })
 
 @Table({timestamps:false})
