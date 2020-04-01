@@ -2,7 +2,7 @@ import {Request, Response, NextFunction, RequestHandler} from 'express';
 import {HttpException} from '../classes/HttpException';
 import { Middleware } from '../middleware/common';
 import { CustomValidators } from '../classes/CustomValidators';
-import sequelize, { Sequelize } from 'sequelize';
+import sequelize, { Sequelize, Op } from 'sequelize';
 import nodemailer from 'nodemailer';
 import {body} from 'express-validator/check';
 
@@ -272,26 +272,30 @@ export class ArticleController {
                 return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
             }
 
-            if (myArticle.order<1) throw Error("Article must have order larger than 1 !");
-            if (myArticle.order==1) {
-                //Do nothing as is already upper
+            //Find prev article
+            console.log("FINING PREV ARTICLE, current order is", myArticle.order);
+            let myArticlePrev = await Article.findOne(
+                    {where:Sequelize.and({
+                        cathegory:myArticle.cathegory,
+                        order:{[Op.lt]:myArticle.order}
+                    }),
+                    order:[['order', 'DESC']] });
+            if (!myArticlePrev) {
+                console.log("There is no prev, so doing nothing !")
                 res.json([{}]);
             } else {
-                let myArticlePred = await Article.findOne({where: Sequelize.and({cathegory:myArticle.cathegory,order:myArticle.order-1})});
-                if (!myArticlePred) throw Error("Could not find predecessor");
-                
-                myArticlePred.order = Number(myArticle.order);
-                myArticle.order = Number(myArticle.order-1);
-
-
+                //Now switch orders !
+                let save = myArticlePrev.order;
+                myArticlePrev.order = myArticle.order;
+                myArticle.order = save;
                 await myArticle.save();
-                await myArticlePred.save();
+                await myArticlePrev.save();
                 //Now get all articles of the same cathegory and move up order and return articles
                 let result = [];
-                let articles = [myArticle,myArticlePred];
+                let articles = [myArticle,myArticlePrev];
                 for (let article of articles) result.push(article.sanitize(res.locals.language));
                 res.json(result);
-            }
+            } 
 
         } catch(error) {
             next(error);
@@ -318,16 +322,23 @@ export class ArticleController {
                 if (myCath.role=="content" && !(myUser.hasRole("content") || myUser.hasRole("admin"))) {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
                 }
-                let max = await Article.max('order',{where:{cathegory:myArticle.cathegory}})
-                if (myArticle.order<1) throw Error("Article must have order larger than 1 !");
-                if (myArticle.order==max) {
-                    //Do nothing as is already down max
+                //Find next article
+                console.log("FINING NEXT ARTICLE, current order is", myArticle.order);
+                let myArticleNext = await Article.findOne(
+                    {where:Sequelize.and({
+                        cathegory:myArticle.cathegory,
+                        order:{[Op.gt]:myArticle.order}
+                    }),
+                    order:[['order', 'ASC']] });
+                 if (!myArticleNext) {
+                    console.log("There is no next, so doing nothing !")
                     res.json([{}]);
-                } else {
-                    let myArticleNext = await Article.findOne({where:Sequelize.and({cathegory:myArticle.cathegory,order:myArticle.order+1})});
-                    if (!myArticleNext) throw Error("Could not find predecessor");
+                 } else {
+                    console.log("FOUND NEXT:", myArticle.order);
+                    //Now switch orders !
+                    let save = myArticleNext.order;
                     myArticleNext.order = myArticle.order;
-                    myArticle.order = myArticle.order+1;
+                    myArticle.order = save;
                     await myArticle.save();
                     await myArticleNext.save();
                     //Now get all articles of the same cathegory and move up order and return articles
@@ -335,7 +346,7 @@ export class ArticleController {
                     let articles = [myArticle,myArticleNext];
                     for (let article of articles) result.push(article.sanitize(res.locals.language));
                     res.json(result);
-                }
+                 }  
             } catch(error) {
                 next(error);
             }
