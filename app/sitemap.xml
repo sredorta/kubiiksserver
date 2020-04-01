@@ -85,4 +85,52 @@
         <loc>https://kubiiks.com/ca/contact</loc>
         <priority>0.80</priority>
     </url>
+    <url>
+        <loc>https://localhost:4300/ca/articles/14</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/en/articles/14</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/es/articles/14</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/fr/articles/14</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/ca/articles/34</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/en/articles/34</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/es/articles/34</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/fr/articles/34</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-01</lastmod>
+    </url>
 </urlset>

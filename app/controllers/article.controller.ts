@@ -111,6 +111,7 @@ export class ArticleController {
                 }
                 //Find biggest order of the cathegory
                 let max = <number>await Article.max('order',{where:{cathegory:req.body.cathegory}});
+                if (!max) max = 1;
                 let myArticle = await Article.create({
                     key:null,
                     page:null,
@@ -207,48 +208,52 @@ export class ArticleController {
     }
 
     /**Updates the sitemap */
-    static updateSiteMap(article:Article) {
-        //STEP 1: read current sitemap.xml
-        let data = fs.readFileSync(process.cwd() + '/app/sitemap.xml', "ascii");
-        if (!data) return;
-        const existingSitemapList = JSON.parse(converter.xml2json(data, { compact: true, ignoreComment: true, spaces: 4 }));
+    static async updateSiteMap(article:Article) {
+        try {
+            //Determine if article needs to be included in the sitemap
+            let myCath = await Cathegory.findOne({where:{name:article.cathegory}})
+            if (!myCath) throw Error("Cathegory not found");
+            if (myCath.hasPage) {
+                //STEP 1: read current sitemap.xml
+                let data = fs.readFileSync(process.cwd() + '/app/sitemap.xml', "ascii");
+                if (!data) return;
+                const existingSitemapList = JSON.parse(converter.xml2json(data, { compact: true, ignoreComment: true, spaces: 4 }));
+                //STEP 2: remove all articles of the sitemap
+                let urls = existingSitemapList.urlset.url.filter((obj:any) => !obj.loc._text.match(/^.*articles\/[0-9]+$/) );
+                let setting = await Setting.findOne({where:{key:'url'}});
+                if (!setting) throw Error("No base URL found !");
+                let baseUrl = setting.value;
 
-        //STEP 2: remove all articles of the sitemap
-        let urls = existingSitemapList.urlset.url.filter((obj:any) => !obj.loc._text.match(/^.*\/[0-9]+$/) );
-
-        //STEP 3: Recreate all articles in the sitemap and update the file
-        Setting.findOne({where:{key:'url'}}).then(setting => {
-            if (setting) {
-                Article.findAll({where:{cathegory:'blog',public:true}}).then(articles => {
+                for (let art of await Article.findAll({where:Sequelize.and({cathegory:article.cathegory,public:true})})) {
                     Middleware.languagesSupported().forEach(lang => {
-                        articles.forEach(article => {
-                            urls.push({
-                                loc: {
-                                    _text: setting.value+"/"+lang+"/article/"+article.id,
-                                },
-                                changefreq: {
-                                    _text: 'monthly'
-                                },
-                                priority: {
-                                    _text: 0.8
-                                },
-                                lastmod: {
-                                    _text: article.updatedAt.toISOString().slice(0,10)
-                                }
-                            });
-                        });
-                    });
-                    //Here we got all new urls;
-                    existingSitemapList.urlset.url = urls;
-                    const finalXML = converter.json2xml(existingSitemapList, { compact: true, ignoreComment: true, spaces: 4 }); // to convert json text to xml text
-                    fs.writeFile(process.cwd() + '/app/sitemap.xml', finalXML, (err) => {
-                        if (err) {
-                         return console.log(err);
-                        }
-                       });
+                        urls.push({
+                            loc: {
+                                _text: baseUrl+"/"+lang+"/articles/"+art.id,
+                            },
+                            changefreq: {
+                                _text: 'monthly'
+                            },
+                            priority: {
+                                _text: 0.8
+                            },
+                            lastmod: {
+                                _text: art.updatedAt.toISOString().slice(0,10)
+                            }
+                        })
+                    })
+                }
+                //Here we got all new urls;
+                existingSitemapList.urlset.url = urls;
+                const finalXML = converter.json2xml(existingSitemapList, { compact: true, ignoreComment: true, spaces: 4 }); // to convert json text to xml text
+                fs.writeFile(process.cwd() + '/app/sitemap.xml', finalXML, (err) => {
+                       if (err) {
+                        return console.log(err);
+                       }
                 });
             }
-        })
+        } catch(error) {
+            console.log("Got error:",error);
+        }
     }
 
 
@@ -273,7 +278,6 @@ export class ArticleController {
             }
 
             //Find prev article
-            console.log("FINING PREV ARTICLE, current order is", myArticle.order);
             let myArticlePrev = await Article.findOne(
                     {where:Sequelize.and({
                         cathegory:myArticle.cathegory,
@@ -281,7 +285,6 @@ export class ArticleController {
                     }),
                     order:[['order', 'DESC']] });
             if (!myArticlePrev) {
-                console.log("There is no prev, so doing nothing !")
                 res.json([{}]);
             } else {
                 //Now switch orders !
@@ -323,7 +326,6 @@ export class ArticleController {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
                 }
                 //Find next article
-                console.log("FINING NEXT ARTICLE, current order is", myArticle.order);
                 let myArticleNext = await Article.findOne(
                     {where:Sequelize.and({
                         cathegory:myArticle.cathegory,
@@ -331,10 +333,8 @@ export class ArticleController {
                     }),
                     order:[['order', 'ASC']] });
                  if (!myArticleNext) {
-                    console.log("There is no next, so doing nothing !")
                     res.json([{}]);
                  } else {
-                    console.log("FOUND NEXT:", myArticle.order);
                     //Now switch orders !
                     let save = myArticleNext.order;
                     myArticleNext.order = myArticle.order;
