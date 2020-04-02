@@ -270,13 +270,21 @@ export class EmailBuilder {
         this.html = this.html + `
         <style type="text/css">
             body {
-              margin: 0;
-              padding: 0;
+              margin: 0 auto !important;
+              padding: 0 !important;
+              height: 100% !important;
+              width: 100% !important;
+            }
+            * {
+              -ms-text-size-adjust: 100%;
             }
     
             table, tr, td {
               vertical-align: top;
               border-collapse: collapse;
+              mso-table-lspace: 0pt !important;
+              mso-table-rspace: 0pt !important;
+              border-color:transparent !important;
             }
     
             p, ul {
@@ -357,13 +365,13 @@ export class EmailBuilder {
 
     _addBody() {
         this.html = this.html + `
-          <body class="email-body" style="margin: 0px;padding: 0px;-webkit-text-size-adjust: 100%;">
+          <body class="email-body" style="margin: 0px;padding: 0px;-webkit-text-size-adjust: 100%;background-color: ${this.json.bgColor};">
             <!--[if (gte mso 9)|(IE)]>
                 <table width="700" align="center" cellpadding="0" cellspacing="0" border="0">
                     <tr>
                         <td>
                             <![endif]-->
-          <table align="center" width="100%" cellspacing="0" cellpadding="0" style="vertical-align: top;margin: 0 auto;background-color: ${this.json.bgColor};">
+          <table align="center" width="100%" cellspacing="0" cellpadding="0" border="0" style="vertical-align: top;margin: 0 auto;background-color: ${this.json.bgColor};">
             <tbody>
                 ${this._addContent()}
             </tbody>
@@ -385,9 +393,9 @@ export class EmailBuilder {
         this.json.blocks.forEach(block => {
             result = result.concat(
                     `
-                    <table class="block" align="center" width="100%" cellspacing="0" cellpadding="0" style="vertical-align: top;margin: 0 auto;background-color: ${this.json.bgColor};">
+                    <table class="block" align="center" width="100%" cellspacing="0" cellpadding="0" border="0" style="vertical-align: top;margin: 0 auto;background-color: ${this.json.bgColor};">
                     <tbody>
-                    <tr style="${this._getStyle(block.id)}">
+                    <tr style="border-collapse: collapse;${this._getStyle(block.id)}">
                     `);
             block.cells.forEach(cell => {
                     result = result.concat(this._addCell(cell));
@@ -445,7 +453,7 @@ export class EmailBuilder {
             }
             case EWidgetType.IMAGE: {
               return `
-              <img src=${widget.imageUrl} style="display:block;height:auto;max-width:${widget.imgWidth}px;width:100%" title=${widget.imgAlt} alt=${widget.imgAlt}>
+              <img src=${widget.imageUrl} style="display:block;height:auto;max-width:${widget.imgWidth}px;width:100%;-ms-interpolation-mode: bicubic;" title=${widget.imgAlt} alt=${widget.imgAlt}>
               `;
             }
             default: return "";
