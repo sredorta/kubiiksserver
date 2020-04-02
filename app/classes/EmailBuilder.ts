@@ -303,6 +303,46 @@ export class EmailBuilder {
             .block {
                 width:320px !important;
             }
+            @media screen and (min-width: 331px) {
+              .block {
+                  width: 330px!important;
+              }
+            }
+            @media screen and (min-width: 341px) {
+              .block {
+                  width: 340px!important;
+              }
+            }
+            @media screen and (min-width: 351px) {
+              .block {
+                  width: 350px!important;
+              }
+            }
+            @media screen and (min-width: 371px) {
+              .block {
+                  width: 370px!important;
+              }
+            }
+            @media screen and (min-width: 391px) {
+              .block {
+                  width: 390px!important;
+              }
+            }
+            @media screen and (min-width: 451px) {
+              .block {
+                  width: 450px!important;
+              }
+            }
+            @media screen and (min-width: 501px) {
+              .block {
+                  width: 500px!important;
+              }
+            }
+            @media screen and (min-width: 601px) {
+              .block {
+                  width: 600px!important;
+              }
+            }
             @media screen and (min-width: 701px) {
                 .block {
                     width: 700px!important;
