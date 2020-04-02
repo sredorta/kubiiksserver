@@ -110,7 +110,7 @@ export class ArticleController {
                     return next(new HttpException(403, messages.authTokenInvalidRole('content'), null));
                 }
                 //Find biggest order of the cathegory
-                let max = <number>await Article.max('order',{where:{cathegory:req.body.cathegory}});
+                let max = <number>await Article.scope("withoutTrans").max('order',{where:{cathegory:req.body.cathegory}});
                 if (!max) max = 1;
                 let myArticle = await Article.create({
                     key:null,

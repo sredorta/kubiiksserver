@@ -20,8 +20,12 @@ export const NArticle = 'Not a model';
     full: {
         attributes: {exclude : []},
         include: [() => ArticleTranslation]
+    },
+    withoutTrans: {
+      attributes:{exclude : []}
     }
   })
+
 @Table({timestamps:true})
 export class Article extends Model<Article> {
   id!:number;
