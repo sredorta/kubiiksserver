@@ -34,7 +34,7 @@ export const messages = {
     oauth2MissingField : (name = 'field') => `Error de autentificación, imposible de recuperar el campo ${name} `,
     authEmailResetPassword: (name = 'field') => `Un correo electrónico ha sido enviado a : ${name}`,
     authEmailValidate: (name = 'field') => `Un correo electrónico de confirmación ha sido enviado a : ${name}`,
-    authEmailValidateSubject: (name = 'field') => `${name} : Verificación de la cuenta de correo`,    
+    authEmailValidateSubject: 'Verificación de la cuenta de correo',    
     authEmailValidateError: 'No se ha podido activar la cuenta, contacta con el administrador',
     authEmailValidateSuccess: 'La cuenta ha sido activada',
     authAccountNotActive: 'Tienes que validar la cuenta de correo electrónico antes de poder acceder',
@@ -49,7 +49,7 @@ export const messages = {
     emailDeleteProtected: 'Los modelos de correo del sistema no se pueden borrar',
     emailValidationLink: (name = 'field') => `<p>Por favor valida tu cuenta clicando en el siguiente <a href='${name}'>enlace</a></p>`,
     emailResetPassword: (name = 'field') => `<p>Su nueva contraseña : <span>${name}<span></p>`,
-    emailResetPasswordSubject: (name = 'field') => `${name} : Nueva contraseña`,
+    emailResetPasswordSubject: 'Recuperar mi cuenta',
     emailResetPasswordNoUser: "Ha habido una demanda de reinicializacion de contraseña para esta cuenta de correo electronico, esta cuenta no està en nuestras bases de datos",
 
     //chat part

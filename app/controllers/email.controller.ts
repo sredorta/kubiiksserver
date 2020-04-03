@@ -168,16 +168,22 @@ export class EmailController {
             if (!myUser) return next(new HttpException(500, messages.validationDBMissing('user'),null));
             let myEmail = await Email.findByPk(req.body.email.id);
             if (!myEmail) throw new HttpException(500, messages.validationDBMissing('email'),null); 
+            
+            let mySetting = await Setting.findOne({where:{key:'sitename'}});
+            if (!mySetting) throw new Error("Could not find sitename !");
+            let myName = mySetting.value;
+
+
             let sentList : string[] = [];
             //When self is checked
             if (req.body.options.self) {
                 let myTrans = myEmail.translations.find(obj=>obj.iso == res.locals.language);
                 if (!myTrans) throw new Error("Translation not found");
-                let html = await myEmail.getHtml(myTrans, {unsubscribeNewsletter:AppConfig.api.kiiwebExtHost + "/"+myUser.language+"/auth/unsubscribe?email="+myUser.email});
+                let html = await myEmail.getHtml(myTrans, {emailNewsletterUnsubscribe:AppConfig.api.kiiwebExtHost + "/"+myUser.language+"/auth/unsubscribe?email="+myUser.email});
                 if (!html)  return next(new HttpException(500, messages.emailSentError,null));
                 const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
                 let myEmailT = {
-                                from: AppConfig.emailSmtp.sender,
+                                from: `${myName} <${AppConfig.emailSmtp.sender}>`,
                                 to: myUser.email,
                                 subject: myEmail.getTitle(myTrans),
                                 text: htmlToText.fromString(html),
@@ -197,7 +203,7 @@ export class EmailController {
                         if (!html)  return next(new HttpException(500, messages.emailSentError,null));
                         const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
                         let myEmailT = {
-                                        from: AppConfig.emailSmtp.sender,
+                                        from: `${myName} <${AppConfig.emailSmtp.sender}>`,
                                         to: user.email,
                                         subject: myEmail.getTitle(myTrans),
                                         text: htmlToText.fromString(html),
@@ -215,11 +221,11 @@ export class EmailController {
                     if (sentList.indexOf(user.email)<0) {
                         let myTrans = myEmail.translations.find(obj=>obj.iso == user.language);
                         if (!myTrans) throw new Error("Translation not found");
-                        let html = await myEmail.getHtml(myTrans, {unsubscribeNewsletter:AppConfig.api.kiiwebExtHost + "/"+user.language+"/auth/unsubscribe?email="+user.email});
+                        let html = await myEmail.getHtml(myTrans, {emailNewsletterUnsubscribe:AppConfig.api.kiiwebExtHost + "/"+user.language+"/auth/unsubscribe?email="+user.email});
                         if (!html)  return next(new HttpException(500, messages.emailSentError,null));
                         const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
                         let myEmailT = {
-                                        from: AppConfig.emailSmtp.sender,
+                                        from: `${myName} <${AppConfig.emailSmtp.sender}>`,
                                         to: user.email,
                                         subject: myEmail.getTitle(myTrans),
                                         text: htmlToText.fromString(html),

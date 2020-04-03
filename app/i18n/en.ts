@@ -33,7 +33,7 @@ export const messages = {
     oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
     authEmailResetPassword: (name = 'field') => `An email has been sent to : ${name}`,
     authEmailValidate: (name = 'field') => `A validation email has been sent to : ${name}`,
-    authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
+    authEmailValidateSubject: 'Email account validation',
     authEmailValidateError: 'The account could not be activated, contact the administrator',
     authEmailValidateSuccess: 'Your account has been activated',
     authAccountNotActive: 'You need to validate your email account before getting access',
@@ -47,7 +47,7 @@ export const messages = {
     emailDeleteProtected: 'System email templates cannot be deleted',
     emailValidationLink: (name = 'field') => `<p>Please validate your account by clicking to the following <a href='${name}'>link</a></p>`,
     emailResetPassword: (name = 'field') => `<p>Your new password : <span>${name}<span></p>`,
-    emailResetPasswordSubject: (name = 'field') => `${name} : Reset password`,
+    emailResetPasswordSubject: 'Recover my account',
     emailResetPasswordNoUser: "There has been a password request to this email account, however this email account doesn't appear to be on our databases",
 
 

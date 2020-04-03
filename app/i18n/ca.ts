@@ -34,7 +34,7 @@ export const messages = {
     oauth2MissingField : (name = 'field') => `Error de autentificació, impossible de recuperar el camp ${name} `,
     authEmailResetPassword: (name = 'field') => `Un correu electrònic ha estat enviat a : ${name}`,
     authEmailValidate: (name = 'field') => `Un correu electrònic de confirmació ha estat enviat a : ${name}`,
-    authEmailValidateSubject: (name = 'field') => `${name} : Verificació del compte de correu`,    
+    authEmailValidateSubject: 'Verificació del compte de correu',    
     authEmailValidateError: "No s'ha pogut activar el compte, contacta amb l'administrador",
     authEmailValidateSuccess: "S'ha activat el compte",
     authAccountNotActive: "Per accedir s'ha de validar el compte de correu electrònic abans",
@@ -49,7 +49,7 @@ export const messages = {
     emailDeleteProtected: 'Els models de correu del sistema no es poden esborrar',
     emailValidationLink: (name = 'field') => `<p>Valida el teu compte clicant al següent <a href='${name}'>enllaç</a></p>`,
     emailResetPassword: (name = 'field') => `<p>La nova contrasenya és : <span>${name}<span></p>`,
-    emailResetPasswordSubject: (name = 'field') => `${name} : Nova contrasenya`,
+    emailResetPasswordSubject: 'Recuperar el meu compte',
     emailResetPasswordNoUser: "Hi ha hagut una demanda de reinicialitzar la contrasenya en aquest compte de correu electronic, en canvi aquest compte no està enregistrat en les nostres bases de dades",
 
     //chat part

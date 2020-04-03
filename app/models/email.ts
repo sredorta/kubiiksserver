@@ -94,11 +94,14 @@ export class Email extends Model<Email> {
             if (!myEmail) throw new Error("Email template not found");
             let myTrans = myEmail.translations.find(obj => obj.iso == iso);
             if (!myTrans) throw new Error("Translation not found !");
+            let mySetting = await Setting.findOne({where:{key:'sitename'}});
+            if (!mySetting) throw new Error("Could not find sitename !");
+            let myName = mySetting.value;
             let builder = new EmailBuilder(myTrans,replacements);
             let html = builder.getHtml();
             const transporter = nodemailer.createTransport(AppConfig.emailSmtp);
             let myEmailT = {
-                            from: AppConfig.emailSmtp.sender,
+                            from: `${myName} <${AppConfig.emailSmtp.sender}>`,
                             to: to,
                             subject: subject,
                             text: htmlToText.fromString(html),

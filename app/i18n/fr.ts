@@ -34,7 +34,7 @@ export const messages = {
     oauth2MissingField : (name = 'field') => `Erreur pendant l'authentification, impossible de récupérer le champ ${name} `,
     authEmailResetPassword: (name = 'field') => `Un courriel a été envoyé à : ${name}`,
     authEmailValidate: (name = 'field') => `Un courriel de validation de compte a été envoyé à : ${name}`,
-    authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre adresse de courriel`,
+    authEmailValidateSubject: 'Validation de votre adresse de courriel',
     authEmailValidateError: "Le compte n'a pas pu être activé, contactez l'administrateur du site",
     authEmailValidateSuccess: 'Votre compte est désormais activé',
     authAccountNotActive: 'Vous devez confirmer votre adresse de courriel avant de pouvoir accéder',
@@ -49,7 +49,7 @@ export const messages = {
     emailDeleteProtected: 'Les modèles de courriel du système ne peuvent pas être effacés',
     emailValidationLink: (name = 'field') => `<p>Merci de valider votre compte en cliquant sur ce <a href='${name}'>lien</a></p>`,
     emailResetPassword: (name = 'field') => `<p>Accedez à votre compte en clickant sur ce <a href='${name}'>lien</a></p>`,
-    emailResetPasswordSubject: (name = 'field') => `${name} : Demande de nouveau mot de passe`,
+    emailResetPasswordSubject: 'Récupérer mon compte',
     emailResetPasswordNoUser: "Il y a eu une demande de nouveau mot de passe sur ce compte de courriel electronique, ce compte n'est pas enregistré dans nos bases de données",
 
     //chat part

@@ -20,6 +20,8 @@ export class NewsletterController {
         try {
             let news = await Newsletter.findOne({where:{email:req.body.email}});
             if (news) {
+                news.language = res.locals.language;
+                await news.save();
                 res.send({message: {show:true, text:messages.newsletterSubscribed}});
             } else {
                 await Newsletter.create({firstName:req.body.firstName,lastName:req.body.lastName,email:req.body.email,language:res.locals.language});
