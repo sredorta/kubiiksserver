@@ -32,7 +32,7 @@ export const messages = {
     authAlreadyLoggedIn:  'Vostè ja està connectat',
 
     oauth2MissingField : (name = 'field') => `Error de autentificació, impossible de recuperar el camp ${name} `,
-    authEmailResetPassword: (name = 'field') => `Un correu electrònic amb la nova contrasenya ha estat enviat a : ${name}`,
+    authEmailResetPassword: (name = 'field') => `Un correu electrònic ha estat enviat a : ${name}`,
     authEmailValidate: (name = 'field') => `Un correu electrònic de confirmació ha estat enviat a : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Verificació del compte de correu`,    
     authEmailValidateError: "No s'ha pogut activar el compte, contacta amb l'administrador",

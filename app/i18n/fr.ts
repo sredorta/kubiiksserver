@@ -32,7 +32,7 @@ export const messages = {
     authAlreadyLoggedIn:  'Utilisateur déjà connecté',
 
     oauth2MissingField : (name = 'field') => `Erreur pendant l'authentification, impossible de récupérer le champ ${name} `,
-    authEmailResetPassword: (name = 'field') => `Un courriel avec le nouveau mot de passe a été envoyé à : ${name}`,
+    authEmailResetPassword: (name = 'field') => `Un courriel a été envoyé à : ${name}`,
     authEmailValidate: (name = 'field') => `Un courriel de validation de compte a été envoyé à : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Validation de votre adresse de courriel`,
     authEmailValidateError: "Le compte n'a pas pu être activé, contactez l'administrateur du site",

@@ -240,6 +240,9 @@ export class EmailBuilder {
             let value :string = replacements[key];
             if (value.includes('http://')) key = "http://"+key;
             if (value.includes('https://')) key = "https://"+key;
+            //Maximum allowed 3 times
+            dataR = dataR.replace(key,value);
+            dataR = dataR.replace(key,value);
             dataR = dataR.replace(key,value);
         })
         return <IEmailData>JSON.parse(dataR);
@@ -414,18 +417,29 @@ export class EmailBuilder {
     _addCell(cell:IEmailCell) {
         let result = `<td style="${this._getStyle(cell.id)}" valign="${this._getVAlign(cell)}" align="${this._getHAlign(cell)}">`;
         for (let item of cell.widgets) {
-             result=result.concat(this._addItem(item));
+             result=result.concat(this._addItem(item,cell));
         }
         result = result.concat(`</td>`);
         return result;
     }
     
-      _addItem(widget:IEmailWidget) {
+      _addItem(widget:IEmailWidget,cell:IEmailCell) {
         if (widget) {
           let paddingY = '10px';
           let paddingX = '20px';
           let padding = paddingY + ' ' + paddingX;
           let border = '3px';
+          let margin ="";
+          switch (cell.hAlign) {
+            case "left":
+              margin="margin-left:0;margin-right:auto;";
+              break;
+            case "right":
+              margin="margin-left:auto;margin-right:0;"
+              break;
+            default:
+              margin="margin:0 auto;"    
+          }
     
           switch (widget.format) {
             case EWidgetType.TEXT: {
@@ -453,7 +467,7 @@ export class EmailBuilder {
             }
             case EWidgetType.IMAGE: {
               return `
-              <img src=${widget.imageUrl} style="display:block;height:auto;max-width:${widget.imgWidth}px;width:100%;-ms-interpolation-mode: bicubic;" title=${widget.imgAlt} alt=${widget.imgAlt}>
+              <img src=${widget.imageUrl} style="display:block;height:auto;max-width:${widget.imgWidth}px;width:100%;-ms-interpolation-mode: bicubic;${margin}" title=${widget.imgAlt} alt=${widget.imgAlt}>
               `;
             }
             default: return "";

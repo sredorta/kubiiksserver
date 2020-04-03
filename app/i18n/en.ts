@@ -31,7 +31,7 @@ export const messages = {
     authTooManyTrials:  'Too many failed trials, please try again in few minutes',
     authAlreadyLoggedIn:  'User already logged in',
     oauth2MissingField : (name = 'field') => `Authentication failed, no access given to field ${name}`,
-    authEmailResetPassword: (name = 'field') => `An email with your new password has been sent to : ${name}`,
+    authEmailResetPassword: (name = 'field') => `An email has been sent to : ${name}`,
     authEmailValidate: (name = 'field') => `A validation email has been sent to : ${name}`,
     authEmailValidateSubject: (name = 'field') => `${name} : Email account validation`,
     authEmailValidateError: 'The account could not be activated, contact the administrator',
