@@ -556,6 +556,9 @@ export class EmailBuilder {
           padding =`padding-top:${elem.paddingTop}px;padding-left:${elem.paddingLeft}px;padding-right:${elem.paddingRight}px;padding-bottom:${elem.paddingBottom}px;`;
           alignment = `vertical-align:${elem.vAlign};text-align:${elem.hAlign}`;
         }
+        if (elem.type== EElemType.WIDGET) {
+          width ='width:100%;';
+        }
         style = style.concat(fonts,background,width,padding,alignment);
         return style;
       }
