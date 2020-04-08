@@ -89,48 +89,96 @@
         <loc>https://localhost:4300/ca/articles/14</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
     </url>
     <url>
         <loc>https://localhost:4300/en/articles/14</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
     </url>
     <url>
         <loc>https://localhost:4300/es/articles/14</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
     </url>
     <url>
         <loc>https://localhost:4300/fr/articles/14</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
     </url>
     <url>
-        <loc>https://localhost:4300/ca/articles/34</loc>
+        <loc>https://localhost:4300/ca/articles/15</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
     </url>
     <url>
-        <loc>https://localhost:4300/en/articles/34</loc>
+        <loc>https://localhost:4300/en/articles/15</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
     </url>
     <url>
-        <loc>https://localhost:4300/es/articles/34</loc>
+        <loc>https://localhost:4300/es/articles/15</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
     </url>
     <url>
-        <loc>https://localhost:4300/fr/articles/34</loc>
+        <loc>https://localhost:4300/fr/articles/15</loc>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
-        <lastmod>2020-04-01</lastmod>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/ca/articles/16</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/en/articles/16</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/es/articles/16</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/fr/articles/16</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/ca/articles/17</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/en/articles/17</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/es/articles/17</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
+    </url>
+    <url>
+        <loc>https://localhost:4300/fr/articles/17</loc>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+        <lastmod>2020-04-08</lastmod>
     </url>
 </urlset>

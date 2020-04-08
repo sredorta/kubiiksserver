@@ -15,6 +15,7 @@ import * as converter from 'xml-js';
 import fs from 'fs';
 import { Setting } from '../models/setting';
 import { Cathegory } from '../models/cathegory';
+import { userInfo } from 'os';
 export class CathegoryController {
 
 
@@ -28,25 +29,12 @@ export class CathegoryController {
             let myUser = await User.scope("details").findByPk(req.user.id);
             let result = [];
             if (!myUser) throw new Error("User not found !"); 
-            result = cathegories.filter(obj => obj.name != "content");  //Always remove content cathegory
-
-            //Filter cathegories depending on role of user
-            if (myUser.hasRole("kubiiks")) {
-                //No filter
-            } else if (myUser.hasRole("admin")) {
-                result = cathegories.filter(obj => obj.role != "kubiiks");
-            } else {
-                if (myUser.hasRole("blog")) {
-                    for (let cathegory of cathegories) {
-                        if (cathegory.role == "blog") result.push(cathegory); 
-                    }
-                }
-                if (myUser.hasRole("content")) {
-                    for (let cathegory of cathegories) {
-                        if (cathegory.role == "content") result.push(cathegory); 
-                    }
-                }
+            for (let cathegory of cathegories) {
+                if (cathegory.role == "blog" && myUser.hasRole("blog")) result.push(cathegory); 
+                if (cathegory.role == "content" && myUser.hasRole("content")) result.push(cathegory); 
+                if (cathegory.role == "kubiiks" && myUser.hasRole("kubiiks")) result.push(cathegory); 
             }
+            result = result.filter(obj => obj.name != "content");  //Always remove content cathegory
             res.json(result);
         } catch(error) {
             next(error);
