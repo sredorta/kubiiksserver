@@ -105,6 +105,7 @@ const storageImagesProducts = multer.diskStorage({
 /**Parses header and checks file size before uploading */
 const imageFilter = (req:any, file:any, callback:any) => {
     try {
+      console.log("ULOADING !",file);
       const headers : string[] = req.rawHeaders;
       const index = headers.indexOf("content-length");
       const size = headers[index+1];

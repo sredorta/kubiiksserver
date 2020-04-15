@@ -180,6 +180,10 @@ export class Disk {
                 found = await EmailTranslation.findOne({where:{data:{[Op.like]:'%'+file.basename+'%'}}});
                 if (found) resolve(true);
 
+                //Find in pages
+                found = await Page.findOne({where:{image:{[Op.like]:'%'+file.basename+'%'}}});
+                if (found) resolve(true);
+                
                 resolve(false);
             } catch(error) {
                reject(true);
@@ -335,6 +339,7 @@ export class DiskController {
 
     /**Uploads image to blog folder and returns imageUrl for angular-editor*/
     static uploadImageToBlog = async (req: Request, res: Response, next:NextFunction) => {
+        console.log(req.file);
         res.send({imageUrl: AppConfig.api.kiiserverExtHost+"/public/images/blog/" + req.file.filename});  
     }
 
